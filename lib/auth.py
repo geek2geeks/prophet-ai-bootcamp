@@ -2,20 +2,17 @@ import streamlit as st
 
 SUPABASE_URL = "https://naecdtkxxlawxlkljtkt.supabase.co"
 
-@st.cache_resource
-def _create_supabase_client():
-    """Create and cache the Supabase client. Returns None if secrets not configured."""
+
+def _get_anon_key():
     try:
-        from supabase import create_client
-        url = st.secrets.get("supabase", {}).get("url", SUPABASE_URL)
-        key = st.secrets["supabase"]["key"]
-        return create_client(url, key)
+        return st.secrets["supabase"]["key"]
     except Exception:
         return None
 
+
 @st.cache_resource
-def _create_supabase_admin():
-    """Create admin client with service_role key for profile inserts."""
+def get_admin_client():
+    """Admin client (service_role) for data operations. Bypasses RLS."""
     try:
         from supabase import create_client
         url = st.secrets.get("supabase", {}).get("url", SUPABASE_URL)
@@ -24,11 +21,26 @@ def _create_supabase_admin():
     except Exception:
         return None
 
+
+def _fresh_auth_client():
+    """Fresh client for auth operations (PKCE needs clean state)."""
+    try:
+        from supabase import create_client
+        url = st.secrets.get("supabase", {}).get("url", SUPABASE_URL)
+        key = st.secrets["supabase"]["key"]
+        return create_client(url, key)
+    except Exception:
+        return None
+
+
 def get_supabase():
-    return _create_supabase_client()
+    """Return admin client for data queries."""
+    return get_admin_client()
+
 
 def is_demo_mode():
-    return get_supabase() is None
+    return _get_anon_key() is None
+
 
 def init_session():
     if "user" not in st.session_state:
@@ -41,17 +53,19 @@ def init_session():
         st.session_state.demo_submissions = {}
     _handle_oauth_callback()
 
+
 def _get_redirect_url():
     try:
         return st.secrets.get("app", {}).get("url", "http://localhost:8501")
     except Exception:
         return "http://localhost:8501"
 
+
 def _handle_oauth_callback():
     params = st.query_params
     code = params.get("code")
     if code and st.session_state.get("user") is None:
-        sb = get_supabase()
+        sb = _fresh_auth_client()
         if sb:
             try:
                 res = sb.auth.exchange_code_for_session({"auth_code": code})
@@ -63,15 +77,15 @@ def _handle_oauth_callback():
                     "avatar": user.user_metadata.get("avatar_url", ""),
                 }
                 _ensure_profile(user)
-                st.session_state.role = _get_role(sb, str(user.id))
+                st.session_state.role = _get_role(str(user.id))
                 st.query_params.clear()
             except Exception as e:
                 st.query_params.clear()
                 st.error(f"Erro no callback OAuth: {e}")
 
+
 def _ensure_profile(user):
-    """Create user profile using admin client to bypass RLS."""
-    admin = _create_supabase_admin()
+    admin = get_admin_client()
     if not admin:
         return
     try:
@@ -84,15 +98,20 @@ def _ensure_profile(user):
     except Exception:
         pass
 
-def _get_role(sb, user_id: str) -> str:
+
+def _get_role(user_id: str) -> str:
+    admin = get_admin_client()
+    if not admin:
+        return "aluno"
     try:
-        res = sb.table("user_profiles").select("role").eq("id", user_id).single().execute()
+        res = admin.table("user_profiles").select("role").eq("id", user_id).single().execute()
         return res.data["role"] if res.data else "aluno"
     except Exception:
         return "aluno"
 
+
 def get_google_login_url() -> str:
-    sb = get_supabase()
+    sb = _fresh_auth_client()
     if sb is None:
         return ""
     try:
@@ -107,8 +126,9 @@ def get_google_login_url() -> str:
     except Exception:
         return ""
 
+
 def login_email(email: str, password: str) -> bool:
-    sb = get_supabase()
+    sb = _fresh_auth_client()
     if sb is None:
         st.session_state.user = {"id": "demo", "email": email, "name": email, "avatar": ""}
         st.session_state.role = "admin" if "admin" in email else "aluno"
@@ -121,21 +141,22 @@ def login_email(email: str, password: str) -> bool:
             "avatar": res.user.user_metadata.get("avatar_url", ""),
         }
         _ensure_profile(res.user)
-        st.session_state.role = _get_role(sb, str(res.user.id))
+        st.session_state.role = _get_role(str(res.user.id))
         return True
     except Exception as e:
         st.error(f"Erro de login: {e}")
         return False
 
+
 def register_email(email: str, password: str, nome: str) -> bool:
-    sb = get_supabase()
+    sb = _fresh_auth_client()
     if sb is None:
         st.session_state.user = {"id": "demo", "email": email, "name": nome, "avatar": ""}
         st.session_state.role = "aluno"
         return True
     try:
         res = sb.auth.sign_up({"email": email, "password": password})
-        admin = _create_supabase_admin()
+        admin = get_admin_client()
         if admin:
             admin.table("user_profiles").insert({
                 "id": str(res.user.id), "nome": nome, "role": "aluno"
@@ -150,21 +171,18 @@ def register_email(email: str, password: str, nome: str) -> bool:
         st.error(f"Erro no registo: {e}")
         return False
 
+
 def logout():
-    sb = get_supabase()
-    if sb:
-        try:
-            sb.auth.sign_out()
-        except Exception:
-            pass
     st.session_state.user = None
     st.session_state.role = None
+
 
 def require_auth():
     init_session()
     if st.session_state.user is None:
         st.warning("Faz login para aceder a esta pagina.")
         st.stop()
+
 
 def is_admin():
     return st.session_state.get("role") == "admin"
