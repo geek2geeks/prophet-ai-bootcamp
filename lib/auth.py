@@ -68,11 +68,10 @@ def _handle_oauth_callback():
         sb = _fresh_auth_client()
         if sb:
             try:
-                verifier = st.session_state.get("_pkce_verifier", "")
-                res = sb.auth.exchange_code_for_session({
-                    "auth_code": code,
-                    "code_verifier": verifier,
-                })
+                verifier = st.session_state.pop("_pkce_verifier", "")
+                # Set verifier on the fresh client's storage so exchange can find it
+                sb.auth._storage.set_item("supabase.auth.token-code-verifier", verifier)
+                res = sb.auth.exchange_code_for_session({"auth_code": code})
                 user = res.user
                 st.session_state.user = {
                     "id": str(user.id),
@@ -127,8 +126,12 @@ def get_google_login_url() -> str:
             }
         })
         # Store PKCE code_verifier for the callback
-        if hasattr(sb.auth, '_code_verifier') and sb.auth._code_verifier:
-            st.session_state._pkce_verifier = sb.auth._code_verifier
+        try:
+            verifier = sb.auth._storage.get_item("supabase.auth.token-code-verifier")
+            if verifier:
+                st.session_state._pkce_verifier = verifier
+        except Exception:
+            pass
         return res.url
     except Exception:
         return ""
