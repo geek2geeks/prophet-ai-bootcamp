@@ -1,11 +1,12 @@
 import streamlit as st
 from lib.auth import require_auth
 from lib.ai import get_ai_response
+from lib.theme import inject_css, page_header
 
 require_auth()
+inject_css()
 
-st.header("AI Tutor")
-st.caption("O teu assistente pessoal para duvidas do bootcamp — powered by DeepSeek")
+page_header("AI Tutor", "O teu assistente pessoal para duvidas do bootcamp -- powered by DeepSeek")
 
 # Init chat history
 if "chat_messages" not in st.session_state:
@@ -13,7 +14,13 @@ if "chat_messages" not in st.session_state:
 
 # Suggested questions
 if not st.session_state.chat_messages:
-    st.markdown("#### Experimenta perguntar:")
+    st.markdown("""
+    <div style="text-align:center; padding:24px 0 16px; color:#64748B;">
+        <div style="font-size:1.1rem; font-weight:600; color:#0F172A; margin-bottom:4px;">Experimenta perguntar</div>
+        <div style="font-size:0.85rem;">Clica numa sugestao ou escreve a tua propria pergunta</div>
+    </div>
+    """, unsafe_allow_html=True)
+
     suggestions = [
         "O que e a clausula de incontestabilidade e como afeta os sinistros?",
         "Como calculo a reserva V(t) para um seguro temporario?",
@@ -49,6 +56,7 @@ if prompt := st.chat_input("Escreve a tua pergunta..."):
 
 # Clear chat button
 if st.session_state.chat_messages:
+    st.markdown("")
     if st.button("Limpar conversa"):
         st.session_state.chat_messages = []
         st.rerun()

@@ -3,11 +3,12 @@ import pandas as pd
 from lib.auth import require_auth
 from lib.course import get_badge, get_all_exercises
 from lib.db import get_leaderboard, get_progress, get_submissions
+from lib.theme import inject_css, page_header, stat_cards
 
 require_auth()
+inject_css()
 
-st.header("Leaderboard")
-st.caption("Ranking dos alunos por pontuacao total")
+page_header("Leaderboard", "Ranking dos alunos por pontuacao total")
 
 data = get_leaderboard()
 
@@ -38,7 +39,7 @@ else:
 
 # --- Personal stats ---
 st.markdown("---")
-st.subheader("As Tuas Estatisticas")
+st.markdown("#### As Tuas Estatisticas")
 
 user_id = st.session_state.user["id"]
 progress = get_progress(user_id)
@@ -49,7 +50,8 @@ pts_total = (sum(progress.get(e["id"], {}).get("pontos", 0) for e in all_ex)
              + sum(s.get("pontos", 0) for s in submissions.values()))
 completed = len([e for e in all_ex if e["id"] in progress or e["id"] in submissions])
 
-c1, c2, c3 = st.columns(3)
-c1.metric("Total Pontos", pts_total)
-c2.metric("Exercicios Completos", f"{completed}/{len(all_ex)}")
-c3.metric("Badge Atual", get_badge(pts_total))
+stat_cards([
+    {"value": str(pts_total), "label": "Total Pontos", "color": "blue"},
+    {"value": f"{completed}/{len(all_ex)}", "label": "Exercicios Completos", "color": "green"},
+    {"value": get_badge(pts_total), "label": "Badge Atual", "color": "purple"},
+])

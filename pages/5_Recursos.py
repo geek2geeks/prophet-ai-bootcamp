@@ -1,21 +1,38 @@
 import streamlit as st
 from lib.auth import require_auth
+from lib.theme import inject_css, page_header
 
 require_auth()
+inject_css()
 
-st.header("Recursos & Datasets")
-st.caption("Todos os ficheiros necessarios para o bootcamp")
+page_header("Recursos & Datasets", "Todos os ficheiros necessarios para o bootcamp")
 
-st.markdown("### Vertical VIDA (Dominio Principal)")
+# --- Vida Semana 1 ---
+st.markdown("#### Vertical VIDA -- Semana 1")
 
 vida_s1 = {
     "carteira_apolices_vida.csv": "Carteira de 3K apolices vida: temporario, vida inteira, misto, renda vitalicia",
-    "sinistralidade_vida.csv": "Historico de eventos vida (obitos, resgates, vencimentos, rendas) — 1.5K registos, 8 anomalias",
+    "sinistralidade_vida.csv": "Historico de eventos vida (obitos, resgates, vencimentos, rendas) -- 1.5K registos, 8 anomalias",
     "exclusoes_apolice_vida.json": "Exclusoes: suicidio, guerra, desportos radicais, incontestabilidade",
     "nota_sinistro_vida.txt": "3 processos de sinistro vida (obito simples, suicidio em carencia, declaracao falsa)",
     "red_flags_fraude_vida.csv": "200 sinistros com ~40 red flags de fraude escondidos",
-    "questionario_subscricao_vida.csv": "500 propostas de subscricao — ~20 declaracoes falsas",
+    "questionario_subscricao_vida.csv": "500 propostas de subscricao -- ~20 declaracoes falsas",
 }
+
+for name, desc in vida_s1.items():
+    st.markdown(f"""
+    <div style="display:flex; align-items:flex-start; gap:10px; padding:8px 0; border-bottom:1px solid #F1F5F9;">
+        <code style="background:#EFF6FF; color:#1D4ED8; padding:2px 8px; border-radius:6px; font-size:0.8rem; white-space:nowrap; flex-shrink:0;">/semana-1/</code>
+        <div>
+            <strong style="color:#0F172A; font-size:0.9rem;">{name}</strong>
+            <div style="color:#64748B; font-size:0.82rem;">{desc}</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+# --- Vida Semana 2 ---
+st.markdown("")
+st.markdown("#### Vertical VIDA -- Semana 2")
 
 vida_s2 = {
     "tabua_mortalidade_CSO2017.csv": "Tabua SOA CSO 2017 (qx por idade e sexo, 0-120 anos)",
@@ -27,13 +44,21 @@ vida_s2 = {
     "benchmark_mercado_vida_pt.csv": "Benchmarks mercado vida PT 2018-2025",
 }
 
-for name, desc in vida_s1.items():
-    st.markdown(f"- **`{name}`** (`/dados/semana-1/`) — {desc}")
 for name, desc in vida_s2.items():
-    st.markdown(f"- **`{name}`** (`/dados/semana-2/`) — {desc}")
+    st.markdown(f"""
+    <div style="display:flex; align-items:flex-start; gap:10px; padding:8px 0; border-bottom:1px solid #F1F5F9;">
+        <code style="background:#F0FDF4; color:#065F46; padding:2px 8px; border-radius:6px; font-size:0.8rem; white-space:nowrap; flex-shrink:0;">/semana-2/</code>
+        <div>
+            <strong style="color:#0F172A; font-size:0.9rem;">{name}</strong>
+            <div style="color:#64748B; font-size:0.82rem;">{desc}</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
+# --- Saude ---
+st.markdown("")
 st.markdown("---")
-st.markdown("### Vertical SAUDE (Dia 3)")
+st.markdown("#### Vertical SAUDE (Dia 3)")
 
 saude = {
     "medical_costs_sample.csv": "10K registos de custos medicos (idade, IMC, fumador, custo)",
@@ -48,10 +73,20 @@ saude = {
 }
 
 for name, desc in saude.items():
-    st.markdown(f"- **`{name}`** — {desc}")
+    st.markdown(f"""
+    <div style="display:flex; align-items:flex-start; gap:10px; padding:8px 0; border-bottom:1px solid #F1F5F9;">
+        <code style="background:#FEF3C7; color:#92400E; padding:2px 8px; border-radius:6px; font-size:0.8rem; white-space:nowrap; flex-shrink:0;">saude</code>
+        <div>
+            <strong style="color:#0F172A; font-size:0.9rem;">{name}</strong>
+            <div style="color:#64748B; font-size:0.82rem;">{desc}</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
+# --- Templates ---
+st.markdown("")
 st.markdown("---")
-st.markdown("### Templates & Utilidades")
+st.markdown("#### Templates & Utilidades")
 
 templates = {
     "template_constitution.md": "Template base para constitution.md (SDD)",
@@ -64,30 +99,37 @@ templates = {
 }
 
 for name, desc in templates.items():
-    st.markdown(f"- **`{name}`** (`/templates/`) — {desc}")
+    st.markdown(f"""
+    <div style="display:flex; align-items:flex-start; gap:10px; padding:8px 0; border-bottom:1px solid #F1F5F9;">
+        <code style="background:#EDE9FE; color:#5B21B6; padding:2px 8px; border-radius:6px; font-size:0.8rem; white-space:nowrap; flex-shrink:0;">/templates/</code>
+        <div>
+            <strong style="color:#0F172A; font-size:0.9rem;">{name}</strong>
+            <div style="color:#64748B; font-size:0.82rem;">{desc}</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
+# --- Stack ---
+st.markdown("")
 st.markdown("---")
-st.markdown("### Stack Tecnologico")
-st.markdown("""
-| Categoria | Ferramenta |
-|---|---|
-| Linguagem | Python 3.11+ |
-| AI Coding | OpenCode CLI + Z.ai Coding Plan (GLM-5) |
-| LLM API | DeepSeek (endpoint OpenAI-compatible) |
-| Agentes | CrewAI |
-| ML | Scikit-learn, XGBoost, SHAP |
-| Web | Streamlit |
-| Auth & DB | Supabase (Auth + PostgreSQL + RLS) |
-| RAG | ChromaDB (local) |
-| Deploy | Streamlit Community Cloud |
-""")
+st.markdown("#### Stack Tecnologico")
 
-st.markdown("---")
-st.markdown("### Links Uteis")
-st.markdown("""
-- [Repositorio do Curso](https://github.com/geek2geeks/prophet-ai-bootcamp)
-- [Streamlit Cloud](https://share.streamlit.io/)
-- [Supabase Dashboard](https://supabase.com/dashboard)
-- [DeepSeek API Docs](https://platform.deepseek.com/docs)
-- [CrewAI Docs](https://docs.crewai.com/)
-""")
+stack = [
+    ("Linguagem", "Python 3.11+"),
+    ("AI Coding", "OpenCode CLI + Z.ai Coding Plan (GLM-5)"),
+    ("LLM API", "DeepSeek (endpoint OpenAI-compatible)"),
+    ("Agentes", "CrewAI"),
+    ("ML", "Scikit-learn, XGBoost, SHAP"),
+    ("Web", "Streamlit"),
+    ("Auth & DB", "Supabase (Auth + PostgreSQL + RLS)"),
+    ("RAG", "ChromaDB (local)"),
+    ("Deploy", "Streamlit Community Cloud"),
+]
+
+for cat, tool in stack:
+    st.markdown(f"""
+    <div style="display:flex; align-items:center; gap:12px; padding:6px 0;">
+        <span style="min-width:90px; font-weight:600; color:#64748B; font-size:0.82rem; text-transform:uppercase;">{cat}</span>
+        <span style="color:#1E293B; font-size:0.9rem;">{tool}</span>
+    </div>
+    """, unsafe_allow_html=True)
