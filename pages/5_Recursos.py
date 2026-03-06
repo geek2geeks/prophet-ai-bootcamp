@@ -1,38 +1,40 @@
 import streamlit as st
 from lib.auth import require_auth
-from lib.theme import inject_css, page_header
+from lib.theme import inject_css, page_header, section_title
 
 require_auth()
 inject_css()
 
-page_header("Recursos & Datasets", "Todos os ficheiros necessarios para o bootcamp")
+page_header("Recursos & Datasets", "Todos os ficheiros necessarios para o bootcamp", "📦")
+
+def resource_list(items: dict, badge_text: str, badge_bg: str, badge_color: str):
+    for name, desc in items.items():
+        st.markdown(f"""
+        <div class="res-item">
+            <span class="res-badge" style="background:{badge_bg}; color:{badge_color};">{badge_text}</span>
+            <div class="res-info">
+                <strong>{name}</strong>
+                <p>{desc}</p>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
 
 # --- Vida Semana 1 ---
-st.markdown("#### Vertical VIDA -- Semana 1")
+section_title("Vertical VIDA — Semana 1", "📋", "#DBEAFE", "#1D4ED8")
 
 vida_s1 = {
     "carteira_apolices_vida.csv": "Carteira de 3K apolices vida: temporario, vida inteira, misto, renda vitalicia",
-    "sinistralidade_vida.csv": "Historico de eventos vida (obitos, resgates, vencimentos, rendas) -- 1.5K registos, 8 anomalias",
+    "sinistralidade_vida.csv": "Historico de eventos vida (obitos, resgates, vencimentos, rendas) — 1.5K registos, 8 anomalias",
     "exclusoes_apolice_vida.json": "Exclusoes: suicidio, guerra, desportos radicais, incontestabilidade",
     "nota_sinistro_vida.txt": "3 processos de sinistro vida (obito simples, suicidio em carencia, declaracao falsa)",
     "red_flags_fraude_vida.csv": "200 sinistros com ~40 red flags de fraude escondidos",
-    "questionario_subscricao_vida.csv": "500 propostas de subscricao -- ~20 declaracoes falsas",
+    "questionario_subscricao_vida.csv": "500 propostas de subscricao — ~20 declaracoes falsas",
 }
-
-for name, desc in vida_s1.items():
-    st.markdown(f"""
-    <div style="display:flex; align-items:flex-start; gap:10px; padding:8px 0; border-bottom:1px solid #F1F5F9;">
-        <code style="background:#EFF6FF; color:#1D4ED8; padding:2px 8px; border-radius:6px; font-size:0.8rem; white-space:nowrap; flex-shrink:0;">/semana-1/</code>
-        <div>
-            <strong style="color:#0F172A; font-size:0.9rem;">{name}</strong>
-            <div style="color:#64748B; font-size:0.82rem;">{desc}</div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+resource_list(vida_s1, "S1", "#DBEAFE", "#1D4ED8")
 
 # --- Vida Semana 2 ---
-st.markdown("")
-st.markdown("#### Vertical VIDA -- Semana 2")
+section_title("Vertical VIDA — Semana 2", "📊", "#D1FAE5", "#065F46")
 
 vida_s2 = {
     "tabua_mortalidade_CSO2017.csv": "Tabua SOA CSO 2017 (qx por idade e sexo, 0-120 anos)",
@@ -43,22 +45,11 @@ vida_s2 = {
     "mortalidade_covid_portugal.csv": "Excesso mortalidade PT 2019-2023, por faixa etaria/sexo",
     "benchmark_mercado_vida_pt.csv": "Benchmarks mercado vida PT 2018-2025",
 }
-
-for name, desc in vida_s2.items():
-    st.markdown(f"""
-    <div style="display:flex; align-items:flex-start; gap:10px; padding:8px 0; border-bottom:1px solid #F1F5F9;">
-        <code style="background:#F0FDF4; color:#065F46; padding:2px 8px; border-radius:6px; font-size:0.8rem; white-space:nowrap; flex-shrink:0;">/semana-2/</code>
-        <div>
-            <strong style="color:#0F172A; font-size:0.9rem;">{name}</strong>
-            <div style="color:#64748B; font-size:0.82rem;">{desc}</div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+resource_list(vida_s2, "S2", "#D1FAE5", "#065F46")
 
 # --- Saude ---
-st.markdown("")
 st.markdown("---")
-st.markdown("#### Vertical SAUDE (Dia 3)")
+section_title("Vertical SAUDE (Dia 3)", "🏥", "#FEF3C7", "#92400E")
 
 saude = {
     "medical_costs_sample.csv": "10K registos de custos medicos (idade, IMC, fumador, custo)",
@@ -71,22 +62,11 @@ saude = {
     "tabua_morbilidade_saude.csv": "Frequencia + severidade por faixa etaria",
     "carteira_beneficiarios.csv": "5K beneficiarios saude",
 }
-
-for name, desc in saude.items():
-    st.markdown(f"""
-    <div style="display:flex; align-items:flex-start; gap:10px; padding:8px 0; border-bottom:1px solid #F1F5F9;">
-        <code style="background:#FEF3C7; color:#92400E; padding:2px 8px; border-radius:6px; font-size:0.8rem; white-space:nowrap; flex-shrink:0;">saude</code>
-        <div>
-            <strong style="color:#0F172A; font-size:0.9rem;">{name}</strong>
-            <div style="color:#64748B; font-size:0.82rem;">{desc}</div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+resource_list(saude, "SAUDE", "#FEF3C7", "#92400E")
 
 # --- Templates ---
-st.markdown("")
 st.markdown("---")
-st.markdown("#### Templates & Utilidades")
+section_title("Templates & Utilidades", "📄", "#EDE9FE", "#5B21B6")
 
 templates = {
     "template_constitution.md": "Template base para constitution.md (SDD)",
@@ -97,39 +77,31 @@ templates = {
     "scripts_com_bugs.md": "5 scripts com bugs atuariais escondidos (Dia 2)",
     "excel_validacao_cashflow.md": "Calculo manual de referencia para validar cash flows (Dia 7)",
 }
-
-for name, desc in templates.items():
-    st.markdown(f"""
-    <div style="display:flex; align-items:flex-start; gap:10px; padding:8px 0; border-bottom:1px solid #F1F5F9;">
-        <code style="background:#EDE9FE; color:#5B21B6; padding:2px 8px; border-radius:6px; font-size:0.8rem; white-space:nowrap; flex-shrink:0;">/templates/</code>
-        <div>
-            <strong style="color:#0F172A; font-size:0.9rem;">{name}</strong>
-            <div style="color:#64748B; font-size:0.82rem;">{desc}</div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+resource_list(templates, "TPL", "#EDE9FE", "#5B21B6")
 
 # --- Stack ---
-st.markdown("")
 st.markdown("---")
-st.markdown("#### Stack Tecnologico")
+section_title("Stack Tecnologico", "⚡", "#FFE4E6", "#BE123C")
 
 stack = [
-    ("Linguagem", "Python 3.11+"),
-    ("AI Coding", "OpenCode CLI + Z.ai Coding Plan (GLM-5)"),
-    ("LLM API", "DeepSeek (endpoint OpenAI-compatible)"),
-    ("Agentes", "CrewAI"),
-    ("ML", "Scikit-learn, XGBoost, SHAP"),
-    ("Web", "Streamlit"),
-    ("Auth & DB", "Supabase (Auth + PostgreSQL + RLS)"),
-    ("RAG", "ChromaDB (local)"),
-    ("Deploy", "Streamlit Community Cloud"),
+    ("🐍", "Python 3.11+", "Linguagem"),
+    ("🤖", "OpenCode CLI + Z.ai", "AI Coding"),
+    ("💬", "DeepSeek API", "LLM"),
+    ("🧠", "CrewAI", "Agentes"),
+    ("📈", "Scikit-learn, XGBoost, SHAP", "ML"),
+    ("🌐", "Streamlit", "Web"),
+    ("🔐", "Supabase Auth + PostgreSQL + RLS", "Auth & DB"),
+    ("📚", "ChromaDB", "RAG"),
+    ("☁️", "Streamlit Community Cloud", "Deploy"),
 ]
 
-for cat, tool in stack:
+st.markdown('<div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin-top:8px;">', unsafe_allow_html=True)
+for icon, tool, cat in stack:
     st.markdown(f"""
-    <div style="display:flex; align-items:center; gap:12px; padding:6px 0;">
-        <span style="min-width:90px; font-weight:600; color:#64748B; font-size:0.82rem; text-transform:uppercase;">{cat}</span>
-        <span style="color:#1E293B; font-size:0.9rem;">{tool}</span>
+    <div style="background:white; border:1px solid #E2E8F0; border-radius:10px; padding:14px 16px; text-align:center;">
+        <div style="font-size:1.3rem; margin-bottom:4px;">{icon}</div>
+        <div style="font-weight:700; color:#0F172A; font-size:0.85rem;">{tool}</div>
+        <div style="color:#94A3B8; font-size:0.72rem; text-transform:uppercase; font-weight:600;">{cat}</div>
     </div>
     """, unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)

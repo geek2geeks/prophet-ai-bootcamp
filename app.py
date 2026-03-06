@@ -15,10 +15,12 @@ inject_css()
 # --- Sidebar ---
 with st.sidebar:
     st.markdown("""
-    <div style="text-align:center; padding: 16px 0 8px;">
-        <img src="https://img.icons8.com/fluency/64/graduation-cap.png" width="48" style="margin-bottom:4px;">
+    <div style="text-align:center; padding: 20px 0 12px;">
+        <div style="width:48px; height:48px; margin:0 auto 8px; background:linear-gradient(135deg,#3B82F6,#8B5CF6);
+                    border-radius:14px; display:flex; align-items:center; justify-content:center;
+                    font-size:1.4rem; color:white; font-weight:900;">P</div>
         <div style="font-size:1.05rem; font-weight:700; color:#F1F5F9 !important; letter-spacing:-0.02em;">Prophet AI Bootcamp</div>
-        <div style="font-size:0.75rem; color:#94A3B8 !important;">AI & Data Science para Atuarios</div>
+        <div style="font-size:0.72rem; color:#64748B !important; margin-top:2px;">AI & Data Science para Atuarios</div>
     </div>
     """, unsafe_allow_html=True)
     st.markdown("---")
@@ -38,15 +40,20 @@ with st.sidebar:
             """, unsafe_allow_html=True)
         else:
             st.markdown(f"""
-            <div style="padding:8px 4px;">
-                <div style="font-size:0.85rem; font-weight:600; color:#F1F5F9 !important;">{name}</div>
-                <div style="font-size:0.7rem; color:#94A3B8 !important;">{st.session_state.role}</div>
+            <div style="display:flex; align-items:center; gap:10px; padding:8px 4px;">
+                <div style="width:36px; height:36px; border-radius:50%; background:#334155;
+                            display:flex; align-items:center; justify-content:center;
+                            font-weight:700; font-size:0.9rem; color:#CBD5E1;">{name[0].upper()}</div>
+                <div>
+                    <div style="font-size:0.85rem; font-weight:600; color:#F1F5F9 !important;">{name}</div>
+                    <div style="font-size:0.7rem; color:#94A3B8 !important;">{st.session_state.role}</div>
+                </div>
             </div>
             """, unsafe_allow_html=True)
 
         if is_demo_mode():
             st.markdown("""
-            <div style="background:rgba(245,158,11,0.15); border:1px solid rgba(245,158,11,0.3);
+            <div style="background:rgba(245,158,11,0.12); border:1px solid rgba(245,158,11,0.25);
                         border-radius:8px; padding:8px 12px; margin:8px 0; font-size:0.75rem; color:#FBBF24 !important;">
                 Modo Demo (sem Supabase)
             </div>
@@ -55,6 +62,7 @@ with st.sidebar:
         if st.button("Sair", use_container_width=True):
             logout()
             st.rerun()
+
     st.markdown("---")
     st.markdown("""
     <div style="font-size:0.7rem; color:#475569 !important; padding:4px 0;">
@@ -62,16 +70,25 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
 
-# --- Main Content ---
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# LANDING PAGE (not logged in)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 if st.session_state.user is None:
-    # ── Landing / Login ──
+    # Dark hero
     st.markdown("""
-    <div class="hero">
-        <h1>Prophet AI <span>Bootcamp</span></h1>
+    <div class="dark-hero">
+        <h1>Torna-te um<br><span class="gradient-text">AI Actuary</span></h1>
         <p class="subtitle">
-            AI & Data Science para Atuarios de Vida &mdash;
-            De Especialista de Risco a Fundador de SaaS Atuarial
+            10 dias intensivos de AI & Data Science para Atuarios de Vida.<br>
+            Constroi o teu proprio motor de projecao. Deploya como SaaS.
         </p>
+        <div class="pill-row">
+            <span class="pill">Python + AI Coding</span>
+            <span class="pill">Machine Learning</span>
+            <span class="pill">Agentes LLM</span>
+            <span class="pill">Solvencia II</span>
+            <span class="pill">SaaS Deploy</span>
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -79,44 +96,41 @@ if st.session_state.user is None:
     st.markdown("""
     <div class="feature-grid">
         <div class="feature-card">
-            <div class="icon">10</div>
-            <h4>Dias</h4>
-            <p>De bootcamp intensivo</p>
+            <div class="fc-icon blue">10</div>
+            <h4>Dias Intensivos</h4>
+            <p>80 horas de formacao pratica com IA e dados reais</p>
         </div>
         <div class="feature-card">
-            <div class="icon">80h</div>
-            <h4>Formacao</h4>
-            <p>Hands-on com IA</p>
+            <div class="fc-icon green">35</div>
+            <h4>Exercicios</h4>
+            <p>Hands-on com datasets de seguros de vida reais</p>
         </div>
         <div class="feature-card">
-            <div class="icon">1000</div>
-            <h4>Pontos</h4>
-            <p>Para ganhar e competir</p>
+            <div class="fc-icon purple">AI</div>
+            <h4>Agentes LLM</h4>
+            <p>CrewAI, RAG, auditoria automatica de sinistros</p>
         </div>
         <div class="feature-card">
-            <div class="icon">SaaS</div>
-            <h4>Produto</h4>
-            <p>Deployado no final</p>
+            <div class="fc-icon amber">$</div>
+            <h4>Produto SaaS</h4>
+            <p>Deploya o teu proprio Prophet AI no final</p>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
     st.markdown("")
 
-    # Login form area
+    # Login area
     _left, center, _right = st.columns([1.2, 2, 1.2])
     with center:
         st.markdown("""
-        <div class="pro-card" style="padding:32px; margin-top:8px;">
-            <h3 style="text-align:center; margin:0 0 4px; color:#0F172A; font-weight:700;">Acede ao Bootcamp</h3>
-            <p style="text-align:center; color:#64748B; font-size:0.85rem; margin:0 0 20px;">
-                Entra com a tua conta para aceder ao curso
-            </p>
+        <div style="text-align:center; margin-bottom:16px;">
+            <h3 style="color:#0F172A; font-weight:800; font-size:1.4rem; margin:0 0 4px;">Acede ao Bootcamp</h3>
+            <p style="color:#64748B; font-size:0.88rem; margin:0;">Entra para comecar a tua jornada</p>
         </div>
         """, unsafe_allow_html=True)
 
-    with center:
-        # Google OAuth button
+        # Google OAuth — always show the button
         google_url = get_google_login_url()
         if google_url:
             st.markdown(f"""
@@ -124,8 +138,17 @@ if st.session_state.user is None:
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
                 Continuar com Google
             </a>
-            <div class="divider-text">ou entra com email</div>
             """, unsafe_allow_html=True)
+        else:
+            # Show button even in demo mode (disabled visual)
+            st.markdown("""
+            <div class="google-btn disabled" title="Configura Supabase para ativar Google login">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+                Continuar com Google
+            </div>
+            """, unsafe_allow_html=True)
+
+        st.markdown('<div class="divider-text">ou entra com email</div>', unsafe_allow_html=True)
 
         tab_login, tab_register = st.tabs(["Entrar", "Criar Conta"])
 
@@ -148,57 +171,57 @@ if st.session_state.user is None:
                     if register_email(email_r, password_r, nome):
                         st.rerun()
 
-    # What you'll build section
-    st.markdown("")
     st.markdown("---")
 
+    # Two-column info
     col_a, col_b = st.columns(2)
     with col_a:
         st.markdown("""
-        <div class="pro-card">
-            <h4 style="color:#0F172A; margin-top:0;">O que vais construir</h4>
-            <p style="color:#475569; font-size:0.9rem; line-height:1.7;">
-                O <strong>Prophet AI</strong> &mdash; um clone do FIS Prophet potenciado por IA:
+        <div class="pro-card" style="height:100%;">
+            <div style="font-size:1.5rem; margin-bottom:10px;">🏗</div>
+            <h4 style="color:#0F172A; margin:0 0 10px; font-weight:700;">O que vais construir</h4>
+            <p style="color:#475569; font-size:0.88rem; line-height:1.8; margin:0;">
+                O <strong>Prophet AI</strong> — um clone do FIS Prophet potenciado por IA.<br>
+                Motor de projecao de cash flows, reservas V(t) e profit testing para 4 produtos vida.
+                Agentes LLM para auditoria de sinistros e cenarios de stress Solvencia II.
+                RBAC com Supabase. Deploy no Streamlit Cloud.
             </p>
-            <ul style="color:#475569; font-size:0.88rem; line-height:2;">
-                <li><strong>Motor de projecao Vida</strong>: cash flows, reservas V(t), profit testing</li>
-                <li><strong>Agentes LLM</strong>: auditoria de sinistros, cenarios de stress</li>
-                <li><strong>RBAC</strong>: controlo de acessos com Supabase</li>
-                <li><strong>SaaS deployado</strong>: interface Streamlit Cloud</li>
-            </ul>
         </div>
         """, unsafe_allow_html=True)
 
     with col_b:
         st.markdown("""
-        <div class="pro-card">
-            <h4 style="color:#0F172A; margin-top:0;">Stack Tecnologico</h4>
-            <ul style="color:#475569; font-size:0.88rem; line-height:2;">
-                <li><strong>Linguagem</strong>: Python 3.11+</li>
-                <li><strong>AI Coding</strong>: OpenCode + Z.ai (GLM-5)</li>
-                <li><strong>LLM</strong>: DeepSeek API</li>
-                <li><strong>Agentes</strong>: CrewAI</li>
-                <li><strong>ML</strong>: Scikit-learn, XGBoost, SHAP</li>
-                <li><strong>Deploy</strong>: Streamlit Cloud + Supabase</li>
-            </ul>
+        <div class="pro-card" style="height:100%;">
+            <div style="font-size:1.5rem; margin-bottom:10px;">⚡</div>
+            <h4 style="color:#0F172A; margin:0 0 10px; font-weight:700;">Stack Tecnologico</h4>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px 16px;">
+                <div style="color:#475569; font-size:0.85rem;"><strong style="color:#3B82F6;">Python</strong> 3.11+</div>
+                <div style="color:#475569; font-size:0.85rem;"><strong style="color:#8B5CF6;">CrewAI</strong> Agentes</div>
+                <div style="color:#475569; font-size:0.85rem;"><strong style="color:#10B981;">DeepSeek</strong> LLM API</div>
+                <div style="color:#475569; font-size:0.85rem;"><strong style="color:#F59E0B;">XGBoost</strong> + SHAP</div>
+                <div style="color:#475569; font-size:0.85rem;"><strong style="color:#EF4444;">Streamlit</strong> Web</div>
+                <div style="color:#475569; font-size:0.85rem;"><strong style="color:#06B6D4;">Supabase</strong> Auth+DB</div>
+                <div style="color:#475569; font-size:0.85rem;"><strong style="color:#EC4899;">ChromaDB</strong> RAG</div>
+                <div style="color:#475569; font-size:0.85rem;"><strong style="color:#84CC16;">OpenCode</strong> AI Coding</div>
+            </div>
         </div>
         """, unsafe_allow_html=True)
 
-    st.markdown("")
     st.markdown("""
-    <div style="text-align:center; padding:24px 0; color:#94A3B8; font-size:0.8rem;">
-        <em>"O teu conhecimento atuarial levou anos a construir. A IA so precisa de dias para o empacotar."</em>
+    <div style="text-align:center; padding:32px 0 16px; color:#94A3B8; font-size:0.85rem; font-style:italic;">
+        "O teu conhecimento atuarial levou anos a construir. A IA so precisa de dias para o empacotar."
     </div>
     """, unsafe_allow_html=True)
 
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# HOME DASHBOARD (logged in)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 else:
-    # ── Logged in — Home Dashboard ──
-    name = st.session_state.user.get("name", st.session_state.user["email"])
-    page_header(f"Bem-vindo, {name}", "Usa o menu lateral para navegar entre as paginas do curso.")
-
     from lib.course import DAYS, get_all_exercises, get_badge
     from lib.db import get_progress, get_submissions
+    from lib.theme import circular_progress, section_title
 
+    name = st.session_state.user.get("name", st.session_state.user["email"])
     user_id = st.session_state.user["id"]
     progress = get_progress(user_id)
     submissions = get_submissions(user_id)
@@ -210,40 +233,58 @@ else:
     pts_sub = sum(s.get("pontos", 0) for s in submissions.values())
     pts_total = pts_ex + pts_sub
     pct = int(completed / total * 100) if total > 0 else 0
+    badge = get_badge(pts_total)
 
-    stat_cards([
-        {"value": f"{completed}/{total}", "label": "Exercicios", "color": "blue"},
-        {"value": str(pts_total), "label": "Pontos Total", "color": "green"},
-        {"value": get_badge(pts_total), "label": "Badge Atual", "color": "purple"},
-        {"value": f"{pct}%", "label": "Progresso", "color": "amber"},
-    ])
+    # Welcome banner
+    st.markdown(f"""
+    <div style="background:linear-gradient(135deg,#EFF6FF 0%,#EDE9FE 50%,#FCE7F3 100%);
+                border-radius:20px; padding:28px 32px; margin-bottom:24px;">
+        <div style="font-size:1.6rem; font-weight:800; color:#0F172A; letter-spacing:-0.02em;">
+            Ola, {name}! 👋
+        </div>
+        <div style="color:#475569; font-size:0.95rem; margin-top:4px;">
+            Continua a tua jornada de AI Actuary. Ja completaste <strong>{completed}</strong> de <strong>{total}</strong> tarefas.
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
-    st.markdown("")
-    st.progress(pct / 100)
+    # Stats + circular progress
+    col_stats, col_circle = st.columns([3, 1])
+
+    with col_stats:
+        stat_cards([
+            {"value": str(pts_total), "label": "Pontos Total", "color": "blue", "icon": "⭐"},
+            {"value": f"{completed}/{total}", "label": "Exercicios", "color": "green", "icon": "✓"},
+            {"value": badge, "label": "Badge Atual", "color": "purple", "icon": "🏆"},
+        ])
+
+    with col_circle:
+        st.markdown("")
+        circular_progress(pct, "completo")
 
     st.markdown("---")
-    st.markdown('<div class="page-header"><h1 style="font-size:1.3rem !important;">Programa &mdash; 10 Dias</h1></div>', unsafe_allow_html=True)
 
-    for day in DAYS:
-        semana = "Sem. 1" if day["semana"] == 1 else "Sem. 2"
-        n_ex = len(day["exercicios"]) + 1
-        done = sum(1 for ex in day["exercicios"] if ex["id"] in progress)
-        done += 1 if day["desafio"]["id"] in progress or day["desafio"]["id"] in submissions else 0
+    # Day cards
+    section_title("Programa — 10 Dias", "📚", "#DBEAFE", "#1D4ED8")
 
-        if done == n_ex:
-            status = "done"
-        elif done > 0:
-            status = "partial"
-        else:
-            status = "todo"
+    # Week tabs
+    w1, w2 = st.tabs(["Semana 1 (Dias 1–5)", "Semana 2 (Dias 6–10)"])
 
-        st.markdown(f"""
-        <div class="day-item">
-            <div class="day-num {status}">{day['dia']}</div>
-            <div class="day-info">
-                <strong>{day['titulo']}</strong>
-                <p>{day['objetivo'][:80]}{'...' if len(day['objetivo']) > 80 else ''}</p>
-            </div>
-            <div class="day-progress">{done}/{n_ex} &bull; {semana}</div>
-        </div>
-        """, unsafe_allow_html=True)
+    for tab, sem_num in [(w1, 1), (w2, 2)]:
+        with tab:
+            for day in [d for d in DAYS if d["semana"] == sem_num]:
+                n_ex = len(day["exercicios"]) + 1
+                done = sum(1 for ex in day["exercicios"] if ex["id"] in progress)
+                done += 1 if day["desafio"]["id"] in progress or day["desafio"]["id"] in submissions else 0
+                status = "done" if done == n_ex else ("partial" if done > 0 else "todo")
+
+                st.markdown(f"""
+                <div class="day-item">
+                    <div class="day-num {status}">{day['dia']}</div>
+                    <div class="day-info">
+                        <strong>{day['titulo']}</strong>
+                        <p>{day['objetivo'][:90]}{'...' if len(day['objetivo']) > 90 else ''}</p>
+                    </div>
+                    <div class="day-progress">{done}/{n_ex}</div>
+                </div>
+                """, unsafe_allow_html=True)
