@@ -68,7 +68,11 @@ def _handle_oauth_callback():
         sb = _fresh_auth_client()
         if sb:
             try:
-                res = sb.auth.exchange_code_for_session({"auth_code": code})
+                verifier = st.session_state.get("_pkce_verifier", "")
+                res = sb.auth.exchange_code_for_session({
+                    "auth_code": code,
+                    "code_verifier": verifier,
+                })
                 user = res.user
                 st.session_state.user = {
                     "id": str(user.id),
@@ -122,6 +126,9 @@ def get_google_login_url() -> str:
                 "redirect_to": redirect_url,
             }
         })
+        # Store PKCE code_verifier for the callback
+        if hasattr(sb.auth, '_code_verifier') and sb.auth._code_verifier:
+            st.session_state._pkce_verifier = sb.auth._code_verifier
         return res.url
     except Exception:
         return ""
