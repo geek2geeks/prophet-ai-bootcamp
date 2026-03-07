@@ -1,27 +1,74 @@
 import streamlit as st
 from lib.auth import require_auth
-from lib.theme import inject_css, page_header, section_title
+from lib.theme import inject_css, page_header, section_title, render_html
+from lib.i18n import t
+from lib.ai import render_tutor_widget
 
 require_auth()
 inject_css()
 
-page_header("Recursos & Datasets", "Todos os ficheiros necessarios para o bootcamp", "📦")
+page_header(t("recursos_title"), t("recursos_sub"), "📦")
 
 def resource_list(items: dict, badge_text: str, badge_bg: str, badge_color: str):
+    render_html('<div class="resource-list">')
     for name, desc in items.items():
-        st.markdown(f"""
-        <div class="res-item">
-            <span class="res-badge" style="background:{badge_bg}; color:{badge_color};">{badge_text}</span>
-            <div class="res-info">
-                <strong>{name}</strong>
-                <p>{desc}</p>
+        render_html(f"""
+        <div class="resource-item">
+            <span class="resource-badge" style="background:{badge_bg}; color:{badge_color};">{badge_text}</span>
+            <div>
+                <strong style="color:#0F172A; font-size:0.92rem;">{name}</strong>
+                <p style="margin:2px 0 0; font-size:0.85rem; color:#64748B;">{desc}</p>
             </div>
         </div>
-        """, unsafe_allow_html=True)
+        """)
+    render_html('</div>')
 
 
-# --- Vida Semana 1 ---
-section_title("Vertical VIDA — Semana 1", "📋", "#DBEAFE", "#1D4ED8")
+def render_resource_section(title: str, icon: str, badge_color_name: str, count: int, items: dict, badge_text: str, badge_bg: str, badge_color: str):
+    section_title(title, icon, badge_color_name)
+    render_html(f"<div class='resource-section-card'><h3>{title}</h3><p>{t('resource_count', count=count)}</p>")
+    resource_list(items, badge_text, badge_bg, badge_color)
+    render_html('</div>')
+
+
+resource_totals = {
+    "vida_s1": 6,
+    "vida_s2": 7,
+    "saude_dia3": 9,
+    "templates": 8,
+    "stack": 9,
+}
+total_resources = (
+    resource_totals["vida_s1"]
+    + resource_totals["vida_s2"]
+    + resource_totals["saude_dia3"]
+    + resource_totals["templates"]
+)
+
+render_html(f"""
+<div class="resource-hero">
+    <div class="hero-copy">
+        <div class="hero-kicker">{t('resources_kicker')}</div>
+        <h2 class="hero-title">{t('recursos_title')}</h2>
+        <p>{t('recursos_sub')}</p>
+    </div>
+    <div class="resource-summary-grid">
+        <div class="resource-summary-card">
+            <strong>{total_resources}</strong>
+            <span>{t('resource_count', count=total_resources)}</span>
+        </div>
+        <div class="resource-summary-card">
+            <strong>{resource_totals['templates']}</strong>
+            <span>{t('templates')}</span>
+        </div>
+        <div class="resource-summary-card">
+            <strong>{resource_totals['stack']}</strong>
+            <span>{t('tech_stack')}</span>
+        </div>
+    </div>
+</div>
+""")
+
 
 vida_s1 = {
     "carteira_apolices_vida.csv": "Carteira de 3K apolices vida: temporario, vida inteira, misto, renda vitalicia",
@@ -29,12 +76,11 @@ vida_s1 = {
     "exclusoes_apolice_vida.json": "Exclusoes: suicidio, guerra, desportos radicais, incontestabilidade",
     "nota_sinistro_vida.txt": "3 processos de sinistro vida (obito simples, suicidio em carencia, declaracao falsa)",
     "red_flags_fraude_vida.csv": "200 sinistros com ~40 red flags de fraude escondidos",
-    "questionario_subscricao_vida.csv": "500 propostas de subscricao — ~20 declaracoes falsas",
+    "questionario_subscricao_vida.csv": "500 propostas de subscricao — ~35 declaracoes falsas",
 }
-resource_list(vida_s1, "S1", "#DBEAFE", "#1D4ED8")
 
-# --- Vida Semana 2 ---
-section_title("Vertical VIDA — Semana 2", "📊", "#D1FAE5", "#065F46")
+# --- Vida Semana 1 ---
+render_resource_section(t("vida_s1"), "📋", "indigo", resource_totals["vida_s1"], vida_s1, t("vida_s1_badge"), "#DBEAFE", "#1D4ED8")
 
 vida_s2 = {
     "tabua_mortalidade_CSO2017.csv": "Tabua SOA CSO 2017 (qx por idade e sexo, 0-120 anos)",
@@ -45,11 +91,12 @@ vida_s2 = {
     "mortalidade_covid_portugal.csv": "Excesso mortalidade PT 2019-2023, por faixa etaria/sexo",
     "benchmark_mercado_vida_pt.csv": "Benchmarks mercado vida PT 2018-2025",
 }
-resource_list(vida_s2, "S2", "#D1FAE5", "#065F46")
+
+# --- Vida Semana 2 ---
+render_resource_section(t("vida_s2"), "📊", "emerald", resource_totals["vida_s2"], vida_s2, t("vida_s2_badge"), "#D1FAE5", "#065F46")
 
 # --- Saude ---
 st.markdown("---")
-section_title("Vertical SAUDE (Dia 3)", "🏥", "#FEF3C7", "#92400E")
 
 saude = {
     "medical_costs_sample.csv": "10K registos de custos medicos (idade, IMC, fumador, custo)",
@@ -62,26 +109,27 @@ saude = {
     "tabua_morbilidade_saude.csv": "Frequencia + severidade por faixa etaria",
     "carteira_beneficiarios.csv": "5K beneficiarios saude",
 }
-resource_list(saude, "SAUDE", "#FEF3C7", "#92400E")
+render_resource_section(t("saude_dia3"), "🏥", "amber", resource_totals["saude_dia3"], saude, t("saude_dia3"), "#FEF3C7", "#92400E")
 
 # --- Templates ---
 st.markdown("---")
-section_title("Templates & Utilidades", "📄", "#EDE9FE", "#5B21B6")
 
 templates = {
     "template_constitution.md": "Template base para constitution.md (SDD)",
     "template_spec.md": "Template base para spec.md",
     "template_modelo_negocio.md": "Template para modelo de negocio (Dia 9)",
-    "template_calculadora_escala.md": "Template para exercicio de escala pessoal (Dia 1)",
+    "template_calculadora_premio.md": "Template para exercicio de Calculadora de Premio Simples (Dia 1)",
     "checklist_auditoria_codigo.md": "5 perguntas de auditoria de codigo gerado por IA",
     "scripts_com_bugs.md": "5 scripts com bugs atuariais escondidos (Dia 2)",
+    "prophet_reference_vida.md": "Referencia funcional do FIS Prophet para motor Vida (Dia 6)",
     "excel_validacao_cashflow.md": "Calculo manual de referencia para validar cash flows (Dia 7)",
 }
-resource_list(templates, "TPL", "#EDE9FE", "#5B21B6")
+render_resource_section(t("templates"), "📄", "indigo", resource_totals["templates"], templates, "TPL", "#EDE9FE", "#5B21B6")
 
 # --- Stack ---
 st.markdown("---")
-section_title("Stack Tecnologico", "⚡", "#FFE4E6", "#BE123C")
+section_title(t("tech_stack"), "⚡", "rose")
+render_html(f"<div class='resource-section-card'><h3>{t('tech_stack')}</h3><p>{t('resource_count', count=resource_totals['stack'])}</p>")
 
 stack = [
     ("🐍", "Python 3.11+", "Linguagem"),
@@ -95,13 +143,17 @@ stack = [
     ("☁️", "Streamlit Community Cloud", "Deploy"),
 ]
 
-st.markdown('<div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin-top:8px;">', unsafe_allow_html=True)
+render_html('<div class="tool-grid">')
 for icon, tool, cat in stack:
-    st.markdown(f"""
-    <div style="background:white; border:1px solid #E2E8F0; border-radius:10px; padding:14px 16px; text-align:center;">
+    render_html(f"""
+    <div class="tool-card">
         <div style="font-size:1.3rem; margin-bottom:4px;">{icon}</div>
         <div style="font-weight:700; color:#0F172A; font-size:0.85rem;">{tool}</div>
         <div style="color:#94A3B8; font-size:0.72rem; text-transform:uppercase; font-weight:600;">{cat}</div>
     </div>
-    """, unsafe_allow_html=True)
-st.markdown('</div>', unsafe_allow_html=True)
+    """)
+render_html('</div>')
+render_html('</div>')
+
+st.markdown("---")
+render_tutor_widget()

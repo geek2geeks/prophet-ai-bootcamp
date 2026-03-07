@@ -1,6 +1,34 @@
+import os
 import streamlit as st
 
 SUPABASE_URL = "https://naecdtkxxlawxlkljtkt.supabase.co"
+
+
+def _auth_bypass_enabled() -> bool:
+    return os.getenv("PROPHET_UI_REVIEW") == "1"
+
+
+def _seed_review_demo_state():
+    if st.session_state.get("demo_progress"):
+        return
+
+    st.session_state.demo_progress = {
+        "ex0.1": {"exercise_id": "ex0.1", "completed": True, "pontos": 10},
+        "ex0.2": {"exercise_id": "ex0.2", "completed": True, "pontos": 10},
+        "ex1.1": {"exercise_id": "ex1.1", "completed": True, "pontos": 10},
+        "ex1.2": {"exercise_id": "ex1.2", "completed": True, "pontos": 10},
+        "ex2.1": {"exercise_id": "ex2.1", "completed": True, "pontos": 10},
+        "ex2.2": {"exercise_id": "ex2.2", "completed": True, "pontos": 10},
+        "ex3.1": {"exercise_id": "ex3.1", "completed": True, "pontos": 10},
+        "ex4.1": {"exercise_id": "ex4.1", "completed": True, "pontos": 10},
+        "ex5.1": {"exercise_id": "ex5.1", "completed": True, "pontos": 10},
+        "ex6.1": {"exercise_id": "ex6.1", "completed": True, "pontos": 10},
+    }
+    st.session_state.demo_submissions = {
+        "des0": {"challenge_id": "des0", "repo_url": "https://github.com/demo/review-des0", "pontos": 25},
+        "des1": {"challenge_id": "des1", "repo_url": "https://github.com/demo/review-des1", "pontos": 25},
+        "des2": {"challenge_id": "des2", "repo_url": "https://github.com/demo/review-des2", "pontos": 25},
+    }
 
 
 def _get_anon_key():
@@ -39,7 +67,7 @@ def get_supabase():
 
 
 def is_demo_mode():
-    return _get_anon_key() is None
+    return _auth_bypass_enabled() or _get_anon_key() is None
 
 
 def init_session():
@@ -51,6 +79,15 @@ def init_session():
         st.session_state.demo_progress = {}
     if "demo_submissions" not in st.session_state:
         st.session_state.demo_submissions = {}
+    if _auth_bypass_enabled() and st.session_state.user is None:
+        st.session_state.user = {
+            "id": "review-demo",
+            "email": "review@prophet-ai.local",
+            "name": "UI Review User",
+            "avatar": "",
+        }
+        st.session_state.role = "admin"
+        _seed_review_demo_state()
     _handle_oauth_callback()
 
 
@@ -61,16 +98,31 @@ def _get_redirect_url():
         return "http://localhost:8501"
 
 
+def get_oauth_cache():
+    if "oauth_cache" not in st.session_state:
+        st.session_state.oauth_cache = {}
+    return st.session_state.oauth_cache
+
+@st.cache_resource
+def get_global_oauth_cache():
+    return {}
+
 def _handle_oauth_callback():
     params = st.query_params
     code = params.get("code")
+    auth_state = params.get("auth_state")
+    
     if code and st.session_state.get("user") is None:
         sb = _fresh_auth_client()
         if sb:
             try:
-                verifier = st.session_state.pop("_pkce_verifier", "")
-                # Set verifier on the fresh client's storage so exchange can find it
-                sb.auth._storage.set_item("supabase.auth.token-code-verifier", verifier)
+                # Restore the PKCE state from the global cache using auth_state
+                cache = get_global_oauth_cache()
+                saved_storage = cache.get(auth_state, {}) if auth_state else {}
+                
+                for k, v in saved_storage.items():
+                    sb.auth._storage.set_item(k, v)
+                
                 res = sb.auth.exchange_code_for_session({"auth_code": code})
                 user = res.user
                 st.session_state.user = {
@@ -81,6 +133,10 @@ def _handle_oauth_callback():
                 }
                 _ensure_profile(user)
                 st.session_state.role = _get_role(str(user.id))
+                
+                # Clear auth debris
+                if auth_state in cache:
+                    del cache[auth_state]
                 st.query_params.clear()
             except Exception as e:
                 st.query_params.clear()
@@ -118,18 +174,32 @@ def get_google_login_url() -> str:
     if sb is None:
         return ""
     try:
-        redirect_url = _get_redirect_url()
+        import uuid
+        import urllib.parse
+        auth_state = str(uuid.uuid4())
+        
+        base_url = _get_redirect_url()
+        parsed = urllib.parse.urlparse(base_url)
+        q = urllib.parse.parse_qs(parsed.query)
+        q["auth_state"] = [auth_state]
+        new_query = urllib.parse.urlencode(q, doseq=True)
+        redirect_url = urllib.parse.urlunparse(parsed._replace(query=new_query))
+        
         res = sb.auth.sign_in_with_oauth({
             "provider": "google",
             "options": {
                 "redirect_to": redirect_url,
             }
         })
-        # Store PKCE code_verifier for the callback
+        # Store all PKCE/state parameters from this fresh client's storage
         try:
-            verifier = sb.auth._storage.get_item("supabase.auth.token-code-verifier")
-            if verifier:
-                st.session_state._pkce_verifier = verifier
+            cache = get_global_oauth_cache()
+            storage_dict = {}
+            if hasattr(sb.auth._storage, 'storage'):
+                for k, v in sb.auth._storage.storage.items():
+                    if "code-verifier" in k or "auth-token" in k or "provider" in k:
+                        storage_dict[k] = v
+            cache[auth_state] = storage_dict
         except Exception:
             pass
         return res.url
@@ -183,12 +253,24 @@ def register_email(email: str, password: str, nome: str) -> bool:
 
 
 def logout():
+    if _auth_bypass_enabled():
+        st.session_state.user = {
+            "id": "review-demo",
+            "email": "review@prophet-ai.local",
+            "name": "UI Review User",
+            "avatar": "",
+        }
+        st.session_state.role = "admin"
+        _seed_review_demo_state()
+        return
     st.session_state.user = None
     st.session_state.role = None
 
 
 def require_auth():
     init_session()
+    if _auth_bypass_enabled():
+        return
     if st.session_state.user is None:
         st.warning("Faz login para aceder a esta pagina.")
         st.stop()
