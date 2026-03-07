@@ -2,13 +2,24 @@
 
 Do not commit real secrets to GitHub. Use this file as a deployment reference only.
 
+## Deployed App
+
+**Live URL:** https://ai-actuary.streamlit.app/
+
+**Pages:**
+- Dashboard: https://ai-actuary.streamlit.app/1_Dashboard
+- Programa: https://ai-actuary.streamlit.app/2_Programa
+- Exercícios: https://ai-actuary.streamlit.app/3_Exercicios
+- Recursos: https://ai-actuary.streamlit.app/5_Recursos
+- AI Tutor: https://ai-actuary.streamlit.app/6_AI_Tutor
+
 ## Streamlit Secrets
 
 Add these in Streamlit Community Cloud under App settings -> Secrets:
 
 ```toml
 [supabase]
-url = "https://your-project-ref.supabase.co"
+url = "https://naecdtkxxlawxlkljtkt.supabase.co"
 key = "<your-supabase-anon-key>"
 service_key = "<your-supabase-service-role-key>"
 
@@ -16,7 +27,7 @@ service_key = "<your-supabase-service-role-key>"
 api_key = "<your-deepseek-api-key>"
 
 [app]
-url = "https://your-app-name.streamlit.app"
+url = "https://ai-actuary.streamlit.app"
 ```
 
 ## Optional Local Tooling
