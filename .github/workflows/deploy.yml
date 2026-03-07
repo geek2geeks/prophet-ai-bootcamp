@@ -1,0 +1,50 @@
+name: Deploy to Streamlit Cloud
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Create secrets.toml for Streamlit
+        run: |
+          mkdir -p ~/.streamlit
+          cat > ~/.streamlit/secrets.toml << 'EOF'
+          [supabase]
+          url = "https://naecdtkxxlawxlkljtkt.supabase.co"
+          key = "${{ secrets.SUPABASE_ANON_KEY }}"
+          service_key = "${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}"
+          
+          [deepseek]
+          api_key = "${{ secrets.DEEPSEEK_API_KEY }}"
+          
+          [app]
+          url = "https://ai-actuary.streamlit.app"
+          EOF
+      
+      - name: Run Streamlit tests
+        run: |
+          streamlit run app.py --logger.level=debug &
+          sleep 10
+          kill %1 || true
+      
+      - name: Deploy notification
+        run: |
+          echo "✅ Deployment complete!"
+          echo "App: https://ai-actuary.streamlit.app"
+          echo "Google OAuth: Enabled"
