@@ -1,5 +1,12 @@
+import base64
+import hashlib
+import json
 import os
+import urllib.parse
+from typing import Optional
+
 import streamlit as st
+from cryptography.fernet import Fernet, InvalidToken
 
 SUPABASE_URL = "https://naecdtkxxlawxlkljtkt.supabase.co"
 
@@ -98,6 +105,47 @@ def _get_redirect_url():
         return "http://localhost:8501"
 
 
+def _get_oauth_cipher() -> Optional[Fernet]:
+    secret_parts = []
+    try:
+        secret_parts.append(st.secrets.get("supabase", {}).get("service_key", ""))
+        secret_parts.append(st.secrets.get("supabase", {}).get("key", ""))
+    except Exception:
+        pass
+
+    secret_parts.append(SUPABASE_URL)
+    secret = next((part for part in secret_parts if part), "")
+    if not secret:
+        return None
+
+    key = base64.urlsafe_b64encode(hashlib.sha256(secret.encode("utf-8")).digest())
+    return Fernet(key)
+
+
+def _encode_oauth_context(code_verifier: str) -> str:
+    cipher = _get_oauth_cipher()
+    if cipher is None:
+        return ""
+
+    payload = json.dumps({"code_verifier": code_verifier}).encode("utf-8")
+    return cipher.encrypt(payload).decode("utf-8")
+
+
+def _decode_oauth_context(token: Optional[str]) -> dict:
+    if not token:
+        return {}
+
+    cipher = _get_oauth_cipher()
+    if cipher is None:
+        return {}
+
+    try:
+        payload = cipher.decrypt(token.encode("utf-8"))
+        return json.loads(payload.decode("utf-8"))
+    except (InvalidToken, json.JSONDecodeError, UnicodeDecodeError):
+        return {}
+
+
 def get_oauth_cache():
     if "oauth_cache" not in st.session_state:
         st.session_state.oauth_cache = {}
@@ -111,19 +159,26 @@ def _handle_oauth_callback():
     params = st.query_params
     code = params.get("code")
     auth_state = params.get("auth_state")
+    oauth_ctx = params.get("oauth_ctx")
     
     if code and st.session_state.get("user") is None:
         sb = _fresh_auth_client()
         if sb:
             try:
-                # Restore the PKCE state from the global cache using auth_state
-                cache = get_global_oauth_cache()
-                saved_storage = cache.get(auth_state, {}) if auth_state else {}
-                
-                for k, v in saved_storage.items():
-                    sb.auth._storage.set_item(k, v)
-                
-                res = sb.auth.exchange_code_for_session({"auth_code": code})
+                oauth_data = _decode_oauth_context(oauth_ctx)
+                code_verifier = oauth_data.get("code_verifier")
+
+                if not code_verifier and auth_state:
+                    cache = get_global_oauth_cache()
+                    saved_storage = cache.get(auth_state, {})
+                    for k, v in saved_storage.items():
+                        sb.auth._storage.set_item(k, v)
+
+                exchange_params = {"auth_code": code}
+                if code_verifier:
+                    exchange_params["code_verifier"] = code_verifier
+
+                res = sb.auth.exchange_code_for_session(exchange_params)
                 user = res.user
                 st.session_state.user = {
                     "id": str(user.id),
@@ -134,9 +189,11 @@ def _handle_oauth_callback():
                 _ensure_profile(user)
                 st.session_state.role = _get_role(str(user.id))
                 
-                # Clear auth debris
-                if auth_state in cache:
-                    del cache[auth_state]
+                if auth_state:
+                    cache = get_global_oauth_cache()
+                    if auth_state in cache:
+                        del cache[auth_state]
+
                 st.query_params.clear()
             except Exception as e:
                 st.query_params.clear()
@@ -175,9 +232,8 @@ def get_google_login_url() -> str:
         return ""
     try:
         import uuid
-        import urllib.parse
         auth_state = str(uuid.uuid4())
-        
+
         base_url = _get_redirect_url()
         parsed = urllib.parse.urlparse(base_url)
         q = urllib.parse.parse_qs(parsed.query)
@@ -191,7 +247,28 @@ def get_google_login_url() -> str:
                 "redirect_to": redirect_url,
             }
         })
-        # Store all PKCE/state parameters from this fresh client's storage
+
+        code_verifier = sb.auth._storage.get_item(f"{sb.auth._storage_key}-code-verifier")
+        oauth_ctx = _encode_oauth_context(code_verifier) if code_verifier else ""
+        oauth_url = res.url
+        if oauth_ctx:
+            auth_parsed = urllib.parse.urlparse(res.url)
+            auth_query = urllib.parse.parse_qs(auth_parsed.query)
+            auth_redirect = auth_query.get("redirect_to", [redirect_url])[0]
+            redirect_parsed = urllib.parse.urlparse(auth_redirect)
+            redirect_query = urllib.parse.parse_qs(redirect_parsed.query)
+            redirect_query["oauth_ctx"] = [oauth_ctx]
+            auth_query["redirect_to"] = [
+                urllib.parse.urlunparse(
+                    redirect_parsed._replace(
+                        query=urllib.parse.urlencode(redirect_query, doseq=True)
+                    )
+                )
+            ]
+            oauth_url = urllib.parse.urlunparse(
+                auth_parsed._replace(query=urllib.parse.urlencode(auth_query, doseq=True))
+            )
+
         try:
             cache = get_global_oauth_cache()
             storage_dict = {}
@@ -202,7 +279,7 @@ def get_google_login_url() -> str:
             cache[auth_state] = storage_dict
         except Exception:
             pass
-        return res.url
+        return oauth_url
     except Exception:
         return ""
 
