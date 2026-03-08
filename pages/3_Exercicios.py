@@ -1,10 +1,170 @@
 import streamlit as st
+import pandas as pd
+from pathlib import Path
 from lib.auth import require_auth, is_admin
 from lib.course import DAYS
 from lib.db import get_progress, set_exercise_complete, set_exercise_incomplete, submit_challenge, get_submissions
 from lib.theme import inject_css, page_header, section_title, render_html
 from lib.i18n import t
 from lib.ai import render_tutor_widget
+
+
+DATASETS_BY_DAY = {
+    0: [
+        ("carteira_vida_sample.csv", "Carteira Vida sample usada nos exercicios do Dia 0."),
+        ("tabua_mortalidade_CSO2017.csv", "Tabua de mortalidade base para prompts precisos e exploradores."),
+    ],
+    1: [
+        ("reporting_vida_q4_2025.csv", "Mock reporting trimestral antes da deterioracao."),
+        ("reporting_vida_q1_2026.csv", "Mock reporting trimestral seguinte para run comparison."),
+        ("manual_reporting_tasks.csv", "Mapa do trabalho manual que uma equipa atuarial ainda faz."),
+    ],
+}
+
+
+def _dataset_path(day_number: int, filename: str) -> Path:
+    return Path(f"data/day{day_number}/{filename}")
+
+
+def render_day_data_panel(day_number: int):
+    datasets = DATASETS_BY_DAY.get(day_number, [])
+    if not datasets:
+        return
+
+    section_title("Dados do dia", "🗂️", "rose")
+    render_html("<div class='resource-section-card'><h3>CSV prontos para usar</h3><p>Descarrega os ficheiros usados nos exercicios sem sair da app.</p></div>")
+
+    for filename, description in datasets:
+        path = _dataset_path(day_number, filename)
+        if not path.exists():
+            st.warning(f"Ficheiro em falta: {path}")
+            continue
+
+        col_info, col_download = st.columns([4, 1], vertical_alignment="center")
+        with col_info:
+            render_html(f"""
+            <div class="resource-item" style="margin-bottom:12px;">
+                <span class="resource-badge" style="background:#FCE7F3; color:#9D174D;">CSV</span>
+                <div>
+                    <strong style="color:#0F172A; font-size:0.92rem;">{filename}</strong>
+                    <p style="margin:2px 0 0; font-size:0.85rem; color:#64748B;">{description}</p>
+                </div>
+            </div>
+            """)
+        with col_download:
+            st.download_button(
+                "Download",
+                data=path.read_bytes(),
+                file_name=path.name,
+                mime="text/csv",
+                key=f"download_{day_number}_{filename}",
+                use_container_width=True,
+            )
+
+
+def render_day1_lab():
+    q4_path = _dataset_path(1, "reporting_vida_q4_2025.csv")
+    q1_path = _dataset_path(1, "reporting_vida_q1_2026.csv")
+    tasks_path = _dataset_path(1, "manual_reporting_tasks.csv")
+    if not (q4_path.exists() and q1_path.exists() and tasks_path.exists()):
+        return
+
+    q4 = pd.read_csv(q4_path)
+    q1 = pd.read_csv(q1_path)
+    tasks = pd.read_csv(tasks_path)
+
+    merged = q4.merge(q1, on=["produto", "segmento"], suffixes=("_q4", "_q1"))
+    merged["delta_lucro"] = merged["lucro_tecnico_eur_q1"] - merged["lucro_tecnico_eur_q4"]
+    merged["delta_reserva"] = merged["reserva_best_estimate_eur_q1"] - merged["reserva_best_estimate_eur_q4"]
+    merged["delta_sinistros"] = merged["sinistros_incorridos_eur_q1"] - merged["sinistros_incorridos_eur_q4"]
+    merged["delta_lapses"] = merged["lapses_q1"] - merged["lapses_q4"]
+    merged["segmento_label"] = merged["produto"] + " | " + merged["segmento"]
+
+    total_lucro_delta = int(merged["delta_lucro"].sum())
+    total_reserva_delta = int(merged["delta_reserva"].sum())
+    total_sinistros_delta = int(merged["delta_sinistros"].sum())
+    total_manual_hours = int(tasks["tempo_manual_horas"].sum())
+
+    section_title("Lab Dia 1", "🧪", "indigo")
+    render_html("""
+    <div class="saas-card" style="margin-bottom:20px; border:1px solid #C7D2FE; background:linear-gradient(135deg, #EEF2FF 0%, #FFFFFF 100%);">
+        <h3 style="margin:0 0 8px; color:#312E81;">Run comparison com dados reais de mock reporting</h3>
+        <p style="margin:0; color:#5C6B7B; line-height:1.6;">Este lab transforma um exercicio passivo num mini workflow de produto. Primeiro exploras a variacao no proprio Streamlit. Depois usas o OpenCode para explicar o que mudou, escrever a nota para o CFO e propor a automacao certa.</p>
+    </div>
+    """)
+
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric("Delta lucro tecnico", f"EUR {total_lucro_delta:,.0f}")
+    m2.metric("Delta reserva", f"EUR {total_reserva_delta:,.0f}")
+    m3.metric("Delta sinistros", f"EUR {total_sinistros_delta:,.0f}")
+    m4.metric("Horas manuais / ciclo", total_manual_hours)
+
+    metric = st.selectbox(
+        "Qual variacao queres explorar?",
+        ["delta_lucro", "delta_reserva", "delta_sinistros", "delta_lapses"],
+        format_func=lambda x: {
+            "delta_lucro": "Lucro tecnico",
+            "delta_reserva": "Reserva best estimate",
+            "delta_sinistros": "Sinistros",
+            "delta_lapses": "Lapses",
+        }[x],
+        key="day1_metric_view",
+    )
+
+    chart_df = merged[["segmento_label", metric]].set_index("segmento_label")
+    st.bar_chart(chart_df, height=300)
+
+    with st.expander("Ver tabela completa de comparacao", expanded=False):
+        st.dataframe(
+            merged[[
+                "produto", "segmento", "lucro_tecnico_eur_q4", "lucro_tecnico_eur_q1", "delta_lucro",
+                "reserva_best_estimate_eur_q4", "reserva_best_estimate_eur_q1", "delta_reserva",
+                "sinistros_incorridos_eur_q4", "sinistros_incorridos_eur_q1", "delta_sinistros",
+                "lapses_q4", "lapses_q1", "delta_lapses",
+            ]],
+            use_container_width=True,
+            hide_index=True,
+        )
+        st.dataframe(tasks, use_container_width=True, hide_index=True)
+
+    st.markdown("**Perguntas para responder com AI**")
+    q1_col, q2_col = st.columns(2)
+    with q1_col:
+        selected_driver = st.radio(
+            "Qual parece ser o driver principal da subida de reserva?",
+            ["Sinistralidade", "Lapses", "Crescimento de premio", "Nao da para saber"],
+            key="day1_driver_guess",
+        )
+        st.text_area(
+            "Que 2 segmentos explicam mais a deterioracao do lucro?",
+            placeholder="Ex: Temporario 55-64 e Temporario 45-54...",
+            key="day1_segments_notes",
+            height=100,
+        )
+    with q2_col:
+        st.text_area(
+            "Escreve a tua versao curta da nota ao CFO antes de pedir ajuda ao OpenCode",
+            placeholder="Em 4-5 linhas, o que dirias?",
+            key="day1_cfo_note",
+            height=100,
+        )
+        st.multiselect(
+            "Onde esta o trabalho manual repetitivo neste workflow?",
+            [
+                "Juntar runs de varios periodos",
+                "Atribuir deltas a drivers",
+                "Escrever memo executivo",
+                "Reconciliar lapses observados vs esperados",
+                "Preparar pack de auditoria",
+            ],
+            key="day1_manual_pain",
+        )
+
+    st.info(
+        "Prompt sugerido para OpenCode: 'Compara reporting_vida_q4_2025.csv e reporting_vida_q1_2026.csv."
+        " Identifica os maiores drivers da variacao do lucro tecnico e da reserva."
+        " Resume em 5 linhas para o CFO e sugere uma feature AI para automatizar este reporting trimestral.'"
+    )
 
 require_auth()
 inject_css()
@@ -107,6 +267,11 @@ if day["dia"] == 0:
         """)
 
 # --- Exercises ---
+render_day_data_panel(day["dia"])
+
+if day["dia"] == 1:
+    render_day1_lab()
+
 section_title(t("exercise_checklist"), "✅", "emerald")
 
 for ex in day["exercicios"]:

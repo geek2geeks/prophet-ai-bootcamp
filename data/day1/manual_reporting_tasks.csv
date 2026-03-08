@@ -1,0 +1,7 @@
+tarefa,equipa,frequencia,tempo_manual_horas,risco_de_erro,impacto_no_negocio
+Consolidar outputs de runs trimestrais,Actuarial Reporting,Trimestral,6,Alto,Atraso no fecho e reconciliação manual
+Explicar variacoes Q-on-Q para CFO,Actuarial Reporting,Trimestral,5,Alto,Narrativa inconsistente e retrabalho
+Atualizar tabela de sensitivities,Model Development,Mensal,4,Medio,Decisões lentas sobre assumptions
+Preparar pack para auditoria interna,Governance e Reservas,Trimestral,7,Alto,Falta de audit trail e justificações dispersas
+Reconciliar lapses observados vs esperados,Pricing e Experience Analysis,Mensal,3,Medio,Sinais de deterioração detectados tarde
+Reescrever memo executivo para board,Head of Actuarial,Trimestral,2,Medio,Dependência de uma só pessoa para comunicação clara

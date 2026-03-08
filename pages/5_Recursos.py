@@ -1,4 +1,5 @@
 import streamlit as st
+from pathlib import Path
 from lib.auth import require_auth
 from lib.theme import inject_css, page_header, section_title, render_html
 from lib.i18n import t
@@ -8,6 +9,51 @@ require_auth()
 inject_css()
 
 page_header(t("recursos_title"), t("recursos_sub"), "📦")
+
+
+DOWNLOADABLE_DATASETS = {
+    "Dia 0": [
+        (Path("data/day0/carteira_vida_sample.csv"), "Carteira sample para analise inicial com OpenCode."),
+        (Path("data/day0/tabua_mortalidade_CSO2017.csv"), "Tabua de mortalidade para prompts precisos e exploradores."),
+    ],
+    "Dia 1": [
+        (Path("data/day1/reporting_vida_q4_2025.csv"), "Mock reporting trimestral base para run comparison."),
+        (Path("data/day1/reporting_vida_q1_2026.csv"), "Mock reporting trimestral seguinte para explicar variacoes."),
+        (Path("data/day1/manual_reporting_tasks.csv"), "Lista de tarefas manuais que AI pode reduzir."),
+    ],
+}
+
+
+def render_downloadable_datasets():
+    section_title("Dados descarregaveis", "⬇️", "rose")
+    render_html("<div class='resource-section-card'><h3>CSV acessiveis diretamente na app</h3><p>Os ficheiros dos Dias 0 e 1 estao agora disponiveis para download sem depender de links externos.</p></div>")
+
+    for group_name, files in DOWNLOADABLE_DATASETS.items():
+        st.markdown(f"### {group_name}")
+        for path, description in files:
+            if not path.exists():
+                st.warning(f"Ficheiro em falta: {path}")
+                continue
+            col_info, col_download = st.columns([4, 1], vertical_alignment="center")
+            with col_info:
+                render_html(f"""
+                <div class="resource-item" style="margin-bottom:12px;">
+                    <span class="resource-badge" style="background:#FCE7F3; color:#9D174D;">CSV</span>
+                    <div>
+                        <strong style="color:#0F172A; font-size:0.92rem;">{path.name}</strong>
+                        <p style="margin:2px 0 0; font-size:0.85rem; color:#64748B;">{description}</p>
+                    </div>
+                </div>
+                """)
+            with col_download:
+                st.download_button(
+                    "Download",
+                    data=path.read_bytes(),
+                    file_name=path.name,
+                    mime="text/csv",
+                    key=f"resource_download_{group_name}_{path.name}",
+                    use_container_width=True,
+                )
 
 def resource_list(items: dict, badge_text: str, badge_bg: str, badge_color: str):
     render_html('<div class="resource-list">')
@@ -68,6 +114,10 @@ render_html(f"""
     </div>
 </div>
 """)
+
+render_downloadable_datasets()
+
+st.markdown("---")
 
 
 vida_s1 = {
