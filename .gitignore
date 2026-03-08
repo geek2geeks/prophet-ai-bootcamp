@@ -10,6 +10,8 @@ supabase/.branches/
 node_modules/
 package-lock.json
 package.json
+!ai-actuary-bootcamp/package.json
+!ai-actuary-bootcamp/package-lock.json
 NUL
 *.log
 screens/
