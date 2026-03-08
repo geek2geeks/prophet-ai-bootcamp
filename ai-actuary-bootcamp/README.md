@@ -61,6 +61,20 @@ npm run dev
 npm run lint && npm run build && npx playwright test && npx firebase deploy --only hosting
 ```
 
+## GitHub automation
+
+The repo-root workflow `.github/workflows/ai-actuary-bootcamp.yml` verifies and deploys the app from `ai-actuary-bootcamp/`.
+
+Set these GitHub repository secrets before relying on CI or hosting deploys:
+
+- `NEXT_PUBLIC_FIREBASE_API_KEY`
+- `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
+- `NEXT_PUBLIC_FIREBASE_PROJECT_ID`
+- `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`
+- `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`
+- `NEXT_PUBLIC_FIREBASE_APP_ID`
+- `FIREBASE_SERVICE_ACCOUNT_AI_ACTUARY_BOOTCAMP_DEV_260308`
+
 To also update Firestore security rules:
 
 ```bash

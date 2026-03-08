@@ -49,14 +49,14 @@ export function MissionWorkspaceTools({
 
   return (
     <div className="space-y-4">
-      <section className="rounded-[1.75rem] border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[0_18px_50px_rgba(22,27,45,0.06)]">
-        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
+      <section className="panel rounded-[1.75rem] p-5">
+        <p className="kicker">
           Hoje em resumo
         </p>
         <h2 className="mt-3 text-lg font-semibold text-[var(--foreground)]">
           Dia {dayNumber.toString().padStart(2, "0")} · {dayTitle}
         </h2>
-        <div className="mt-4 rounded-2xl bg-[var(--surface-subtle)] p-4">
+        <div className="panel-soft mt-4 rounded-2xl p-4">
           <div className="flex items-center justify-between text-sm">
             <span className="font-medium text-[var(--foreground)]">Progresso da aula</span>
             <span className="text-[var(--muted-foreground)]">{completionRatio}%</span>
@@ -74,15 +74,15 @@ export function MissionWorkspaceTools({
         </div>
       </section>
 
-      <section className="rounded-[1.75rem] border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[0_18px_50px_rgba(22,27,45,0.06)]">
-        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
+      <section className="panel rounded-[1.75rem] p-5">
+        <p className="kicker">
           Checklist de sucesso
         </p>
         <div className="mt-4 space-y-3">
           {exercises.map((exercise) => (
             <label
               key={exercise.id}
-              className="flex cursor-pointer items-start gap-3 rounded-2xl border border-[var(--border)] bg-white px-4 py-3"
+              className="panel-soft flex cursor-pointer items-start gap-3 rounded-2xl px-4 py-3"
             >
               <input
                 type="checkbox"
@@ -102,7 +102,7 @@ export function MissionWorkspaceTools({
             </label>
           ))}
 
-          <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-[var(--accent-soft)] bg-[var(--surface-subtle)] px-4 py-3">
+          <label className="panel-accent flex cursor-pointer items-start gap-3 rounded-2xl px-4 py-3">
             <input
               type="checkbox"
               className="mt-1 h-4 w-4 rounded border-[var(--border-strong)] text-[var(--accent)]"
@@ -122,20 +122,20 @@ export function MissionWorkspaceTools({
         </div>
       </section>
 
-      <section className="rounded-[1.75rem] border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[0_18px_50px_rgba(22,27,45,0.06)]">
-        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
+      <section className="panel rounded-[1.75rem] p-5">
+        <p className="kicker">
           Modo de trabalho
         </p>
         <div className="mt-4 space-y-3 text-sm leading-7 text-[var(--muted-foreground)]">
-          <div className="rounded-2xl bg-[var(--surface-subtle)] p-4">
+          <div className="panel-soft rounded-2xl p-4">
             <p className="font-semibold text-[var(--foreground)]">Na plataforma</p>
             <p className="mt-1">Ler a aula, acompanhar o progresso, guardar notas e capturar a prova do que foi feito.</p>
           </div>
-          <div className="rounded-2xl bg-[var(--surface-subtle)] p-4">
+          <div className="panel-soft rounded-2xl p-4">
             <p className="font-semibold text-[var(--foreground)]">Nas ferramentas locais</p>
             <p className="mt-1">{cliLabel}</p>
           </div>
-          <div className="rounded-2xl bg-[var(--surface-subtle)] p-4">
+          <div className="panel-soft rounded-2xl p-4">
             <p className="font-semibold text-[var(--foreground)]">Pronto para avancar quando</p>
             <p className="mt-1">As notas da aula capturam o insight chave, o trabalho local produziu um artefacto util e o desafio ficou marcado como concluido.</p>
           </div>
@@ -143,15 +143,15 @@ export function MissionWorkspaceTools({
       </section>
 
       {artifactList?.length ? (
-        <section className="rounded-[1.75rem] border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[0_18px_50px_rgba(22,27,45,0.06)]">
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
+        <section className="panel rounded-[1.75rem] p-5">
+          <p className="kicker">
             Artefactos a guardar
           </p>
           <div className="mt-4 space-y-3 text-sm leading-7 text-[var(--muted-foreground)]">
             {artifactList.map((artifact) => (
               <div
                 key={artifact}
-                className="rounded-2xl border border-[var(--border)] bg-[var(--surface-subtle)] px-4 py-3"
+                className="panel-soft rounded-2xl px-4 py-3"
               >
                 {artifact}
               </div>
@@ -161,8 +161,8 @@ export function MissionWorkspaceTools({
       ) : null}
 
       {/* Sticky notes tip */}
-      <section className="rounded-[1.75rem] border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[0_18px_50px_rgba(22,27,45,0.06)]">
-        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
+      <section className="panel rounded-[1.75rem] p-5">
+        <p className="kicker">
           Notas
         </p>
         <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">

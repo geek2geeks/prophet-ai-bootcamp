@@ -33,8 +33,8 @@ export async function DayResourcePanel({
   const markdownPreview = markdownResource ? await readMarkdownPreview(markdownResource) : null;
 
   return (
-    <section className="rounded-[1.8rem] border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[0_18px_50px_rgba(22,27,45,0.06)]">
-      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
+    <section className="panel rounded-[1.8rem] p-6">
+      <p className="kicker">
         Recursos
       </p>
       <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">{title}</h2>
@@ -45,7 +45,7 @@ export async function DayResourcePanel({
           {resources.map((resource) => (
             <article
               key={resource.id}
-              className="rounded-[1.3rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-4"
+              className="panel-soft rounded-[1.3rem] p-4"
             >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
@@ -62,7 +62,7 @@ export async function DayResourcePanel({
 
                 <a
                   href={buildResourceDownloadHref(resource.id)}
-                  className="inline-flex items-center rounded-full border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-semibold text-[var(--foreground)] transition hover:border-[var(--accent-soft)] hover:bg-[var(--surface)]"
+                  className="inline-flex items-center rounded-full border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-semibold text-[var(--foreground)] transition hover:border-[var(--accent-soft)] hover:bg-[var(--accent-ghost)]"
                 >
                   Download
                 </a>
@@ -71,7 +71,7 @@ export async function DayResourcePanel({
           ))}
         </div>
 
-        <div className="rounded-[1.4rem] border border-[var(--border)] bg-[#171b2d] p-5 text-white shadow-[0_18px_50px_rgba(22,27,45,0.16)]">
+        <div className="rounded-[1.4rem] border border-[rgba(29,39,48,0.2)] bg-[linear-gradient(180deg,#223746,#18242d)] p-5 text-white shadow-[0_22px_50px_rgba(29,39,48,0.22)]">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/60">
             Preview util
           </p>

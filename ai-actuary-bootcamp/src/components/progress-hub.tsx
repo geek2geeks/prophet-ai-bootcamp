@@ -59,8 +59,8 @@ export function ProgressHub({ items, days }: Props) {
 
   return (
     <section className="grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
-      <div className="rounded-[2rem] border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[0_18px_50px_rgba(22,27,45,0.06)] sm:p-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--muted-foreground)]">
+      <div className="panel rounded-[2rem] p-6 sm:p-8">
+        <p className="kicker">
           Continuar aprendizagem
         </p>
         <div className="mt-4 grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
@@ -72,13 +72,13 @@ export function ProgressHub({ items, days }: Props) {
               {summary.currentDay.objetivo}
             </p>
             <div className="mt-5 flex flex-wrap gap-2">
-              <span className="rounded-full bg-[var(--surface-subtle)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">
+              <span className="glass-pill rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">
                 {summary.currentDay.exercicios.length} exercicios
               </span>
-              <span className="rounded-full bg-[var(--surface-subtle)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">
+              <span className="glass-pill rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">
                 {summary.currentDay.topicCount} topicos
               </span>
-              <span className="rounded-full bg-[var(--surface-subtle)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">
+              <span className="glass-pill rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">
                 Construir localmente
               </span>
             </div>
@@ -86,7 +86,7 @@ export function ProgressHub({ items, days }: Props) {
 
           <Link
             href={`/missions/${summary.nextMission}`}
-            className="inline-flex items-center justify-center rounded-full bg-[var(--accent)] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[var(--accent-strong)]"
+            className="inline-flex items-center justify-center rounded-full bg-[linear-gradient(135deg,var(--accent),#d88657)] px-5 py-3 text-sm font-semibold text-white shadow-[0_14px_34px_rgba(181,95,50,0.22)] transition hover:translate-y-[-1px] hover:bg-[linear-gradient(135deg,var(--accent-strong),var(--accent))]"
           >
             Retomar aula
           </Link>
@@ -94,7 +94,7 @@ export function ProgressHub({ items, days }: Props) {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
-        <div className="rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[0_18px_50px_rgba(22,27,45,0.06)]">
+        <div className="metric-card rounded-[1.5rem] p-5">
           <p className="text-xs uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
             Dias concluidos
           </p>
@@ -106,7 +106,7 @@ export function ProgressHub({ items, days }: Props) {
           </p>
         </div>
 
-        <div className="rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[0_18px_50px_rgba(22,27,45,0.06)]">
+        <div className="metric-card rounded-[1.5rem] p-5">
           <p className="text-xs uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
             Itens concluidos
           </p>
@@ -118,7 +118,7 @@ export function ProgressHub({ items, days }: Props) {
           </p>
         </div>
 
-        <div className="rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[0_18px_50px_rgba(22,27,45,0.06)]">
+        <div className="metric-card rounded-[1.5rem] p-5">
           <p className="text-xs uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
             Pontos capturados
           </p>

@@ -43,11 +43,11 @@ export function RoadmapBoard({ days }: Props) {
   return (
     <section
       id="roadmap"
-      className="rounded-[2rem] border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[0_18px_50px_rgba(22,27,45,0.06)] sm:p-8"
+      className="panel rounded-[2rem] p-6 sm:p-8"
     >
       <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--muted-foreground)]">
+          <p className="kicker">
             Roteiro do curso
           </p>
           <h2 className="mt-2 font-serif text-3xl text-[var(--foreground)] sm:text-4xl">
@@ -64,7 +64,7 @@ export function RoadmapBoard({ days }: Props) {
         {weeks.map(([week, weekDays]) => (
           <div key={week} className="space-y-4">
             <div className="flex items-center gap-3">
-              <span className="rounded-full bg-[var(--surface-subtle)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
+              <span className="glass-pill rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
                 Semana {week}
               </span>
               <div className="h-px flex-1 bg-[var(--border)]" />
@@ -78,9 +78,9 @@ export function RoadmapBoard({ days }: Props) {
                   <Link
                     key={day.slug}
                     href={`/missions/${day.slug}`}
-                    className="grid gap-4 rounded-[1.5rem] border border-[var(--border)] bg-white p-5 transition hover:border-[var(--accent-soft)] hover:shadow-[0_18px_45px_rgba(22,27,45,0.08)] md:grid-cols-[auto_1fr_auto] md:items-start"
+                    className="grid gap-4 rounded-[1.5rem] border border-[var(--border)] bg-[rgba(255,255,255,0.74)] p-5 shadow-[0_14px_38px_rgba(47,41,34,0.05)] transition hover:border-[var(--accent-soft)] hover:bg-white hover:shadow-[0_20px_46px_rgba(47,41,34,0.08)] md:grid-cols-[auto_1fr_auto] md:items-start"
                   >
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--surface-subtle)] text-sm font-semibold text-[var(--accent)]">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--accent-ghost)] text-sm font-semibold text-[var(--accent)]">
                       {day.slug}
                     </div>
 
@@ -92,10 +92,10 @@ export function RoadmapBoard({ days }: Props) {
                         {day.objetivo}
                       </p>
                       <div className="mt-3 flex flex-wrap gap-2">
-                        <span className="rounded-full bg-[var(--surface-subtle)] px-2.5 py-1 text-xs font-medium text-[var(--muted-foreground)]">
+                        <span className="glass-pill px-2.5 py-1 text-xs font-medium text-[var(--muted-foreground)] rounded-full">
                           {day.exercicios.length} exercicios
                         </span>
-                        <span className="rounded-full bg-[var(--surface-subtle)] px-2.5 py-1 text-xs font-medium text-[var(--muted-foreground)]">
+                        <span className="glass-pill px-2.5 py-1 text-xs font-medium text-[var(--muted-foreground)] rounded-full">
                           {day.topicCount} topicos
                         </span>
                       </div>

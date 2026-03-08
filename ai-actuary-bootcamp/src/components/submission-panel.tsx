@@ -266,13 +266,13 @@ export function SubmissionPanel({
   return (
     <section
       className={joinClassNames(
-        "rounded-[1.8rem] border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[0_18px_50px_rgba(22,27,45,0.06)]",
+        "panel rounded-[1.8rem] p-6",
         className,
       )}
     >
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
+          <p className="kicker">
             Entrega de artefactos
           </p>
           <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
@@ -283,13 +283,13 @@ export function SubmissionPanel({
           </p>
         </div>
 
-        <span className="rounded-full bg-[var(--surface-subtle)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">
+        <span className="glass-pill rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">
           {missionLabel ?? missionTitle}
         </span>
       </div>
 
       <div className="mt-5 grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
-        <div className="rounded-[1.4rem] border border-[var(--accent-soft)] bg-[linear-gradient(180deg,rgba(124,63,88,0.05),rgba(124,63,88,0.12))] p-5">
+        <div className="panel-accent rounded-[1.4rem] p-5">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--accent)]">
             O que convem entregar
           </p>
@@ -300,7 +300,7 @@ export function SubmissionPanel({
           </div>
         </div>
 
-        <div className="rounded-[1.4rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-5">
+        <div className="panel-soft rounded-[1.4rem] p-5">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
             Estado da ligacao
           </p>
@@ -316,7 +316,7 @@ export function SubmissionPanel({
           {artifactHints.map((hint) => (
             <span
               key={hint}
-              className="rounded-full border border-[var(--border)] bg-white px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted-foreground)]"
+              className="glass-pill rounded-full px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted-foreground)]"
             >
               {hint}
             </span>
@@ -326,7 +326,7 @@ export function SubmissionPanel({
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
         <div className="grid gap-4 lg:grid-cols-2">
-          <label className="block rounded-[1.4rem] border border-[var(--border)] bg-white p-4">
+          <label className="panel-soft block rounded-[1.4rem] p-4">
             <span className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
               Titulo do artefacto
             </span>
@@ -340,7 +340,7 @@ export function SubmissionPanel({
             />
           </label>
 
-          <label className="block rounded-[1.4rem] border border-[var(--border)] bg-white p-4">
+          <label className="panel-soft block rounded-[1.4rem] p-4">
             <span className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
               Ficheiro opcional
             </span>
@@ -356,7 +356,7 @@ export function SubmissionPanel({
           </label>
         </div>
 
-        <label className="block rounded-[1.4rem] border border-[var(--border)] bg-[var(--notebook-paper)] p-4">
+        <label className="block rounded-[1.4rem] border border-[var(--border)] bg-[var(--notebook-paper)]/92 p-4 shadow-[0_12px_30px_rgba(47,41,34,0.04)]">
           <span className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
             Resumo da evidencia
           </span>
@@ -399,14 +399,14 @@ export function SubmissionPanel({
           <button
             type="submit"
             disabled={submitting || authLoading || !user}
-            className="inline-flex items-center justify-center rounded-full bg-[var(--accent)] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[var(--accent-strong)] disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex items-center justify-center rounded-full bg-[linear-gradient(135deg,var(--accent),#d88657)] px-5 py-3 text-sm font-semibold text-white shadow-[0_12px_28px_rgba(181,95,50,0.2)] transition hover:translate-y-[-1px] hover:bg-[linear-gradient(135deg,var(--accent-strong),var(--accent))] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {submitting ? "A enviar..." : "Enviar evidencia"}
           </button>
         </div>
       </form>
 
-      <div className="mt-8 rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-5">
+      <div className="panel-soft mt-8 rounded-[1.5rem] p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
@@ -417,7 +417,7 @@ export function SubmissionPanel({
             </h3>
           </div>
 
-          <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--accent)]">
+          <span className="glass-pill rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--accent)]">
             {submissions.length} registos
           </span>
         </div>

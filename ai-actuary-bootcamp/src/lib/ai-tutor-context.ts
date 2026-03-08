@@ -10,7 +10,7 @@ export const COURSE_CONTEXT = {
     publico:
       "Atuarios que querem tornar-se builders e fundadores AI-native, mesmo sem background de coding tradicional",
     objetivo:
-      "Construir um Prophet Lite com AI Copilot: local primeiro, deploy depois, com narrativa de mercado e lancamento publico",
+      "Construir um Prophet Lite com AI Copilot: local primeiro, deploy depois, com narrativa de mercado e lancamento claro",
     formador: "Peter (pedro@stratfordgeek.com)",
     metodologia:
       "Spec-Driven Development (SDD) -- escrever spec primeiro, gerar codigo com AI, auditar com checklist",
@@ -123,7 +123,7 @@ export const COURSE_CONTEXT = {
     dia_9:
       "Build local da app: Streamlit, uploads, dashboard, copiloto AI. OCR/parser corre localmente primeiro, DeepSeek depois da extracao.",
     dia_10:
-      "Deploy, demo e ativacao de mercado: secrets, auth basica, app online, README, post no LinkedIn e lancamento publico.",
+      "Deploy, demo e ativacao de mercado: secrets, auth basica, app online, README, nota de lancamento e partilha com equipa ou primeiros utilizadores.",
   },
 
   recapitulativos: {
@@ -148,7 +148,7 @@ export const COURSE_CONTEXT = {
     fim_dia_9:
       "Tens a app local utilizavel, com copiloto AI e document drop integrados no fluxo principal.",
     fim_dia_10:
-      "Tens um MVP online e uma narrativa publica: demo, README e post de lancamento no LinkedIn.",
+      "Tens um MVP online e uma narrativa publica: demo, README e nota de lancamento para equipa, parceiros ou primeiros utilizadores.",
   },
 };
 
@@ -257,7 +257,7 @@ REGRAS DE COMUNICACAO:
 - Para OpenCode: conheces as 14 ferramentas built-in e todos os comandos CLI.
 - Se nao souberes algo, diz claramente. Nao inventes.
 - O foco nao e ensinar coding manual — e ensinar a especificar, validar, empacotar, deployar e divulgar.
-- O ultimo entregavel do bootcamp e um MVP online e um post de lancamento no LinkedIn.
+- O ultimo entregavel do bootcamp e um MVP online e uma nota de lancamento para equipa, parceiros ou primeiros utilizadores.
 `;
 
 export type TutorMessage = {

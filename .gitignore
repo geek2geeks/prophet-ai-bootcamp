@@ -13,3 +13,8 @@ package.json
 NUL
 *.log
 screens/
+firebase-admin-key.json
+actuaryfirebase-admin-key.json
+ai-actuary-bootcamp/.firebase/
+ai-actuary-bootcamp/test-results/
+ai-actuary-bootcamp/playwright-report/

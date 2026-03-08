@@ -53,7 +53,7 @@ export default async function MissionPage({ params }: Props) {
     <RouteGuard>
       <main className="page-shell px-4 pb-28 pt-8 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl space-y-6">
-        <section className="rounded-[2rem] border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[0_18px_50px_rgba(22,27,45,0.06)] sm:p-8">
+        <section className="panel rounded-[2rem] p-6 sm:p-8">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-3 text-sm text-[var(--muted-foreground)]">
               <Link href="/" className="font-medium text-[var(--foreground)]">
@@ -67,7 +67,7 @@ export default async function MissionPage({ params }: Props) {
               {previousDay ? (
                 <Link
                   href={`/missions/${previousDay.slug}`}
-                  className="inline-flex items-center rounded-full border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--foreground)] transition hover:border-[var(--accent-soft)]"
+                  className="inline-flex items-center rounded-full border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--foreground)] transition hover:border-[var(--accent-soft)] hover:bg-[var(--accent-ghost)]"
                 >
                   Dia anterior
                 </Link>
@@ -76,7 +76,7 @@ export default async function MissionPage({ params }: Props) {
               {nextDay ? (
                 <Link
                   href={`/missions/${nextDay.slug}`}
-                  className="inline-flex items-center rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[var(--accent-strong)]"
+                  className="inline-flex items-center rounded-full bg-[linear-gradient(135deg,var(--accent),#d88657)] px-4 py-2 text-sm font-semibold text-white shadow-[0_12px_28px_rgba(181,95,50,0.2)] transition hover:translate-y-[-1px] hover:bg-[linear-gradient(135deg,var(--accent-strong),var(--accent))]"
                 >
                   Dia seguinte
                 </Link>
@@ -86,11 +86,11 @@ export default async function MissionPage({ params }: Props) {
 
           <div className="mt-6 grid gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--muted-foreground)]">
+              <p className="kicker">
                 Aula do dia {day.slug}
               </p>
               <span className="ink-rule mt-3" aria-hidden="true" />
-              <h1 className="mt-4 max-w-4xl font-serif text-5xl leading-tight text-[var(--foreground)] sm:text-6xl">
+              <h1 className="mt-4 max-w-4xl font-serif text-[3.2rem] leading-[0.96] text-[var(--foreground)] sm:text-[4.75rem]">
                 {day.titulo}
               </h1>
               <p className="mt-4 max-w-3xl text-base leading-8 text-[var(--muted-foreground)] sm:text-lg">
@@ -98,7 +98,7 @@ export default async function MissionPage({ params }: Props) {
               </p>
             </div>
 
-            <div className="rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-5">
+            <div className="panel-soft rounded-[1.5rem] p-5">
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--muted-foreground)]">
                 O que significa ter sucesso hoje
               </p>
@@ -113,8 +113,8 @@ export default async function MissionPage({ params }: Props) {
 
         <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
           <div className="space-y-6">
-            <section className="rounded-[1.8rem] border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[0_18px_50px_rgba(22,27,45,0.06)]">
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
+            <section className="panel rounded-[1.8rem] p-6">
+              <p className="kicker">
                 Visao geral
               </p>
               <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
@@ -124,7 +124,7 @@ export default async function MissionPage({ params }: Props) {
                 {guide.headline}
               </p>
               <div className="mt-5 grid gap-3 md:grid-cols-3">
-                <div className="rounded-[1.3rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-4">
+                <div className="panel-soft rounded-[1.3rem] p-4">
                   <p className="text-xs uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
                       Tamanho da aula
                   </p>
@@ -132,7 +132,7 @@ export default async function MissionPage({ params }: Props) {
                       {day.exercicios.length} exercicios · {day.topicCount} topicos
                   </p>
                 </div>
-                <div className="rounded-[1.3rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-4">
+                <div className="panel-soft rounded-[1.3rem] p-4">
                   <p className="text-xs uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
                       Pontos da missao
                   </p>
@@ -140,7 +140,7 @@ export default async function MissionPage({ params }: Props) {
                       {day.totalMissionPoints} pontos
                   </p>
                 </div>
-                <div className="rounded-[1.3rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-4">
+                <div className="panel-soft rounded-[1.3rem] p-4">
                   <p className="text-xs uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
                       Passo local principal
                   </p>
@@ -151,19 +151,19 @@ export default async function MissionPage({ params }: Props) {
               </div>
             </section>
 
-            <section className="rounded-[1.8rem] border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[0_18px_50px_rgba(22,27,45,0.06)]">
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
+            <section className="panel rounded-[1.8rem] p-6">
+              <p className="kicker">
                 Como trabalhar hoje
               </p>
               <div className="mt-5 grid gap-4 lg:grid-cols-2">
-                <div className="rounded-[1.3rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-4">
+                <div className="panel-soft rounded-[1.3rem] p-4">
                   <p className="font-semibold text-[var(--foreground)]">No navegador</p>
                   <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">
                     {guide.localFirst}
                   </p>
                 </div>
 
-                <div className="rounded-[1.3rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-4">
+                <div className="panel-soft rounded-[1.3rem] p-4">
                   <p className="font-semibold text-[var(--foreground)]">Nas ferramentas locais</p>
                   <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">
                     {guide.cliMoments[0]?.detail}
@@ -175,7 +175,7 @@ export default async function MissionPage({ params }: Props) {
                 {guide.toolRoles.map((toolRole) => (
                   <span
                     key={toolRole.tool}
-                    className="rounded-full bg-[var(--surface-subtle)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--accent)]"
+                    className="glass-pill rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--accent)]"
                   >
                     {toolRole.tool}
                   </span>
@@ -219,8 +219,8 @@ export default async function MissionPage({ params }: Props) {
 
             {day.dia === 10 ? <Day10LaunchConsole /> : null}
 
-            <section className="rounded-[1.8rem] border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[0_18px_50px_rgba(22,27,45,0.06)]">
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
+            <section className="panel rounded-[1.8rem] p-6">
+              <p className="kicker">
                 Aprender
               </p>
               <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
@@ -231,7 +231,7 @@ export default async function MissionPage({ params }: Props) {
                   <details
                     key={moduleKey}
                     open={index === 0}
-                    className="rounded-[1.4rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-4"
+                    className="panel-soft rounded-[1.4rem] p-4"
                   >
                     <summary className="cursor-pointer list-none">
                       <p className="text-xs uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
@@ -245,7 +245,7 @@ export default async function MissionPage({ params }: Props) {
                       {moduleContent.topicos.map((topic) => (
                         <article
                           key={`${moduleKey}-${topic.titulo}`}
-                          className="rounded-[1.1rem] border border-[var(--border)] bg-white p-4"
+                          className="rounded-[1.1rem] border border-[var(--border)] bg-white/82 p-4 shadow-[0_10px_24px_rgba(47,41,34,0.04)]"
                         >
                           <h3 className="font-medium text-[var(--foreground)]">
                             {topic.titulo}
@@ -261,8 +261,8 @@ export default async function MissionPage({ params }: Props) {
               </div>
             </section>
 
-            <section className="rounded-[1.8rem] border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[0_18px_50px_rgba(22,27,45,0.06)]">
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
+            <section className="panel rounded-[1.8rem] p-6">
+              <p className="kicker">
                 Praticar
               </p>
               <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
@@ -272,7 +272,7 @@ export default async function MissionPage({ params }: Props) {
                 {day.exercicios.map((exercise, index) => (
                   <article
                     key={exercise.id}
-                    className="rounded-[1.5rem] border border-[var(--border)] bg-white p-5"
+                    className="rounded-[1.5rem] border border-[var(--border)] bg-white/84 p-5 shadow-[0_12px_30px_rgba(47,41,34,0.05)]"
                   >
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div>
@@ -283,7 +283,7 @@ export default async function MissionPage({ params }: Props) {
                           {exercise.titulo}
                         </h3>
                       </div>
-                      <span className="rounded-full bg-[var(--surface-subtle)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">
+                      <span className="glass-pill rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">
                         {exercise.pontos} pts
                       </span>
                     </div>
@@ -296,15 +296,15 @@ export default async function MissionPage({ params }: Props) {
               </div>
             </section>
 
-            <section className="rounded-[1.8rem] border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[0_18px_50px_rgba(22,27,45,0.06)]">
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
+            <section className="panel rounded-[1.8rem] p-6">
+              <p className="kicker">
                 Construir localmente
               </p>
               <div className="mt-5 space-y-4">
                 {guide.cliMoments.map((moment, index) => (
                   <div
                     key={moment.label}
-                    className="grid gap-4 rounded-[1.3rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-4 md:grid-cols-[auto_1fr]"
+                    className="panel-soft grid gap-4 rounded-[1.3rem] p-4 md:grid-cols-[auto_1fr]"
                   >
                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-sm font-semibold text-[var(--accent)]">
                       {index + 1}
@@ -320,7 +320,7 @@ export default async function MissionPage({ params }: Props) {
               </div>
             </section>
 
-            <section className="rounded-[1.8rem] border border-[var(--accent-soft)] bg-[linear-gradient(180deg,rgba(124,63,88,0.06),rgba(124,63,88,0.1))] p-6 shadow-[0_18px_50px_rgba(22,27,45,0.06)]">
+            <section className="panel-accent rounded-[1.8rem] p-6">
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--accent)]">
                 Desafio
               </p>
