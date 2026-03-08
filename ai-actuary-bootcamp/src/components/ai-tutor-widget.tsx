@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { useAuth } from "@/lib/auth-context";
+import { db } from "@/lib/firebase";
 import {
   buildMessages,
   type TutorMessage,
@@ -38,6 +38,11 @@ interface Session {
   createdAt: number;
   messages: TutorMessage[];
 }
+
+type SharedKeys = {
+  deepseek?: string;
+  zai?: string;
+};
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -273,6 +278,39 @@ function saveSessions(uid: string, sessions: Session[]) {
   }
 }
 
+function mergeSessions(local: Session[], remote: Session[]) {
+  const merged = new Map<string, Session>();
+  [...remote, ...local].forEach((session) => {
+    const existing = merged.get(session.id);
+    if (!existing || session.createdAt >= existing.createdAt) {
+      merged.set(session.id, session);
+    }
+  });
+
+  return Array.from(merged.values()).sort((a, b) => a.createdAt - b.createdAt).slice(-MAX_SESSIONS);
+}
+
+async function saveSessionsToCloud(
+  uid: string,
+  sessions: Session[],
+  dayNumber: number | undefined,
+) {
+  const now = Date.now();
+  const pruned = sessions.slice(-MAX_SESSIONS).map((session) => ({
+    ...session,
+    updatedAt: now,
+    dayLabel: dayNumber !== undefined ? `Dia ${dayNumber.toString().padStart(2, "0")}` : undefined,
+  }));
+
+  await setDoc(
+    doc(db, "students", uid),
+    {
+      tutorSessions: pruned,
+    },
+    { merge: true },
+  );
+}
+
 function newSessionId() {
   return `s_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
 }
@@ -306,9 +344,8 @@ export function AiTutorWidget({
   // Input & streaming
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
-  const [apiKey, setApiKey] = useState<string | null>(null);
   const [keyError, setKeyError] = useState("");
-  const abortRef = useRef<AbortController | null>(null);
+  const [deepseekKey, setDeepseekKey] = useState("");
 
   // Firestore progress
   const [firestoreProgress, setFirestoreProgress] =
@@ -318,23 +355,6 @@ export function AiTutorWidget({
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const studentName = user?.displayName?.split(" ")[0] ?? null;
-
-  // -------------------------------------------------------------------------
-  // Load API key
-  // -------------------------------------------------------------------------
-  useEffect(() => {
-    if (!user) return;
-    getDoc(doc(db, "config", "keys"))
-      .then((snap) => {
-        if (snap.exists()) {
-          const data = snap.data() as { deepseek?: string };
-          setApiKey(data.deepseek ?? null);
-        } else {
-          setKeyError("Chaves de API nao configuradas.");
-        }
-      })
-      .catch(() => setKeyError("Erro ao carregar chaves de API."));
-  }, [user]);
 
   // -------------------------------------------------------------------------
   // Load Firestore progress when widget opens
@@ -362,11 +382,49 @@ export function AiTutorWidget({
   }, [currentProgress]);
 
   // -------------------------------------------------------------------------
-  // Load sessions from localStorage when user is available
+  // Load sessions from localStorage + Firebase when user is available
   // -------------------------------------------------------------------------
   useEffect(() => {
     if (!user) return;
-    setSessions(loadSessions(user.uid));
+    const local = loadSessions(user.uid);
+    setSessions(local);
+
+    getDoc(doc(db, "students", user.uid))
+      .then((snap) => {
+        if (!snap.exists()) {
+          return;
+        }
+
+        const data = snap.data() as { tutorSessions?: Session[] };
+        const remote = Array.isArray(data.tutorSessions) ? data.tutorSessions : [];
+        const merged = mergeSessions(local, remote);
+        setSessions(merged);
+        saveSessions(user.uid, merged);
+      })
+      .catch(() => {
+        setSessions(local);
+      });
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) {
+      setDeepseekKey("");
+      return;
+    }
+
+    getDoc(doc(db, "config", "keys"))
+      .then((snap) => {
+        if (!snap.exists()) {
+          setDeepseekKey("");
+          return;
+        }
+
+        const data = snap.data() as SharedKeys;
+        setDeepseekKey(data.deepseek?.trim() ?? "");
+      })
+      .catch(() => {
+        setDeepseekKey("");
+      });
   }, [user]);
 
   // -------------------------------------------------------------------------
@@ -414,13 +472,16 @@ export function AiTutorWidget({
     };
     setSessions((prev) => {
       const next = [...prev, session].slice(-MAX_SESSIONS);
-      if (user) saveSessions(user.uid, next);
+      if (user) {
+        saveSessions(user.uid, next);
+        void saveSessionsToCloud(user.uid, next, dayNumber);
+      }
       return next;
     });
     setActiveSessionId(id);
     setMessages([]);
     setView("chat");
-  }, [user]);
+  }, [dayNumber, user]);
 
   const resumeSession = useCallback((session: Session) => {
     setActiveSessionId(session.id);
@@ -433,7 +494,10 @@ export function AiTutorWidget({
     (id: string) => {
       setSessions((prev) => {
         const next = prev.filter((s) => s.id !== id);
-        if (user) saveSessions(user.uid, next);
+        if (user) {
+          saveSessions(user.uid, next);
+          void saveSessionsToCloud(user.uid, next, dayNumber);
+        }
         return next;
       });
       if (activeSessionId === id) {
@@ -442,7 +506,7 @@ export function AiTutorWidget({
       }
       setConfirmDeleteId(null);
     },
-    [user, activeSessionId],
+    [dayNumber, user, activeSessionId],
   );
 
   // Persist messages to the active session after each assistant response
@@ -459,23 +523,22 @@ export function AiTutorWidget({
             : s.title;
           return { ...s, title, messages: msgs };
         });
-        if (user) saveSessions(user.uid, next);
+        if (user) {
+          saveSessions(user.uid, next);
+          void saveSessionsToCloud(user.uid, next, dayNumber);
+        }
         return next;
       });
     },
-    [user],
+    [dayNumber, user],
   );
 
   // -------------------------------------------------------------------------
-  // Send message (SSE streaming)
+  // Send message (client-side via shared DeepSeek key)
   // -------------------------------------------------------------------------
   async function sendMessage(overrideInput?: string) {
     const text = (overrideInput ?? input).trim();
     if (!text || streaming) return;
-    if (!apiKey) {
-      setKeyError("Chave DeepSeek nao disponivel.");
-      return;
-    }
     if (!activeSessionId) return;
 
     const userMessage: TutorMessage = { role: "user", content: text };
@@ -483,74 +546,59 @@ export function AiTutorWidget({
     setMessages(nextMessages);
     setInput("");
     setStreaming(true);
+    setKeyError("");
+
+    if (!deepseekKey) {
+      setStreaming(false);
+      setKeyError("Tutor indisponivel: chave DeepSeek ausente em config/keys.");
+      const missingKeyMessages: TutorMessage[] = [
+        ...nextMessages,
+        {
+          role: "assistant",
+          content:
+            "O tutor nao esta disponivel agora porque a chave partilhada do DeepSeek nao foi carregada.",
+        },
+      ];
+      setMessages(missingKeyMessages);
+      persistSession(missingKeyMessages, activeSessionId);
+      return;
+    }
 
     // Placeholder assistant message for streaming
     const placeholder: TutorMessage = { role: "assistant", content: "" };
     setMessages([...nextMessages, placeholder]);
-
-    const ctrl = new AbortController();
-    abortRef.current = ctrl;
 
     try {
       const response = await fetch("https://api.deepseek.com/chat/completions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`,
+          Authorization: `Bearer ${deepseekKey}`,
         },
-        signal: ctrl.signal,
         body: JSON.stringify({
           model: "deepseek-chat",
           messages: buildMessages(nextMessages, pageContext),
           max_tokens: 2048,
           temperature: 0.4,
-          stream: true,
+          stream: false,
         }),
       });
 
       if (!response.ok) {
-        throw new Error(`DeepSeek API error: ${response.status}`);
+        const errorPayload = (await response.json().catch(() => null)) as
+          | { error?: { message?: string }; message?: string }
+          | null;
+        throw new Error(
+          errorPayload?.error?.message ||
+            errorPayload?.message ||
+            `DeepSeek API error: ${response.status}`,
+        );
       }
 
-      if (!response.body) throw new Error("No response body");
-
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let accumulated = "";
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        const chunk = decoder.decode(value, { stream: true });
-        const lines = chunk.split("\n");
-
-        for (const line of lines) {
-          const trimmed = line.trim();
-          if (!trimmed.startsWith("data:")) continue;
-          const payload = trimmed.slice(5).trim();
-          if (payload === "[DONE]") break;
-          try {
-            const parsed = JSON.parse(payload) as {
-              choices: Array<{ delta: { content?: string } }>;
-            };
-            const delta = parsed.choices?.[0]?.delta?.content ?? "";
-            if (delta) {
-              accumulated += delta;
-              setMessages((prev) => {
-                const updated = [...prev];
-                updated[updated.length - 1] = {
-                  role: "assistant",
-                  content: accumulated,
-                };
-                return updated;
-              });
-            }
-          } catch {
-            // Partial JSON line — skip
-          }
-        }
-      }
+      const payload = (await response.json()) as {
+        choices?: Array<{ message?: { content?: string | null } }>;
+      };
+      const accumulated = payload.choices?.[0]?.message?.content?.trim() || "Sem resposta.";
 
       // Final settled messages
       const finalMessages: TutorMessage[] = [
@@ -560,11 +608,8 @@ export function AiTutorWidget({
       setMessages(finalMessages);
       persistSession(finalMessages, activeSessionId);
     } catch (err: unknown) {
-      if (err instanceof Error && err.name === "AbortError") {
-        // User cancelled — keep whatever was streamed
-        return;
-      }
       console.error(err);
+      setKeyError(err instanceof Error ? err.message : "Erro ao contactar o tutor AI.");
       const errorMessages: TutorMessage[] = [
         ...nextMessages,
         {
@@ -576,12 +621,10 @@ export function AiTutorWidget({
       setMessages(errorMessages);
     } finally {
       setStreaming(false);
-      abortRef.current = null;
     }
   }
 
   function cancelStream() {
-    abortRef.current?.abort();
     setStreaming(false);
   }
 
@@ -802,10 +845,10 @@ export function AiTutorWidget({
                       streaming
                         ? "A escrever..."
                         : keyError
-                          ? "Chave API em falta"
+                          ? "Tutor indisponivel"
                           : "Pergunta ao tutor..."
                     }
-                    disabled={streaming || Boolean(keyError)}
+                    disabled={streaming}
                     rows={1}
                     className="flex-1 resize-none bg-transparent text-xs leading-6 text-[var(--foreground)] outline-none placeholder:text-[var(--muted-foreground)] disabled:opacity-50"
                   />
@@ -822,7 +865,7 @@ export function AiTutorWidget({
                   ) : (
                     <button
                       onClick={() => void sendMessage()}
-                      disabled={!input.trim() || Boolean(keyError)}
+                      disabled={!input.trim()}
                       className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-xl bg-[var(--accent)] text-white transition hover:bg-[var(--accent-strong)] disabled:opacity-40"
                     >
                       <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
