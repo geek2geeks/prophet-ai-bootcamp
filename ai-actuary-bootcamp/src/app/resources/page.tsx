@@ -11,12 +11,12 @@ export default function ResourcesPage() {
   return (
     <main className="page-shell px-4 pb-28 pt-8 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl space-y-6">
-        <section className="panel rounded-[2rem] p-6 sm:p-8">
+        <section className="panel-tech shell-frame soft-grid rounded-[2rem] p-6 sm:p-8">
           <p className="kicker">
             Recursos
           </p>
           <span className="ink-rule mt-3" aria-hidden="true" />
-          <h1 className="mt-4 max-w-4xl font-serif text-[3.2rem] leading-[0.96] text-[var(--foreground)] sm:text-[4.6rem]">
+          <h1 className="mt-4 max-w-4xl font-serif text-[3.2rem] leading-[0.92] tracking-[-0.04em] text-[var(--foreground)] sm:text-[4.6rem]">
             Ficheiros, referencias e datasets prontos para continuar localmente.
           </h1>
           <p className="mt-4 max-w-3xl text-base leading-8 text-[var(--muted-foreground)] sm:text-lg">

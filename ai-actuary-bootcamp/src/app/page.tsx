@@ -1,231 +1,267 @@
-import Link from "next/link";
+"use client";
 
+import { AppLink } from "@/components/app-link";
 import { ProgressHub } from "@/components/progress-hub";
 import { RoadmapBoard } from "@/components/roadmap-board";
+import { useAuth } from "@/lib/auth-context";
+import { isAdminEmail } from "@/lib/admin";
 import { course, days, missionItems } from "@/lib/course";
+import { useStudentState } from "@/lib/use-student-state";
 
-const methodology = [
+const buildLoop = [
   {
-    title: "Abrir a aula com objetivo claro",
-    body: "Cada dia começa com uma missao concreta, criterios de sucesso e artefactos esperados para reduzir hesitacao logo nos primeiros minutos.",
+    step: "01",
+    title: "Escolhe o foco do dia",
+    body: "Entra, vê o próximo passo e evita cair numa homepage de marketing sempre que voltas ao workspace.",
   },
   {
-    title: "Sair para o terminal no momento certo",
-    body: "A plataforma diz quando deves mudar para OpenCode, Python, DeepSeek ou o teu ambiente local em vez de te prender a leitura passiva.",
+    step: "02",
+    title: "Constrói localmente",
+    body: "O site orienta, mas o progresso real acontece no terminal, no código e nas entregas que guardas.",
   },
   {
-    title: "Voltar com prova reutilizavel",
-    body: "Notas, entregas e checkpoints ficam guardados para o teu raciocinio nao desaparecer entre sessoes de build.",
+    step: "03",
+    title: "Fecha com prova",
+    body: "Checklist, notas e artefactos ficam ligados ao teu perfil para continuares sem perder contexto.",
   },
 ];
 
-const buildOutcomes = [
-  "Motor deterministico para projecoes de vida",
-  "Copiloto AI com contexto atuarial do produto",
-  "Document drop com OCR e memoria pesquisavel",
-  "Landing, pricing e narrativa de lancamento",
-];
-
-const founderSignals = [
-  {
-    value: "11",
-    label: "dias orientados a produto",
-  },
-  {
-    value: "675",
-    label: "pontos alinhados a entregas reais",
-  },
-  {
-    value: "1",
-    label: "MVP Prophet Lite para mostrar ao mercado",
-  },
+const publicSignals = [
+  { value: `${days.length}`, label: "dias com missões reais" },
+  { value: `${course.totalPoints}`, label: "pontos ligados a entregas" },
+  { value: "1 MVP", label: "produto para mostrar" },
 ];
 
 export default function Home() {
+  const { user, loading } = useAuth();
+  const { stickyNotes, progress } = useStudentState();
+
+  const startedItems = missionItems.filter((item) => progress[item.id]).length;
+  const nextMission =
+    missionItems.find((item) => !progress[item.id])?.slug ?? days.at(-1)?.slug ?? "00";
+  const isAdmin = isAdminEmail(user?.email);
+
+  if (!loading && user) {
+    return (
+      <main className="page-shell px-4 pb-28 pt-6 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl space-y-8">
+          <section className="panel-tech shell-frame soft-grid rounded-[2.6rem] px-6 py-7 sm:px-8 sm:py-9 lg:px-10 lg:py-10">
+            <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+              <div className="max-w-3xl">
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="glass-pill inline-flex items-center gap-2 rounded-full px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--foreground)]">
+                    <span className="accent-dot" aria-hidden="true" />
+                    Workspace ativo
+                  </span>
+                  {isAdmin ? (
+                    <span className="glass-pill inline-flex items-center gap-2 rounded-full px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--accent)]">
+                      Admin
+                    </span>
+                  ) : null}
+                </div>
+
+                <h1 className="mt-6 max-w-5xl font-serif text-[3.1rem] leading-[0.92] tracking-[-0.04em] text-[var(--foreground)] sm:text-[4.4rem] xl:text-[5rem]">
+                  Bem-vindo de volta.
+                  <br />
+                  <span className="text-[var(--accent)]">Continua a construir</span> sem ruído.
+                </h1>
+
+                <p className="mt-5 max-w-2xl text-base leading-8 text-[var(--muted-foreground)] sm:text-lg">
+                  Esta home passa a ser o teu cockpit: próximo dia, progresso, notas e acessos úteis.
+                  Menos landing. Mais sistema de trabalho.
+                </p>
+
+                <div className="mt-7 flex flex-wrap gap-3">
+                  <AppLink href={`/missions/${nextMission}`} className="button-primary px-6 py-3.5 text-sm">
+                    Retomar Dia {nextMission}
+                  </AppLink>
+                  <AppLink href="/portfolio" className="button-secondary px-6 py-3.5 text-sm font-semibold">
+                    Abrir portfolio
+                  </AppLink>
+                  {isAdmin ? (
+                    <AppLink href="/admin" className="button-secondary px-6 py-3.5 text-sm font-semibold">
+                      Ir para admin
+                    </AppLink>
+                  ) : null}
+                </div>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+                <div className="metric-card rounded-[1.5rem] p-5">
+                  <p className="text-xs uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
+                    Itens tocados
+                  </p>
+                  <p className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-[var(--foreground)]">
+                    {startedItems}
+                  </p>
+                </div>
+                <div className="metric-card rounded-[1.5rem] p-5">
+                  <p className="text-xs uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
+                    Notas ativas
+                  </p>
+                  <p className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-[var(--foreground)]">
+                    {stickyNotes.length}
+                  </p>
+                </div>
+                <div className="metric-card rounded-[1.5rem] p-5">
+                  <p className="text-xs uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
+                    Próximo foco
+                  </p>
+                  <p className="mt-3 text-xl font-semibold tracking-[-0.03em] text-[var(--foreground)]">
+                    Dia {nextMission}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <ProgressHub items={missionItems} days={days} />
+
+          <section className="grid gap-5 lg:grid-cols-[0.88fr_1.12fr]">
+            <div className="panel shell-frame rounded-[2rem] p-6 sm:p-8">
+              <p className="kicker">Ritmo de trabalho</p>
+              <h2 className="mt-3 font-serif text-3xl tracking-[-0.03em] text-[var(--foreground)] sm:text-4xl">
+                Três momentos. Zero clutter.
+              </h2>
+
+              <div className="mt-6 space-y-4">
+                {buildLoop.map((item) => (
+                  <div key={item.step} className="panel-soft relative rounded-[1.5rem] p-4 pl-16 sm:p-5 sm:pl-18">
+                    <div className="absolute left-4 top-4 flex h-10 w-10 items-center justify-center rounded-2xl bg-[var(--cool-accent-soft)] text-sm font-semibold text-[var(--cool-accent)]">
+                      {item.step}
+                    </div>
+                    <p className="text-base font-semibold text-[var(--foreground)]">{item.title}</p>
+                    <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">{item.body}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="panel shell-frame rounded-[2rem] p-6 sm:p-8">
+              <p className="kicker">Acessos rápidos</p>
+              <h2 className="mt-3 font-serif text-3xl tracking-[-0.03em] text-[var(--foreground)] sm:text-4xl">
+                O que precisas agora.
+              </h2>
+              <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                <AppLink href={`/missions/${nextMission}`} className="panel-soft rounded-[1.45rem] p-5 transition duration-300 hover:border-[var(--cool-accent)] hover:bg-white">
+                  <p className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[var(--accent)]">Missão</p>
+                  <p className="mt-3 text-base font-semibold text-[var(--foreground)]">Retomar Dia {nextMission}</p>
+                </AppLink>
+                <AppLink href="/portfolio" className="panel-soft rounded-[1.45rem] p-5 transition duration-300 hover:border-[var(--cool-accent)] hover:bg-white">
+                  <p className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[var(--accent)]">Portfolio</p>
+                  <p className="mt-3 text-base font-semibold text-[var(--foreground)]">Ver progresso e entregas</p>
+                </AppLink>
+                <AppLink href="/resources" className="panel-soft rounded-[1.45rem] p-5 transition duration-300 hover:border-[var(--cool-accent)] hover:bg-white">
+                  <p className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[var(--accent)]">Recursos</p>
+                  <p className="mt-3 text-base font-semibold text-[var(--foreground)]">Abrir ficheiros e referências</p>
+                </AppLink>
+                {isAdmin ? (
+                  <AppLink href="/admin" className="panel-soft rounded-[1.45rem] p-5 transition duration-300 hover:border-[var(--cool-accent)] hover:bg-white">
+                    <p className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[var(--accent)]">Admin</p>
+                    <p className="mt-3 text-base font-semibold text-[var(--foreground)]">Gerir chaves, alunos e reviews</p>
+                  </AppLink>
+                ) : null}
+              </div>
+            </div>
+          </section>
+
+          <RoadmapBoard days={days} />
+        </div>
+      </main>
+    );
+  }
+
   return (
-    <main className="page-shell px-4 pb-28 pt-8 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-7xl space-y-8">
-        <section className="grid gap-5 xl:grid-cols-[1.18fr_0.82fr]">
-          <div className="panel relative overflow-hidden rounded-[2.25rem] px-6 py-7 sm:px-8 sm:py-9">
-            <div className="absolute inset-x-0 top-0 h-40 bg-[radial-gradient(circle_at_top_left,rgba(181,95,50,0.18),transparent_56%)]" />
-            <div className="absolute right-[-3.5rem] top-10 h-40 w-40 rounded-full border border-[rgba(181,95,50,0.16)] bg-[rgba(255,255,255,0.28)] blur-sm" />
-            <div className="relative">
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="glass-pill inline-flex items-center gap-2 rounded-full px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--foreground)]">
+    <main className="page-shell px-4 pb-28 pt-6 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl space-y-10">
+        <section className="panel relative overflow-hidden rounded-[2.6rem] px-6 py-7 sm:px-8 sm:py-9 lg:px-10 lg:py-10">
+          <div className="hero-mesh" aria-hidden="true" />
+          <div className="hero-glow hero-glow-left float-slow" aria-hidden="true" />
+          <div className="hero-glow hero-glow-right float-slow float-delay-2" aria-hidden="true" />
+
+          <div className="relative grid gap-8 lg:grid-cols-[1.08fr_0.92fr] lg:items-center">
+            <div className="max-w-3xl">
+              <div className="fade-up flex flex-wrap items-center gap-3">
+                <span className="glass-pill inline-flex items-center gap-2 rounded-full px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--foreground)]">
                   <span className="accent-dot" aria-hidden="true" />
-                  Inicio do curso
+                  Builder track para atuários
                 </span>
                 <span className="text-xs font-medium uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
-                  Builder track para atuarios
+                  Local-first learning platform
                 </span>
               </div>
-              <h1 className="mt-6 max-w-5xl font-serif text-[3.25rem] leading-[0.95] text-[var(--foreground)] sm:text-[4.5rem] xl:text-[5.15rem]">
-                Constrói o teu
-                <span className="text-[var(--accent)]"> Prophet Lite</span>
+
+              <h1 className="fade-up fade-delay-1 mt-6 max-w-5xl font-serif text-[3.25rem] leading-[0.92] tracking-[-0.04em] text-[var(--foreground)] sm:text-[4.6rem] xl:text-[5.4rem]">
+                Constrói o teu <span className="text-[var(--accent)]">Prophet Lite</span>
                 <br />
-                e aprende a pensar como fundador AI-native.
+                com sensação de produto real.
               </h1>
-              <p className="mt-5 max-w-3xl text-base leading-8 text-[var(--muted-foreground)] sm:text-lg">
-                Este bootcamp nao foi desenhado para te transformar em mais um operador de ferramentas.
-                Foi desenhado para te levar de atuario funcional a builder com criterio de produto,
-                stack moderna e um MVP pronto para demonstrar a uma equipa real.
+
+              <p className="fade-up fade-delay-2 mt-5 max-w-2xl text-base leading-8 text-[var(--muted-foreground)] sm:text-lg">
+                Sai do papel de operador e entra em builder com criterio de produto. Menos
+                clutter, mais foco, stack moderna e um MVP que já nasce pronto para demo.
               </p>
 
-              <div className="mt-7 flex flex-wrap gap-3">
-                <Link
-                  href="/missions/00"
-                  className="inline-flex items-center rounded-full bg-[linear-gradient(135deg,var(--accent),#d88657)] px-6 py-3.5 text-sm font-semibold text-white shadow-[0_16px_36px_rgba(181,95,50,0.26)] transition hover:translate-y-[-1px] hover:bg-[linear-gradient(135deg,var(--accent-strong),var(--accent))]"
-                >
-                  Comecar Dia 00
-                </Link>
-                <a
-                  href="#roadmap"
-                  className="inline-flex items-center rounded-full border border-[var(--border-strong)] bg-white/70 px-6 py-3.5 text-sm font-semibold text-[var(--foreground)] transition hover:border-[var(--accent-soft)] hover:bg-white"
-                >
+              <div className="fade-up fade-delay-3 mt-7 flex flex-wrap gap-3">
+                <AppLink href="/missions/00" className="button-primary px-6 py-3.5 text-sm">
+                  Começar Dia 00
+                </AppLink>
+                <a href="#roadmap" className="button-secondary px-6 py-3.5 text-sm font-semibold">
                   Ver roteiro completo
                 </a>
               </div>
 
-              <div className="mt-8 grid gap-3 sm:grid-cols-3">
-                {founderSignals.map((signal) => (
-                  <div key={signal.label} className="metric-card rounded-[1.4rem] px-4 py-4">
-                    <p className="text-3xl font-semibold text-[var(--foreground)]">{signal.value}</p>
+              <div className="fade-up fade-delay-4 mt-8 grid gap-3 sm:grid-cols-3">
+                {publicSignals.map((signal) => (
+                  <div key={signal.label} className="metric-card rounded-[1.5rem] px-4 py-4">
+                    <p className="text-3xl font-semibold tracking-[-0.03em] text-[var(--foreground)]">
+                      {signal.value}
+                    </p>
                     <p className="mt-1 text-sm leading-6 text-[var(--muted-foreground)]">{signal.label}</p>
                   </div>
                 ))}
               </div>
             </div>
-          </div>
 
-          <div className="grid gap-4">
-            <div className="panel-accent rounded-[2rem] p-6">
-              <p className="kicker">O que sais daqui a construir</p>
-              <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
-                Um produto pequeno, vendavel e tecnicamente credivel.
-              </h2>
-              <p className="mt-3 text-sm leading-7 text-[var(--muted-foreground)]">
-                Em vez de consumir aulas dispersas, vais fechar um fluxo de produto completo:
-                calculo, interface, memoria documental, copiloto e deploy.
-              </p>
-              <div className="mt-5 space-y-2.5">
-                {buildOutcomes.map((item) => (
-                  <div key={item} className="flex items-start gap-3 rounded-[1.2rem] bg-white/72 px-4 py-3">
-                    <span className="accent-dot mt-1.5 shrink-0" aria-hidden="true" />
-                    <p className="text-sm leading-6 text-[var(--foreground)]">{item}</p>
+            <div className="fade-up fade-delay-2 relative mx-auto w-full max-w-[32rem] lg:ml-auto">
+              <div className="scan-surface overflow-hidden rounded-[2.2rem] border border-[rgba(20,32,45,0.08)] bg-[linear-gradient(180deg,rgba(255,255,255,0.88),rgba(244,237,227,0.84))] p-3 shadow-[0_28px_80px_rgba(29,39,48,0.16)]">
+                <div className="tech-surface rounded-[1.8rem] px-5 py-5 sm:px-6 sm:py-6">
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <p className="text-[0.68rem] font-semibold uppercase tracking-[0.3em] text-white/58">
+                        Sistema de build
+                      </p>
+                      <h2 className="mt-3 text-[2rem] font-semibold leading-[1.02] tracking-[-0.05em] text-white sm:text-[2.3rem]">
+                        Menos curso. Mais cockpit.
+                      </h2>
+                    </div>
+                    <span className="rounded-full border border-white/12 bg-white/10 px-3 py-1 text-[0.68rem] font-medium uppercase tracking-[0.18em] text-white/72">
+                      Ativo
+                    </span>
                   </div>
-                ))}
-              </div>
-            </div>
 
-            <div className="panel rounded-[2rem] p-6">
-              <p className="kicker">Curriculum em resumo</p>
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                <div>
-                  <p className="text-3xl font-semibold text-[var(--foreground)]">{days.length}</p>
-                  <p className="mt-1 text-sm text-[var(--muted-foreground)]">Dias no programa</p>
-                </div>
-                <div>
-                  <p className="text-3xl font-semibold text-[var(--foreground)]">{course.totalPoints}</p>
-                  <p className="mt-1 text-sm text-[var(--muted-foreground)]">Pontos do percurso</p>
+                  <div className="mt-6 space-y-3">
+                    {[
+                      "Motor atuarial determinístico",
+                      "Copiloto AI com contexto do produto",
+                      "Deploy com portfolio, tracking e narrativa",
+                    ].map((item, index) => (
+                      <div key={item} className="flex items-center gap-3 rounded-[1.2rem] border border-white/10 bg-white/6 px-4 py-3 backdrop-blur-sm">
+                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-[0.72rem] font-semibold text-white/88">
+                          0{index + 1}
+                        </span>
+                        <p className="text-sm leading-6 text-white/84">{item}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
-              <p className="mt-4 text-sm leading-7 text-[var(--muted-foreground)]">{course.subtitle}</p>
             </div>
           </div>
         </section>
 
         <ProgressHub items={missionItems} days={days} />
-
-        <section className="grid gap-5 lg:grid-cols-[1.05fr_0.95fr]">
-          <div className="panel rounded-[2rem] p-6 sm:p-8">
-            <p className="kicker">Como a plataforma funciona</p>
-            <h2 className="mt-3 font-serif text-3xl text-[var(--foreground)] sm:text-4xl">
-              Menos leitura passiva. Mais ciclos curtos de build.
-            </h2>
-            <div className="mt-6 grid gap-4">
-              {methodology.map((item, index) => (
-                <div
-                  key={item.title}
-                  className="panel-soft grid gap-4 rounded-[1.5rem] p-4 md:grid-cols-[auto_1fr]"
-                >
-                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-sm font-semibold text-[var(--accent)] shadow-[0_8px_24px_rgba(47,41,34,0.08)]">
-                    {index + 1}
-                  </div>
-                  <div>
-                    <p className="font-semibold text-[var(--foreground)]">{item.title}</p>
-                    <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">
-                      {item.body}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="panel rounded-[2rem] p-6 sm:p-8">
-            <p className="kicker">Aplicacoes, nao scripts</p>
-            <h2 className="mt-3 font-serif text-3xl text-[var(--foreground)] sm:text-4xl">
-              A stack moderna entra ao servico de um workflow real.
-            </h2>
-            <p className="mt-4 text-sm leading-7 text-[var(--muted-foreground)]">
-              O curso liga Next.js, Python, DeepSeek e ferramentas de CLI a um caso de uso que
-              faz sentido para uma equipa atuarial pequena: projetar, explicar, documentar e lançar.
-            </p>
-            <div className="mt-6 grid gap-3 sm:grid-cols-2">
-              {([
-                "Next.js para a experiencia do produto",
-                "Python para o motor deterministico",
-                "DeepSeek para copiloto e workflows",
-                "CLI para build, iteracao e deploy",
-              ] as const).map((feat) => (
-                <div key={feat} className="panel-soft rounded-[1.3rem] px-4 py-4 text-sm font-medium text-[var(--foreground)]">
-                  {feat}
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
         <RoadmapBoard days={days} />
-
-        <section
-          id="how-it-works"
-          className="panel rounded-[2rem] p-6 sm:p-8"
-        >
-          <div className="grid gap-6 lg:grid-cols-[0.78fr_1.22fr] lg:items-start">
-            <div>
-              <p className="kicker">O resultado final</p>
-              <h2 className="mt-3 font-serif text-3xl text-[var(--foreground)] sm:text-4xl">
-                O que levas contigo no Dia 10.
-              </h2>
-              <p className="mt-4 text-sm leading-7 text-[var(--muted-foreground)]">
-                Nao sais apenas com notas. Sais com um ativo de produto, um processo de build e
-                uma narrativa clara para continuar a iterar depois do bootcamp.
-              </p>
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-3">
-              <div className="panel-soft rounded-[1.5rem] p-4">
-                <p className="font-semibold text-[var(--foreground)]">MVP funcional</p>
-                <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">
-                  Um motor atuarial pequeno mas robusto, ligado a uma interface que mostra valor logo numa demo.
-                </p>
-              </div>
-              <div className="panel-soft rounded-[1.5rem] p-4">
-                <p className="font-semibold text-[var(--foreground)]">Playbooks de IA</p>
-                <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">
-                  Specs, prompts, criterios e processos repetiveis para continuares a construir com controlo.
-                </p>
-              </div>
-              <div className="panel-soft rounded-[1.5rem] p-4">
-                <p className="font-semibold text-[var(--foreground)]">Portefolio de lancamento</p>
-                <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">
-                  README, copy, demo e material suficiente para mostrar o produto a equipa, clientes ou parceiros.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
       </div>
     </main>
   );

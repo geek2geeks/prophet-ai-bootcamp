@@ -1,9 +1,10 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { AppLink } from "@/components/app-link";
 import { Day1ReportingLab } from "@/components/day1-reporting-lab";
 import { Day10LaunchConsole } from "@/components/day10-launch-console";
 import { Day2SpecStudio } from "@/components/day2-spec-studio";
+import { Day1ReviewPanel } from "@/components/day1-review-panel";
 import { Day3SchemaApiSandbox } from "@/components/day3-schema-api-sandbox";
 import { Day4ModelComparisonBoard } from "@/components/day4-model-comparison-board";
 import { Day5ArchitectureScopeCanvas } from "@/components/day5-architecture-scope-canvas";
@@ -18,6 +19,7 @@ import { SubmissionPanel } from "@/components/submission-panel";
 import { days, getDayBySlug } from "@/lib/course";
 import { getDay1ReportingLabData } from "@/lib/day1-lab-data";
 import { getExperienceGuide } from "@/lib/day-experience";
+import { EXTENDED_REVIEW_DAYS, getReviewPreset } from "@/lib/review-presets";
 import { getResourceGroup } from "@/lib/resource-files";
 import { RouteGuard } from "@/components/route-guard";
 
@@ -53,33 +55,33 @@ export default async function MissionPage({ params }: Props) {
     <RouteGuard>
       <main className="page-shell px-4 pb-28 pt-8 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl space-y-6">
-        <section className="panel rounded-[2rem] p-6 sm:p-8">
+        <section className="panel-tech shell-frame soft-grid rounded-[2.2rem] p-6 sm:p-8">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-3 text-sm text-[var(--muted-foreground)]">
-              <Link href="/" className="font-medium text-[var(--foreground)]">
+              <AppLink href="/" className="font-medium text-[var(--foreground)]">
                 Inicio do curso
-              </Link>
+              </AppLink>
               <span>/</span>
               <span>Dia {day.slug}</span>
             </div>
 
             <div className="flex flex-wrap gap-2">
               {previousDay ? (
-                <Link
+                <AppLink
                   href={`/missions/${previousDay.slug}`}
-                  className="inline-flex items-center rounded-full border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--foreground)] transition hover:border-[var(--accent-soft)] hover:bg-[var(--accent-ghost)]"
+                  className="button-secondary px-4 py-2 text-sm font-medium"
                 >
                   Dia anterior
-                </Link>
+                </AppLink>
               ) : null}
 
               {nextDay ? (
-                <Link
+                <AppLink
                   href={`/missions/${nextDay.slug}`}
-                  className="inline-flex items-center rounded-full bg-[linear-gradient(135deg,var(--accent),#d88657)] px-4 py-2 text-sm font-semibold text-white shadow-[0_12px_28px_rgba(181,95,50,0.2)] transition hover:translate-y-[-1px] hover:bg-[linear-gradient(135deg,var(--accent-strong),var(--accent))]"
+                  className="button-primary px-4 py-2 text-sm"
                 >
                   Dia seguinte
-                </Link>
+                </AppLink>
               ) : null}
             </div>
           </div>
@@ -90,7 +92,7 @@ export default async function MissionPage({ params }: Props) {
                 Aula do dia {day.slug}
               </p>
               <span className="ink-rule mt-3" aria-hidden="true" />
-              <h1 className="mt-4 max-w-4xl font-serif text-[3.2rem] leading-[0.96] text-[var(--foreground)] sm:text-[4.75rem]">
+              <h1 className="mt-4 max-w-4xl font-serif text-[3.2rem] leading-[0.92] tracking-[-0.04em] text-[var(--foreground)] sm:text-[4.75rem]">
                 {day.titulo}
               </h1>
               <p className="mt-4 max-w-3xl text-base leading-8 text-[var(--muted-foreground)] sm:text-lg">
@@ -113,7 +115,7 @@ export default async function MissionPage({ params }: Props) {
 
         <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
           <div className="space-y-6">
-            <section className="panel rounded-[1.8rem] p-6">
+            <section className="panel shell-frame rounded-[1.8rem] p-6">
               <p className="kicker">
                 Visao geral
               </p>
@@ -151,7 +153,7 @@ export default async function MissionPage({ params }: Props) {
               </div>
             </section>
 
-            <section className="panel rounded-[1.8rem] p-6">
+            <section className="panel shell-frame rounded-[1.8rem] p-6">
               <p className="kicker">
                 Como trabalhar hoje
               </p>
@@ -219,7 +221,7 @@ export default async function MissionPage({ params }: Props) {
 
             {day.dia === 10 ? <Day10LaunchConsole /> : null}
 
-            <section className="panel rounded-[1.8rem] p-6">
+            <section className="panel shell-frame rounded-[1.8rem] p-6">
               <p className="kicker">
                 Aprender
               </p>
@@ -261,7 +263,7 @@ export default async function MissionPage({ params }: Props) {
               </div>
             </section>
 
-            <section className="panel rounded-[1.8rem] p-6">
+            <section className="panel shell-frame rounded-[1.8rem] p-6">
               <p className="kicker">
                 Praticar
               </p>
@@ -291,6 +293,47 @@ export default async function MissionPage({ params }: Props) {
                     <p className="mt-4 text-sm leading-7 text-[var(--muted-foreground)]">
                       {exercise.descricao}
                     </p>
+
+                    {EXTENDED_REVIEW_DAYS.has(day.dia) ? (
+                      <div className="mt-5">
+                        <Day1ReviewPanel
+                          itemId={exercise.id}
+                          itemType="exercise"
+                          title={exercise.titulo}
+                          description={exercise.descricao}
+                          maxScore={exercise.pontos}
+                          extraContext={
+                            exercise.id === "ex1.7" && day1LabData
+                              ? [
+                                  `Delta lucro tecnico total: EUR ${day1LabData.summary.totalDeltaLucro}`,
+                                  `Delta reserva total: EUR ${day1LabData.summary.totalDeltaReserva}`,
+                                  `Delta sinistros total: EUR ${day1LabData.summary.totalDeltaSinistros}`,
+                                  `Horas manuais por ciclo: ${day1LabData.summary.totalManualHours}`,
+                                  `Top segmentos por deterioracao do lucro: ${day1LabData.rows
+                                    .slice()
+                                    .sort((a, b) => a.deltaLucro - b.deltaLucro)
+                                    .slice(0, 3)
+                                    .map((row) => `${row.segmentLabel} (${row.deltaLucro})`)
+                                    .join("; ")}`,
+                                  `Top segmentos por subida de reserva: ${day1LabData.rows
+                                    .slice()
+                                    .sort((a, b) => b.deltaReserva - a.deltaReserva)
+                                    .slice(0, 3)
+                                    .map((row) => `${row.segmentLabel} (${row.deltaReserva})`)
+                                    .join("; ")}`,
+                                  `Top tarefas manuais: ${day1LabData.tasks
+                                    .slice()
+                                    .sort((a, b) => b.tempoManualHoras - a.tempoManualHoras)
+                                    .slice(0, 3)
+                                    .map((task) => `${task.tarefa} (${task.tempoManualHoras}h)`)
+                                    .join("; ")}`,
+                                ].join("\n")
+                              : getReviewPreset(exercise.id).extraContext
+                          }
+                          compact
+                        />
+                      </div>
+                    ) : null}
                   </article>
                 ))}
               </div>
@@ -330,6 +373,19 @@ export default async function MissionPage({ params }: Props) {
               <p className="mt-4 text-sm leading-7 text-[var(--muted-foreground)]">
                 {day.desafio.descricao}
               </p>
+
+              {EXTENDED_REVIEW_DAYS.has(day.dia) ? (
+                <div className="mt-5">
+                  <Day1ReviewPanel
+                    itemId={day.desafio.id}
+                    itemType="challenge"
+                    title={day.desafio.titulo}
+                    description={day.desafio.descricao}
+                    maxScore={day.desafio.pontos}
+                    extraContext={getReviewPreset(day.desafio.id).extraContext}
+                  />
+                </div>
+              ) : null}
             </section>
 
             <SubmissionPanel

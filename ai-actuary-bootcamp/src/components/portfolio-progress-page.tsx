@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { AppLink } from "@/components/app-link";
 import { useEffect, useMemo, useState } from "react";
 import { collection, doc, getDoc, getDocs, query, where } from "firebase/firestore";
 
@@ -8,6 +8,7 @@ import { useAuth } from "@/lib/auth-context";
 import { course, days, missionItems } from "@/lib/course";
 import { db } from "@/lib/firebase";
 import { useStudentState } from "@/lib/use-student-state";
+import type { ReviewMap } from "@/lib/day1-review";
 
 type SubmissionEntry = {
   id: string;
@@ -17,6 +18,15 @@ type SubmissionEntry = {
   href: string | null;
   dateLabel: string | null;
   sortValue: number;
+};
+
+type ReviewEntry = {
+  itemId: string;
+  title: string;
+  score: string;
+  feedback: string;
+  updatedAtLabel: string | null;
+  confidence: string;
 };
 
 type CandidateObject = Record<string, unknown>;
@@ -242,7 +252,7 @@ function getDayCompletion(dayProgressIds: string[], progress: Record<string, boo
 
 export function PortfolioProgressPage() {
   const { user } = useAuth();
-  const { progress, stickyNotes, loading } = useStudentState();
+  const { progress, stickyNotes, loading, day1Reviews } = useStudentState();
   const [recentSubmissions, setRecentSubmissions] = useState<SubmissionEntry[]>([]);
   const [submissionsLoading, setSubmissionsLoading] = useState(true);
 
@@ -353,6 +363,38 @@ export function PortfolioProgressPage() {
     };
   }, [stickyNotes, progress]);
 
+  const reviewSummary = useMemo(() => {
+    const entries = Object.values(day1Reviews || {}) as Array<ReviewMap[string]>;
+    const completed = entries.filter((entry) => !entry?.error && entry?.reviewedAnswer?.trim()).length;
+    const fresh = entries.filter((entry) => !entry?.error && entry?.reviewedAnswer?.trim()).slice();
+    const averageScore =
+      completed > 0
+        ? Math.round(
+            entries
+              .filter((entry) => !entry?.error && entry?.reviewedAnswer?.trim())
+              .reduce((sum, entry) => sum + entry.scoreRecommended, 0) / completed,
+          )
+        : 0;
+
+    const recent = fresh
+      .sort((left, right) => right.reviewedAtMs - left.reviewedAtMs)
+      .slice(0, 6)
+      .map((entry) => ({
+        itemId: entry.itemId,
+        title: entry.itemId,
+        score: `${entry.scoreRecommended}/${entry.maxScore}`,
+        feedback: entry.shortFeedback || "Sem comentario curto.",
+        updatedAtLabel: formatDateLabel(entry.reviewedAtMs),
+        confidence: entry.confidence,
+      })) as ReviewEntry[];
+
+    return {
+      completed,
+      averageScore,
+      recent,
+    };
+  }, [day1Reviews]);
+
   const nextSteps = useMemo(() => {
     const actions: Array<{ label: string; href: string }> = [];
 
@@ -389,12 +431,12 @@ export function PortfolioProgressPage() {
     <main className="page-shell px-4 pb-28 pt-8 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl space-y-8">
         <section className="grid gap-5 xl:grid-cols-[1.15fr_0.85fr]">
-          <div className="rounded-[2rem] border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[0_18px_50px_rgba(22,27,45,0.06)] sm:p-8">
+          <div className="panel-tech shell-frame soft-grid rounded-[2rem] p-6 sm:p-8">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--muted-foreground)]">
               Portfolio do estudante
             </p>
             <span className="ink-rule mt-3" aria-hidden="true" />
-            <h1 className="mt-4 max-w-4xl font-serif text-5xl leading-tight text-[var(--foreground)] sm:text-6xl">
+            <h1 className="mt-4 max-w-4xl font-serif text-5xl leading-[0.94] tracking-[-0.04em] text-[var(--foreground)] sm:text-6xl">
               O teu progresso, as tuas entregas e o proximo passo num so lugar.
             </h1>
             <p className="mt-4 max-w-3xl text-base leading-8 text-[var(--muted-foreground)] sm:text-lg">
@@ -403,23 +445,23 @@ export function PortfolioProgressPage() {
 
             <div className="mt-6 flex flex-wrap gap-3">
               {summary.nextDay ? (
-                <Link
+                <AppLink
                   href={`/missions/${summary.nextDay.slug}`}
-                  className="inline-flex items-center rounded-full bg-[var(--accent)] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[var(--accent-strong)]"
+                  className="button-primary px-5 py-3 text-sm"
                 >
                   Continuar no Dia {summary.nextDay.slug}
-                </Link>
+                </AppLink>
               ) : null}
-              <Link
+              <AppLink
                 href="/"
-                className="inline-flex items-center rounded-full border border-[var(--border-strong)] bg-white px-5 py-3 text-sm font-semibold text-[var(--foreground)] transition hover:border-[var(--accent-soft)] hover:bg-[var(--surface-subtle)]"
+                className="button-secondary px-5 py-3 text-sm font-semibold"
               >
                 Voltar ao inicio
-              </Link>
+              </AppLink>
             </div>
           </div>
 
-          <div className="rounded-[2rem] border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[0_18px_50px_rgba(22,27,45,0.06)] sm:p-8">
+          <div className="panel shell-frame rounded-[2rem] p-6 sm:p-8">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--muted-foreground)]">
               Estado da conta
             </p>
@@ -457,36 +499,40 @@ export function PortfolioProgressPage() {
         </section>
 
         <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <article className="rounded-[1.6rem] border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[0_18px_50px_rgba(22,27,45,0.06)]">
+          <article className="metric-card rounded-[1.6rem] p-5">
             <p className="text-xs uppercase tracking-[0.18em] text-[var(--muted-foreground)]">Dias concluidos</p>
             <p className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
               {summary.completedDays}
               <span className="ml-2 text-base font-normal text-[var(--muted-foreground)]">/ {days.length}</span>
             </p>
           </article>
-          <article className="rounded-[1.6rem] border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[0_18px_50px_rgba(22,27,45,0.06)]">
+          <article className="metric-card rounded-[1.6rem] p-5">
             <p className="text-xs uppercase tracking-[0.18em] text-[var(--muted-foreground)]">Itens concluidos</p>
             <p className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
               {summary.completedItems}
               <span className="ml-2 text-base font-normal text-[var(--muted-foreground)]">/ {summary.totalItems}</span>
             </p>
           </article>
-          <article className="rounded-[1.6rem] border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[0_18px_50px_rgba(22,27,45,0.06)]">
+          <article className="metric-card rounded-[1.6rem] p-5">
             <p className="text-xs uppercase tracking-[0.18em] text-[var(--muted-foreground)]">Pontos ganhos</p>
             <p className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
               {summary.completedPoints}
               <span className="ml-2 text-base font-normal text-[var(--muted-foreground)]">/ {summary.totalPoints}</span>
             </p>
           </article>
-          <article className="rounded-[1.6rem] border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[0_18px_50px_rgba(22,27,45,0.06)]">
+          <article className="metric-card rounded-[1.6rem] p-5">
             <p className="text-xs uppercase tracking-[0.18em] text-[var(--muted-foreground)]">Entregas recentes</p>
             <p className="mt-3 text-3xl font-semibold text-[var(--foreground)]">{recentSubmissions.length}</p>
+          </article>
+          <article className="metric-card rounded-[1.6rem] p-5">
+            <p className="text-xs uppercase tracking-[0.18em] text-[var(--muted-foreground)]">Reviews AI</p>
+            <p className="mt-3 text-3xl font-semibold text-[var(--foreground)]">{reviewSummary.completed}</p>
           </article>
         </section>
 
         <section className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
           <div className="space-y-6">
-            <section className="rounded-[2rem] border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[0_18px_50px_rgba(22,27,45,0.06)] sm:p-8">
+            <section className="panel shell-frame rounded-[2rem] p-6 sm:p-8">
               <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--muted-foreground)]">
@@ -503,7 +549,7 @@ export function PortfolioProgressPage() {
 
               <div className="mt-8 grid gap-3">
                 {summary.highlightedDays.map(({ day, completed, total, percent }) => (
-                  <Link
+                  <AppLink
                     key={day.slug}
                     href={`/missions/${day.slug}`}
                     className="grid gap-4 rounded-[1.4rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-4 transition hover:border-[var(--accent-soft)] hover:bg-white md:grid-cols-[auto_1fr_auto] md:items-center"
@@ -519,12 +565,12 @@ export function PortfolioProgressPage() {
                       <p className="text-sm font-semibold text-[var(--foreground)]">{completed}/{total} etapas</p>
                       <p className="mt-1 text-xs uppercase tracking-[0.16em] text-[var(--muted-foreground)]">{percent}% concluido</p>
                     </div>
-                  </Link>
+                  </AppLink>
                 ))}
               </div>
             </section>
 
-            <section className="rounded-[2rem] border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[0_18px_50px_rgba(22,27,45,0.06)] sm:p-8">
+            <section className="panel shell-frame rounded-[2rem] p-6 sm:p-8">
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--muted-foreground)]">
                 Notas adesivas
               </p>
@@ -565,10 +611,74 @@ export function PortfolioProgressPage() {
                 </div>
               </div>
             </section>
+
+            <section className="panel shell-frame rounded-[2rem] p-6 sm:p-8">
+              <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--muted-foreground)]">
+                    Reviews do tutor
+                  </p>
+                  <h2 className="mt-2 font-serif text-3xl text-[var(--foreground)] sm:text-4xl">
+                    Feedback AI guardado ao longo do percurso.
+                  </h2>
+                </div>
+                <p className="max-w-xl text-sm leading-7 text-[var(--muted-foreground)]">
+                  Cada review mostra evidencias, lacunas e o nivel de confianca da avaliacao. Isto torna o progresso mais auditavel e mais facil de rever.
+                </p>
+              </div>
+
+              <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                <article className="rounded-[1.4rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-4">
+                  <p className="text-xs uppercase tracking-[0.16em] text-[var(--muted-foreground)]">Reviews concluidas</p>
+                  <p className="mt-2 text-2xl font-semibold text-[var(--foreground)]">{reviewSummary.completed}</p>
+                </article>
+                <article className="rounded-[1.4rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-4">
+                  <p className="text-xs uppercase tracking-[0.16em] text-[var(--muted-foreground)]">Score medio</p>
+                  <p className="mt-2 text-2xl font-semibold text-[var(--foreground)]">{reviewSummary.averageScore}</p>
+                </article>
+                <article className="rounded-[1.4rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-4">
+                  <p className="text-xs uppercase tracking-[0.16em] text-[var(--muted-foreground)]">Ultimas reviews</p>
+                  <p className="mt-2 text-2xl font-semibold text-[var(--foreground)]">{reviewSummary.recent.length}</p>
+                </article>
+              </div>
+
+              <div className="mt-6 space-y-3">
+                {reviewSummary.recent.length ? (
+                  reviewSummary.recent.map((entry) => (
+                    <article
+                      key={`${entry.itemId}-${entry.updatedAtLabel}`}
+                      className="rounded-[1.4rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-4"
+                    >
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div>
+                          <p className="text-xs uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
+                            {entry.itemId}
+                          </p>
+                          <h3 className="mt-1 text-base font-semibold text-[var(--foreground)]">
+                            {entry.title}
+                          </h3>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-semibold text-[var(--foreground)]">{entry.score}</p>
+                          <p className="mt-1 text-xs uppercase tracking-[0.14em] text-[var(--muted-foreground)]">
+                            {entry.confidence} · {entry.updatedAtLabel ?? "sem data"}
+                          </p>
+                        </div>
+                      </div>
+                      <p className="mt-3 text-sm leading-7 text-[var(--muted-foreground)]">{entry.feedback}</p>
+                    </article>
+                  ))
+                ) : (
+                  <div className="rounded-[1.4rem] border border-dashed border-[var(--border-strong)] bg-[var(--surface-subtle)] p-4 text-sm text-[var(--muted-foreground)]">
+                    Ainda nao ha reviews AI guardadas no teu perfil.
+                  </div>
+                )}
+              </div>
+            </section>
           </div>
 
           <aside className="space-y-6 xl:sticky xl:top-24 xl:self-start">
-            <section className="rounded-[2rem] border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[0_18px_50px_rgba(22,27,45,0.06)] sm:p-8">
+            <section className="panel shell-frame rounded-[2rem] p-6 sm:p-8">
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--muted-foreground)]">
                 Entregas recentes
               </p>
@@ -601,13 +711,13 @@ export function PortfolioProgressPage() {
 
                     if (item.href) {
                       return (
-                        <Link
+                        <AppLink
                           key={item.id}
                           href={item.href}
                           className="block rounded-[1.4rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-4 transition hover:border-[var(--accent-soft)] hover:bg-white"
                         >
                           {content}
-                        </Link>
+                        </AppLink>
                       );
                     }
 
@@ -628,19 +738,19 @@ export function PortfolioProgressPage() {
               </div>
             </section>
 
-            <section className="rounded-[2rem] border border-[var(--accent-soft)] bg-[linear-gradient(180deg,rgba(124,63,88,0.06),rgba(124,63,88,0.1))] p-6 shadow-[0_18px_50px_rgba(22,27,45,0.06)] sm:p-8">
+            <section className="panel-tech shell-frame rounded-[2rem] p-6 sm:p-8">
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--accent)]">
                 Proximos passos
               </p>
               <div className="mt-5 space-y-3">
                 {nextSteps.map((step) => (
-                  <Link
+                  <AppLink
                     key={step.label}
                     href={step.href}
-                    className="block rounded-[1.4rem] border border-[var(--accent-soft)] bg-white/70 px-4 py-3 text-sm leading-7 text-[var(--foreground)] transition hover:bg-white"
+                    className="block rounded-[1.4rem] border border-[rgba(17,32,46,0.08)] bg-white/74 px-4 py-3 text-sm leading-7 text-[var(--foreground)] transition hover:border-[var(--cool-accent)] hover:bg-white"
                   >
                     {step.label}
-                  </Link>
+                  </AppLink>
                 ))}
               </div>
             </section>

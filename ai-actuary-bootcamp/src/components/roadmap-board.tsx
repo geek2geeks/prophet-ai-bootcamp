@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useMemo } from "react";
 
+import { AppLink } from "@/components/app-link";
 import type { DayWithMeta } from "@/lib/course";
 import { useStudentState } from "@/lib/use-student-state";
 
@@ -43,7 +43,7 @@ export function RoadmapBoard({ days }: Props) {
   return (
     <section
       id="roadmap"
-      className="panel rounded-[2rem] p-6 sm:p-8"
+      className="panel shell-frame rounded-[2rem] p-6 sm:p-8"
     >
       <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
@@ -75,12 +75,12 @@ export function RoadmapBoard({ days }: Props) {
                 const status = getDayStatus(day, progress);
 
                 return (
-                  <Link
+                  <AppLink
                     key={day.slug}
                     href={`/missions/${day.slug}`}
-                    className="grid gap-4 rounded-[1.5rem] border border-[var(--border)] bg-[rgba(255,255,255,0.74)] p-5 shadow-[0_14px_38px_rgba(47,41,34,0.05)] transition hover:border-[var(--accent-soft)] hover:bg-white hover:shadow-[0_20px_46px_rgba(47,41,34,0.08)] md:grid-cols-[auto_1fr_auto] md:items-start"
+                    className="grid gap-4 rounded-[1.5rem] border border-[rgba(17,32,46,0.08)] bg-[rgba(255,255,255,0.78)] p-5 shadow-[0_18px_40px_rgba(23,36,48,0.06)] transition duration-300 hover:border-[var(--cool-accent)] hover:bg-white hover:shadow-[0_24px_52px_rgba(23,36,48,0.1)] md:grid-cols-[auto_1fr_auto] md:items-start"
                   >
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--accent-ghost)] text-sm font-semibold text-[var(--accent)]">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--cool-accent-soft)] text-sm font-semibold text-[var(--cool-accent)]">
                       {day.slug}
                     </div>
 
@@ -117,7 +117,7 @@ export function RoadmapBoard({ days }: Props) {
                         {day.totalMissionPoints} pts
                       </span>
                     </div>
-                  </Link>
+                  </AppLink>
                 );
               })}
             </div>

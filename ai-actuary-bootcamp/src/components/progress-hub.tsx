@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useMemo } from "react";
 
+import { AppLink } from "@/components/app-link";
 import type { DayWithMeta } from "@/lib/course";
 import { useStudentState } from "@/lib/use-student-state";
 import { type ProgressMap } from "@/lib/student-state";
@@ -59,13 +59,13 @@ export function ProgressHub({ items, days }: Props) {
 
   return (
     <section className="grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
-      <div className="panel rounded-[2rem] p-6 sm:p-8">
+      <div className="panel-tech shell-frame soft-grid rounded-[2.1rem] p-6 sm:p-8">
         <p className="kicker">
           Continuar aprendizagem
         </p>
         <div className="mt-4 grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
           <div>
-            <h2 className="font-serif text-3xl text-[var(--foreground)] sm:text-4xl">
+            <h2 className="font-serif text-3xl tracking-[-0.03em] text-[var(--foreground)] sm:text-4xl">
               Dia {summary.currentDay.slug}: {summary.currentDay.titulo}
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--muted-foreground)] sm:text-base">
@@ -84,12 +84,12 @@ export function ProgressHub({ items, days }: Props) {
             </div>
           </div>
 
-          <Link
+          <AppLink
             href={`/missions/${summary.nextMission}`}
-            className="inline-flex items-center justify-center rounded-full bg-[linear-gradient(135deg,var(--accent),#d88657)] px-5 py-3 text-sm font-semibold text-white shadow-[0_14px_34px_rgba(181,95,50,0.22)] transition hover:translate-y-[-1px] hover:bg-[linear-gradient(135deg,var(--accent-strong),var(--accent))]"
+            className="button-primary px-5 py-3 text-sm"
           >
             Retomar aula
-          </Link>
+          </AppLink>
         </div>
       </div>
 

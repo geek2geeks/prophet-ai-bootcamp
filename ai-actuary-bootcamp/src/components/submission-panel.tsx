@@ -14,6 +14,9 @@ import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { useAuth } from "@/lib/auth-context";
 import { db } from "@/lib/firebase";
 import { storage } from "@/lib/submission-storage";
+import { getDay1ChallengeSubmissionGateMessage } from "@/lib/day1-review";
+import { EXTENDED_REVIEW_DAYS } from "@/lib/review-presets";
+import { useStudentState } from "@/lib/use-student-state";
 import {
   buildSubmissionRecord,
   mergeSubmissionRecords,
@@ -29,6 +32,8 @@ type SubmissionPanelProps = {
   missionLabel?: string;
   artifactHints?: string[];
   className?: string;
+  submitDisabled?: boolean;
+  submitDisabledReason?: string | null;
 };
 
 const MAX_FILE_SIZE = 20 * 1024 * 1024;
@@ -88,8 +93,11 @@ export function SubmissionPanel({
   missionLabel,
   artifactHints,
   className,
+  submitDisabled = false,
+  submitDisabledReason = null,
 }: SubmissionPanelProps) {
   const { user, loading: authLoading } = useAuth();
+  const { day1Answers, day1Reviews } = useStudentState();
 
   const [summary, setSummary] = useState("");
   const [artifactTitle, setArtifactTitle] = useState("");
@@ -105,6 +113,20 @@ export function SubmissionPanel({
     () => buildUserName(user?.displayName ?? null, user?.email ?? null),
     [user?.displayName, user?.email],
   );
+  const missionDayNumber = useMemo(() => Number.parseInt(missionId, 10), [missionId]);
+  const day1ChallengeGate = useMemo(() => {
+    if (!EXTENDED_REVIEW_DAYS.has(missionDayNumber)) {
+      return null;
+    }
+
+    const challengeId = `des${missionDayNumber}`;
+    return getDay1ChallengeSubmissionGateMessage(
+      day1Reviews[challengeId],
+      day1Answers[challengeId] ?? "",
+    );
+  }, [day1Answers, day1Reviews, missionDayNumber]);
+  const effectiveSubmitDisabledReason = submitDisabledReason ?? day1ChallengeGate;
+  const effectiveSubmitDisabled = submitDisabled || Boolean(day1ChallengeGate);
 
   useEffect(() => {
     let isActive = true;
@@ -177,6 +199,11 @@ export function SubmissionPanel({
 
     if (!trimmedSummary) {
       setErrorMessage("Escreve um resumo curto do que foi entregue.");
+      return;
+    }
+
+    if (effectiveSubmitDisabled) {
+      setErrorMessage(effectiveSubmitDisabledReason || "Esta entrega exige uma review valida antes do envio.");
       return;
     }
 
@@ -266,7 +293,7 @@ export function SubmissionPanel({
   return (
     <section
       className={joinClassNames(
-        "panel rounded-[1.8rem] p-6",
+        "panel shell-frame rounded-[1.8rem] p-6",
         className,
       )}
     >
@@ -387,6 +414,12 @@ export function SubmissionPanel({
           </div>
         ) : null}
 
+        {effectiveSubmitDisabledReason ? (
+          <div className="rounded-[1.2rem] border border-[#ead7b3] bg-[#fff8ea] px-4 py-3 text-sm text-[#8a6630]">
+            {effectiveSubmitDisabledReason}
+          </div>
+        ) : null}
+
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="text-sm leading-7 text-[var(--muted-foreground)]">
             {authLoading
@@ -398,8 +431,8 @@ export function SubmissionPanel({
 
           <button
             type="submit"
-            disabled={submitting || authLoading || !user}
-            className="inline-flex items-center justify-center rounded-full bg-[linear-gradient(135deg,var(--accent),#d88657)] px-5 py-3 text-sm font-semibold text-white shadow-[0_12px_28px_rgba(181,95,50,0.2)] transition hover:translate-y-[-1px] hover:bg-[linear-gradient(135deg,var(--accent-strong),var(--accent))] disabled:cursor-not-allowed disabled:opacity-60"
+            disabled={submitting || authLoading || !user || effectiveSubmitDisabled}
+            className="button-primary px-5 py-3 text-sm disabled:cursor-not-allowed disabled:opacity-60"
           >
             {submitting ? "A enviar..." : "Enviar evidencia"}
           </button>

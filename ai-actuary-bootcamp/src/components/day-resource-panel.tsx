@@ -33,7 +33,7 @@ export async function DayResourcePanel({
   const markdownPreview = markdownResource ? await readMarkdownPreview(markdownResource) : null;
 
   return (
-    <section className="panel rounded-[1.8rem] p-6">
+    <section className="panel shell-frame rounded-[1.8rem] p-6">
       <p className="kicker">
         Recursos
       </p>
@@ -62,7 +62,7 @@ export async function DayResourcePanel({
 
                 <a
                   href={buildResourceDownloadHref(resource.id)}
-                  className="inline-flex items-center rounded-full border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-semibold text-[var(--foreground)] transition hover:border-[var(--accent-soft)] hover:bg-[var(--accent-ghost)]"
+                  className="button-secondary px-4 py-2 text-sm font-semibold"
                 >
                   Download
                 </a>
@@ -71,7 +71,7 @@ export async function DayResourcePanel({
           ))}
         </div>
 
-        <div className="rounded-[1.4rem] border border-[rgba(29,39,48,0.2)] bg-[linear-gradient(180deg,#223746,#18242d)] p-5 text-white shadow-[0_22px_50px_rgba(29,39,48,0.22)]">
+        <div className="tech-surface rounded-[1.4rem] p-5 text-white shadow-[0_22px_50px_rgba(29,39,48,0.22)]">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/60">
             Preview util
           </p>

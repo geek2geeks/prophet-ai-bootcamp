@@ -2,6 +2,8 @@
 
 import { useMemo } from "react";
 import { useStudentState } from "@/lib/use-student-state";
+import { getDay1ReviewGateMessage } from "@/lib/day1-review";
+import { EXTENDED_REVIEW_DAYS } from "@/lib/review-presets";
 
 type Exercise = {
   id: string;
@@ -34,7 +36,7 @@ export function MissionWorkspaceTools({
   cliLabel,
   artifactList,
 }: Props) {
-  const { progress, toggleProgress, loading } = useStudentState();
+  const { progress, toggleProgress, loading, day1Answers, day1Reviews } = useStudentState();
 
   const items = useMemo(() => [...exercises, challenge], [challenge, exercises]);
   const completedCount = items.filter((item) => progress[item.id]).length;
@@ -49,7 +51,7 @@ export function MissionWorkspaceTools({
 
   return (
     <div className="space-y-4">
-      <section className="panel rounded-[1.75rem] p-5">
+      <section className="panel-tech shell-frame rounded-[1.9rem] p-5">
         <p className="kicker">
           Hoje em resumo
         </p>
@@ -74,55 +76,91 @@ export function MissionWorkspaceTools({
         </div>
       </section>
 
-      <section className="panel rounded-[1.75rem] p-5">
+      <section className="panel shell-frame rounded-[1.75rem] p-5">
         <p className="kicker">
           Checklist de sucesso
         </p>
         <div className="mt-4 space-y-3">
-          {exercises.map((exercise) => (
-            <label
-              key={exercise.id}
-              className="panel-soft flex cursor-pointer items-start gap-3 rounded-2xl px-4 py-3"
-            >
-              <input
-                type="checkbox"
-                className="mt-1 h-4 w-4 rounded border-[var(--border-strong)] text-[var(--accent)]"
-                checked={Boolean(progress[exercise.id])}
-                onChange={(e) => toggleProgress(exercise.id, e.target.checked)}
-                disabled={loading}
-              />
-              <div>
-                <p className="text-xs uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-                  {exercise.id}
-                </p>
-                <p className="mt-1 text-sm font-medium text-[var(--foreground)]">
-                  {exercise.titulo}
-                </p>
-              </div>
-            </label>
-          ))}
+          {exercises.map((exercise) => {
+            const reviewGate =
+              EXTENDED_REVIEW_DAYS.has(dayNumber)
+                ? getDay1ReviewGateMessage(
+                    day1Reviews[exercise.id],
+                    day1Answers[exercise.id] ?? "",
+                    "exercise",
+                  )
+                : null;
+            const isChecked = Boolean(progress[exercise.id]);
 
-          <label className="panel-accent flex cursor-pointer items-start gap-3 rounded-2xl px-4 py-3">
-            <input
-              type="checkbox"
-              className="mt-1 h-4 w-4 rounded border-[var(--border-strong)] text-[var(--accent)]"
-              checked={Boolean(progress[challenge.id])}
-              onChange={(e) => toggleProgress(challenge.id, e.target.checked)}
-              disabled={loading}
-            />
-            <div>
-              <p className="text-xs uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-                Desafio
-              </p>
-              <p className="mt-1 text-sm font-medium text-[var(--foreground)]">
-                {challenge.titulo}
-              </p>
-            </div>
-          </label>
+            return (
+              <label
+                key={exercise.id}
+                className="panel-soft flex cursor-pointer items-start gap-3 rounded-2xl px-4 py-3"
+              >
+                <input
+                  type="checkbox"
+                  className="mt-1 h-4 w-4 rounded border-[var(--border-strong)] text-[var(--accent)]"
+                  checked={isChecked}
+                  onChange={(e) => toggleProgress(exercise.id, e.target.checked)}
+                  disabled={loading || (!isChecked && Boolean(reviewGate))}
+                />
+                <div>
+                  <p className="text-xs uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
+                    {exercise.id}
+                  </p>
+                  <p className="mt-1 text-sm font-medium text-[var(--foreground)]">
+                    {exercise.titulo}
+                  </p>
+                  {reviewGate && !isChecked ? (
+                    <p className="mt-2 text-xs leading-5 text-[var(--muted-foreground)]">
+                      {reviewGate}
+                    </p>
+                  ) : null}
+                </div>
+              </label>
+            );
+          })}
+
+          {(() => {
+            const reviewGate =
+              EXTENDED_REVIEW_DAYS.has(dayNumber)
+                ? getDay1ReviewGateMessage(
+                    day1Reviews[challenge.id],
+                    day1Answers[challenge.id] ?? "",
+                    "challenge",
+                  )
+                : null;
+            const isChecked = Boolean(progress[challenge.id]);
+
+            return (
+              <label className="panel-accent flex cursor-pointer items-start gap-3 rounded-2xl px-4 py-3">
+                <input
+                  type="checkbox"
+                  className="mt-1 h-4 w-4 rounded border-[var(--border-strong)] text-[var(--accent)]"
+                  checked={isChecked}
+                  onChange={(e) => toggleProgress(challenge.id, e.target.checked)}
+                  disabled={loading || (!isChecked && Boolean(reviewGate))}
+                />
+                <div>
+                  <p className="text-xs uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
+                    Desafio
+                  </p>
+                  <p className="mt-1 text-sm font-medium text-[var(--foreground)]">
+                    {challenge.titulo}
+                  </p>
+                  {reviewGate && !isChecked ? (
+                    <p className="mt-2 text-xs leading-5 text-[var(--muted-foreground)]">
+                      {reviewGate}
+                    </p>
+                  ) : null}
+                </div>
+              </label>
+            );
+          })()}
         </div>
       </section>
 
-      <section className="panel rounded-[1.75rem] p-5">
+      <section className="panel shell-frame rounded-[1.75rem] p-5">
         <p className="kicker">
           Modo de trabalho
         </p>
@@ -143,7 +181,7 @@ export function MissionWorkspaceTools({
       </section>
 
       {artifactList?.length ? (
-        <section className="panel rounded-[1.75rem] p-5">
+        <section className="panel shell-frame rounded-[1.75rem] p-5">
           <p className="kicker">
             Artefactos a guardar
           </p>
@@ -161,7 +199,7 @@ export function MissionWorkspaceTools({
       ) : null}
 
       {/* Sticky notes tip */}
-      <section className="panel rounded-[1.75rem] p-5">
+      <section className="panel shell-frame rounded-[1.75rem] p-5">
         <p className="kicker">
           Notas
         </p>
