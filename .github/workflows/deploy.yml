@@ -120,7 +120,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ai-actuary-bootcamp-static-export
-          path: ai-actuary-bootcamp
+          path: ai-actuary-bootcamp/out
 
       - name: Validate Firebase preview configuration
         env:
@@ -167,7 +167,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ai-actuary-bootcamp-static-export
-          path: ai-actuary-bootcamp
+          path: ai-actuary-bootcamp/out
 
       - name: Validate Firebase production configuration
         env:
