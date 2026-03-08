@@ -62,9 +62,17 @@ if day["dia"] == 0:
         </div>
         """)
 
+        render_html("""
+        <div style="padding:8px 16px; background:#EFF6FF; border:1px solid #BFDBFE; border-radius:8px; margin-bottom:16px;">
+            <p style="margin:0; color:#1E40AF; font-size:0.85rem; line-height:1.6;">
+                <strong>Qual e a diferenca?</strong> A <strong>DeepSeek API Key</strong> e a chave que permite ao OpenCode comunicar com o modelo de IA (e a chave principal que precisas para os exercicios). A <strong>OpenCode Key</strong> e a chave do plano do bootcamp para o proprio OpenCode. Configura primeiro a DeepSeek, depois a OpenCode.
+            </p>
+        </div>
+        """)
+
         col1, col2 = st.columns(2)
         with col1:
-            st.markdown("**🤖 DeepSeek API Key**")
+            st.markdown("**🤖 DeepSeek API Key** _(principal)_")
             st.caption(t("bootcamp_keys_deepseek_hint"))
             try:
                 dk = st.secrets["bootcamp"]["deepseek_api_key"]
@@ -83,7 +91,10 @@ if day["dia"] == 0:
             try:
                 ok = st.secrets["bootcamp"]["opencode_api_key"]
                 st.code(ok, language=None)
-                st.caption(t("bootcamp_keys_opencode_usage"))
+                st.code(f"set OPENCODE_API_KEY={ok}", language="bash")
+                st.caption("☝️ Windows (CMD)")
+                st.code(f"export OPENCODE_API_KEY={ok}", language="bash")
+                st.caption("☝️ Mac / Linux")
             except Exception:
                 st.warning(t("bootcamp_keys_not_configured"))
 
@@ -147,12 +158,19 @@ with st.container():
     render_html('<div class="challenge-form-shell">')
     st.markdown(f"#### {t('submit_project')}")
     render_html(f"<p style='font-size:0.9rem; color:#64748B;'>{t('submit_description')}</p>")
-    render_html(f"<p class='challenge-note'>{t('exercise_repo_hint')}</p>")
+    if day["dia"] == 0:
+        render_html("""
+        <p class='challenge-note' style='color:#059669; font-size:0.9rem;'>
+            📎 Dia 0: Cola um link (Google Drive, pasta partilhada) OU descreve o que fizeste. Nao precisas de GitHub.
+        </p>
+        """)
+    else:
+        render_html(f"<p class='challenge-note'>{t('exercise_repo_hint')}</p>")
     with st.form(f"challenge_{d['id']}", border=False):
         repo_url = st.text_input(
             t("repo_label"),
             value=existing_sub.get("repo_url", ""),
-            placeholder=t("repo_placeholder"),
+            placeholder="Link Google Drive, pasta partilhada, ou descricao do que fizeste..." if day["dia"] == 0 else t("repo_placeholder"),
             label_visibility="collapsed"
         )
 

@@ -444,6 +444,15 @@ h1 a, h2 a, h3 a, h4 a { display: none !important; }
     top: 0;
 }
 
+.timeline-topic-content {
+    margin: 0.2rem 0 0.55rem 0;
+    font-size: 0.8rem;
+    color: #94A3B8;
+    font-weight: 400;
+    line-height: 1.55;
+    font-style: italic;
+}
+
 .timeline-exercises {
     margin-top: 20px;
     padding-top: 20px;
@@ -2087,6 +2096,9 @@ section[data-testid="stSidebar"] hr {
     .timeline-topic-list li {
         font-size: 0.79rem;
         padding-left: 0.72rem;
+    }
+    .timeline-topic-content {
+        font-size: 0.75rem;
     }
     .hero-title,
     .timeline-header-content h3 {

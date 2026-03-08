@@ -230,9 +230,9 @@ TRANSLATIONS = {
         "fr": "Apprendre a operer",
     },
     "landing_founder_1_desc": {
-        "pt": "OpenCode, MCPs, APIs, docs e modelos para trabalhares com LLMs como motor de execucao.",
-        "en": "OpenCode, MCPs, APIs, docs, and models to work with LLMs as an execution engine.",
-        "fr": "OpenCode, MCPs, APIs, docs et modeles pour travailler avec les LLMs comme moteur d'execution.",
+        "pt": "OpenCode, APIs, docs e modelos para trabalhares com LLMs como motor de execucao.",
+        "en": "OpenCode, APIs, docs, and models to work with LLMs as an execution engine.",
+        "fr": "OpenCode, APIs, docs et modeles pour travailler avec les LLMs comme moteur d'execution.",
     },
     "landing_founder_2_title": {
         "pt": "Definir um produto pequeno",
@@ -280,9 +280,9 @@ TRANSLATIONS = {
         "fr": "Stack AI Builder",
     },
     "feat_agents_desc": {
-        "pt": "OpenCode, GLM-5, DeepSeek, MCPs e prompts reutilizaveis para construir com velocidade",
-        "en": "OpenCode, GLM-5, DeepSeek, MCPs, and reusable prompts to build with speed",
-        "fr": "OpenCode, GLM-5, DeepSeek, MCPs et prompts reutilisables pour construire rapidement",
+        "pt": "OpenCode, GLM-5, DeepSeek e prompts reutilizaveis para construir com velocidade",
+        "en": "OpenCode, GLM-5, DeepSeek, and reusable prompts to build with speed",
+        "fr": "OpenCode, GLM-5, DeepSeek et prompts reutilisables pour construire rapidement",
     },
     "feat_ml": {
         "pt": "Specs & APIs",
@@ -1219,9 +1219,9 @@ TRANSLATIONS = {
         "fr": "Bonjour! Je suis votre AI Tuteur",
     },
     "tutor_welcome_sub": {
-        "pt": "Posso ajudar-te com specs, OpenCode, MCPs, APIs, Prophet Lite,<br>document drop, deploy, narrativa de produto e qualquer duvida do bootcamp.",
-        "en": "I can help with specs, OpenCode, MCPs, APIs, Prophet Lite,<br>document drop, deployment, product narrative, and any bootcamp question.",
-        "fr": "Je peux aider sur les specs, OpenCode, MCPs, APIs, Prophet Lite,<br>depot de documents, deployement, narration produit et toute question du bootcamp.",
+        "pt": "Posso ajudar-te com specs, OpenCode, APIs, Prophet Lite,<br>document drop, deploy, narrativa de produto e qualquer duvida do bootcamp.",
+        "en": "I can help with specs, OpenCode, APIs, Prophet Lite,<br>document drop, deployment, product narrative, and any bootcamp question.",
+        "fr": "Je peux aider sur les specs, OpenCode, APIs, Prophet Lite,<br>depot de documents, deployement, narration produit et toute question du bootcamp.",
     },
     "chat_placeholder": {
         "pt": "Escreve a tua pergunta...",
@@ -1331,9 +1331,9 @@ TRANSLATIONS = {
         "fr": "Template de post",
     },
     "launch_template_body": {
-        "pt": "Hoje lancei o meu Prophet Lite com copiloto AI.\n\nProblema: muitas equipas ainda trabalham com processos pesados, ferramentas legacy e demasiada friccao para transformar assumptions, model points e documentos em runs claros.\n\nO que construí: um MVP que permite subir inputs, correr projecoes deterministicas, explicar resultados com AI e capturar conhecimento a partir de documentos.\n\nStack: OpenCode, GLM-5, DeepSeek, MCPs, Streamlit, ChromaDB e Supabase.\n\nO mais importante que aprendi: com coding LLMs nao preciso de ser programador tradicional para construir software; preciso de saber especificar, validar, iterar e lancar.\n\nSe trabalhas em seguros, vida, analytics ou software B2B e isto te interessa, fala comigo.",
-        "en": "Today I launched my Prophet Lite with an AI copilot.\n\nProblem: many teams still work with heavy processes, legacy tools, and too much friction when turning assumptions, model points, and documents into clear runs.\n\nWhat I built: an MVP that lets users upload inputs, run deterministic projections, explain results with AI, and capture knowledge from documents.\n\nStack: OpenCode, GLM-5, DeepSeek, MCPs, Streamlit, ChromaDB, and Supabase.\n\nWhat I learned most: with coding LLMs I do not need to be a traditional programmer to build software; I need to know how to specify, validate, iterate, and launch.\n\nIf you work in insurance, life, analytics, or B2B software and this is relevant, let’s talk.",
-        "fr": "Aujourd'hui j'ai lance mon Prophet Lite avec copilote AI.\n\nProbleme : beaucoup d'equipes travaillent encore avec des processus lourds, des outils legacy et trop de friction pour transformer hypotheses, model points et documents en runs clairs.\n\nCe que j'ai construit : un MVP qui permet d'uploader des inputs, lancer des projections deterministes, expliquer les resultats avec l'AI et capturer la connaissance depuis des documents.\n\nStack : OpenCode, GLM-5, DeepSeek, MCPs, Streamlit, ChromaDB et Supabase.\n\nLe plus important que j'ai appris : avec les coding LLMs je n'ai pas besoin d'etre un programmeur traditionnel pour construire du software ; je dois savoir specifier, valider, iterer et lancer.\n\nSi vous travaillez dans l'assurance, la vie, l'analytics ou le software B2B et que cela vous parle, parlons-en.",
+        "pt": "Hoje lancei o meu Prophet Lite com copiloto AI.\n\nProblema: muitas equipas ainda trabalham com processos pesados, ferramentas legacy e demasiada friccao para transformar assumptions, model points e documentos em runs claros.\n\nO que construí: um MVP que permite subir inputs, correr projecoes deterministicas, explicar resultados com AI e capturar conhecimento a partir de documentos.\n\nStack: OpenCode, GLM-5, DeepSeek, Streamlit, ChromaDB e Supabase.\n\nO mais importante que aprendi: com coding LLMs nao preciso de ser programador tradicional para construir software; preciso de saber especificar, validar, iterar e lancar.\n\nSe trabalhas em seguros, vida, analytics ou software B2B e isto te interessa, fala comigo.",
+        "en": "Today I launched my Prophet Lite with an AI copilot.\n\nProblem: many teams still work with heavy processes, legacy tools, and too much friction when turning assumptions, model points, and documents into clear runs.\n\nWhat I built: an MVP that lets users upload inputs, run deterministic projections, explain results with AI, and capture knowledge from documents.\n\nStack: OpenCode, GLM-5, DeepSeek, Streamlit, ChromaDB, and Supabase.\n\nWhat I learned most: with coding LLMs I do not need to be a traditional programmer to build software; I need to know how to specify, validate, iterate, and launch.\n\nIf you work in insurance, life, analytics, or B2B software and this is relevant, let’s talk.",
+        "fr": "Aujourd'hui j'ai lance mon Prophet Lite avec copilote AI.\n\nProbleme : beaucoup d'equipes travaillent encore avec des processus lourds, des outils legacy et trop de friction pour transformer hypotheses, model points et documents en runs clairs.\n\nCe que j'ai construit : un MVP qui permet d'uploader des inputs, lancer des projections deterministes, expliquer les resultats avec l'AI et capturer la connaissance depuis des documents.\n\nStack : OpenCode, GLM-5, DeepSeek, Streamlit, ChromaDB et Supabase.\n\nLe plus important que j'ai appris : avec les coding LLMs je n'ai pas besoin d'etre un programmeur traditionnel pour construire du software ; je dois savoir specifier, valider, iterer et lancer.\n\nSi vous travaillez dans l'assurance, la vie, l'analytics ou le software B2B et que cela vous parle, parlons-en.",
     },
     "launch_assets_title": {
         "pt": "Assets a preparar",

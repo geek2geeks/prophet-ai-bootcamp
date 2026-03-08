@@ -151,12 +151,16 @@ def _decode_oauth_context(token: Optional[str]) -> dict:
 
 def _handle_oauth_callback():
     params = st.query_params
+    with open("oauth_debug.log", "a") as f:
+        f.write(f"OAUTH CALLBACK PARAMS: {params}\n")
     code = params.get("code")
     oauth_ctx = params.get("oauth_ctx")
     error_description = params.get("error_description")
 
     if error_description and st.session_state.get("user") is None:
         st.query_params.clear()
+        with open("oauth_debug.log", "a") as f:
+            f.write(f"OAUTH ERROR: {error_description}\n")
         st.error(f"Erro no callback OAuth: {error_description}")
         return
 
@@ -187,6 +191,9 @@ def _handle_oauth_callback():
 
                 st.query_params.clear()
             except Exception as e:
+                import traceback
+                with open("oauth_debug.log", "a") as f:
+                    f.write(f"OAUTH EXCEPTION: {e}\n{traceback.format_exc()}\n")
                 st.query_params.clear()
                 st.error(f"Erro no callback OAuth: {e}")
 

@@ -19,7 +19,7 @@ COURSE_CONTEXT = {
         "opencode": {
             "descricao": "Agente de AI coding open-source para o terminal. Escrito em Go. TUI interativa + modo CLI.",
             "instalacao": "npm i -g opencode",
-            "config": "opencode.jsonc na raiz do projeto ou ~/.config/opencode/opencode.jsonc (global)",
+            "config": "Configuracao via variaveis de ambiente e ficheiro de definicoes do OpenCode CLI. Semelhante ao Claude Code.",
             "ferramentas_builtin": [
                 "read (ler ficheiros)", "write (criar ficheiros)", "edit (editar com string replacement)",
                 "bash (executar comandos shell)", "grep (pesquisar conteudo com regex)",
@@ -36,43 +36,12 @@ COURSE_CONTEXT = {
                 "opencode run --continue": "Continua ultima sessao",
                 "opencode run --format json 'prompt'": "Output em JSON estruturado",
                 "opencode stats": "Ver consumo de tokens e custos",
-                "opencode mcp list": "Listar MCPs configurados",
                 "opencode agent list": "Listar agentes disponiveis",
                 "opencode models": "Listar modelos disponiveis"
             },
-            "agentes": "Agentes personalizados definidos no opencode.jsonc. Cada agente tem: description, model, prompt, tools permitidas. Usar para tarefas repetitivas (ex: agente 'code-reviewer' que so le e comenta).",
+            "agentes": "Agentes personalizados definidos na configuracao do OpenCode CLI. Cada agente tem: description, model, prompt, tools permitidas. Usar para tarefas repetitivas (ex: agente 'code-reviewer' que so le e comenta).",
             "sessions": "Sessoes guardam o historico de conversa. Continuar com --continue, retomar com --session ID, bifurcar com --fork. Exportar/importar com opencode export/import.",
-            "permissoes": "Por defeito tudo permitido. Configurar no opencode.jsonc: permission.bash = 'ask' para pedir confirmacao antes de executar comandos shell."
-        },
-        "mcps": {
-            "descricao": "Model Context Protocol -- servidores que estendem LLMs com ferramentas externas. Protocolo aberto criado pela Anthropic.",
-            "config_formato": "No opencode.jsonc, seccao 'mcp'. Cada servidor tem nome unico, tipo (local/remote), e comando/url.",
-            "excel_mcp": {
-                "pacote": "@negokaz/excel-mcp-server",
-                "instalacao": "Configurar no opencode.jsonc",
-                "config_exemplo": '{"mcp": {"excel": {"type": "local", "command": ["npx", "--yes", "@negokaz/excel-mcp-server"]}}}',
-                "tools": [
-                    "excel_describe_sheets (listar sheets e metadata)",
-                    "excel_read_sheet (ler celulas com paginacao, formulas, estilos)",
-                    "excel_write_to_sheet (escrever valores e formulas -- formulas comecam com '=')",
-                    "excel_create_table (converter range em tabela formatada)",
-                    "excel_copy_sheet (duplicar sheets)",
-                    "excel_format_range (aplicar borders, fonts, fills, number formats)"
-                ],
-                "formatos": "xlsx, xlsm, xltx, xltm",
-                "env": "EXCEL_MCP_PAGING_CELLS_LIMIT=4000 (max celulas por leitura)"
-            },
-            "supabase_mcp": {
-                "url": "https://mcp.supabase.com/mcp",
-                "tipo": "remote",
-                "tools": "list_tables, execute_sql, apply_migration, get_logs, deploy_edge_function, generate_typescript_types, search_docs",
-                "auth": "OAuth automatico via browser ou Bearer token manual",
-                "seguranca": "Usar read_only=true para dados reais, project_ref para limitar acesso"
-            },
-            "filesystem_mcp": "Servidor oficial MCP para operacoes de ficheiros com controlo de acesso. Util para navegar projetos e ler dados.",
-            "pdf_reader_mcp": "Extrair texto e metadados de PDFs. Util para regulamentacao (Solvencia II), clausulados, notas de alta.",
-            "google_sheets_mcp": "Ler/escrever spreadsheets partilhadas via Google Drive. Packages: @xing5/mcp-google-sheets, mcp-gsheets.",
-            "context7_mcp": "Pesquisar documentacao tecnica atualizada. URL: https://mcp.context7.com/mcp (remote, sem auth)."
+            "permissoes": "Por defeito tudo permitido. Configurar nas definicoes do OpenCode CLI: permission.bash = 'ask' para pedir confirmacao antes de executar comandos shell."
         },
         "python": "Python 3.11+ como runtime do MVP. O objetivo nao e ensinar programacao profunda, mas permitir que o aluno opere, leia e valide o que o LLM gera.",
         "z_ai": "Z.ai Coding Plan (GLM-5) para planear implementacoes, rever specs e estruturar trabalho antes de mandar construir.",
@@ -133,7 +102,6 @@ COURSE_CONTEXT = {
     "conceitos_tecnicos": {
         "tokens": "Unidades de texto (~4 chars ingles, ~3 portugues). Input + output = custo. Context window limita quanto o modelo 've'. 1 pagina A4 ~ 500-700 tokens.",
         "temperature": "0 = deterministico/preciso, 1 = criativo/variado. Para calculos atuariais: 0-0.3. Para brainstorming: 0.7-1.0.",
-        "MCP": "Model Context Protocol -- servidores que dao ao LLM acesso a ferramentas externas. Configurados via JSON no opencode.jsonc. Protocolo aberto (Anthropic).",
         "JSON_mode": "Pedir resposta estruturada em JSON. Essencial para pipelines: extrair dados de texto, gerar configs, criar datasets.",
         "streaming": "Tokens aparecem um a um (interativo) vs batch (resposta completa). OpenCode TUI usa streaming, 'opencode run' pode usar batch.",
         "RAG": "Retrieval-Augmented Generation: documentos -> embeddings -> vector DB -> pesquisa semantica -> LLM gera resposta com contexto recuperado.",
@@ -157,7 +125,7 @@ COURSE_CONTEXT = {
     },
 
     "dados_disponiveis": {
-        "dia_0": "sample_data.csv (dados genericos para pratica), tabua mortalidade em Excel (.xlsx) para exercicio MCP",
+        "dia_0": "carteira_vida_sample.csv (30 apolices vida com idade, capital, premio, estado, fumador), tabua_mortalidade_CSO2017.csv (121 idades, qx M/F, lx, ex) -- ambos em data/day0/",
         "dia_2": "carteira_apolices_vida.csv (3000 apolices, 4 produtos), sinistralidade_vida.csv (1500 eventos, 8 anomalias), red_flags_fraude_vida.csv (200 sinistros, ~40 red flags)",
         "dia_3": "medical_costs_sample.csv (10K registos saude), sinistralidade_historica.csv (5K sinistros saude, 10 anomalias), exclusoes_apolice.json (CIDs), 5 faturas PDF + 3 recibos JPG, condicoes_gerais_saude.pdf, nota_alta_hospitalar.txt, tabua_morbilidade_saude.csv, carteira_beneficiarios.csv",
         "dia_4": "tabua_mortalidade_CSO2017.csv (121 idades, M/F), taxas_resgate.csv (30 anos x 4 produtos), questionario_subscricao_vida.csv (500 propostas, ~35 falsas)",
@@ -168,8 +136,8 @@ COURSE_CONTEXT = {
     },
 
     "estrutura_dias": {
-        "dia_0": "Setup do builder AI-native: OpenCode, DeepSeek, MCPs, terminal sem medo, prompts reutilizaveis, mapa da stack e operacao segura",
-        "dia_1": "Mudanca de identidade: de atuario a fundador AI-native. Entender Prophet, escolher wedge, definir problema e tese do produto",
+        "dia_0": "Setup do builder AI-native: terminal desde zero (5 comandos essenciais, Node.js, resolucao de erros), API key DeepSeek (passo a passo completo com configuracao permanente), OpenCode CLI instalado e testado (similar ao Claude Code), analise de carteira vida real e tabua mortalidade com prompts, comparacao prompt preciso vs explorador, mapa da stack AI e 5 regras de seguranca para atuarios. 3 modulos, 6 exercicios com tempo estimado, 1 desafio.",
+        "dia_1": "Mudanca de identidade: de atuario a fundador AI-native. Comeca com glossario de termos novos (SaaS, MVP, wedge, UX, workflow, etc.), depois compara vender horas vs vender produto, analisa o Prophet, escolhe 3 frustracoes vendaveis, escreve memo do fundador e termina com quiz de conceitos. 6 exercicios + desafio. Modulo 1 define vocabulario; Modulo 2 explica porque criar produto; Modulo 3 ensina a escolher o ponto de entrada no mercado.",
         "dia_2": "Specs com Speckit: spec.md, constitution.md, acceptance criteria, coding plans com GLM-5 e auditoria do output",
         "dia_3": "Dados como interfaces: CSV, JSON, YAML, model points, assumptions, API calls e contratos de integracao",
         "dia_4": "Comparar LLMs por tarefa: docs, custos, structured output, benchmarking, scorecards e papel de cada modelo no stack",
@@ -200,8 +168,8 @@ COURSE_CONTEXT = {
     },
 
     "recapitulativos": {
-        "fim_dia_0": "Tens a stack funcional e sabes operar OpenCode, MCPs e prompts de forma disciplinada.",
-        "fim_dia_1": "Tens uma tese de produto e uma wedge pequena para o teu Prophet Lite.",
+        "fim_dia_0": "Tens o terminal dominado, API key configurada de forma permanente, OpenCode operacional, analisaste uma carteira vida e uma tabua de mortalidade com prompts precisos e exploradores, percebes tokens e custos, e tens 5 regras de seguranca para trabalho atuarial com LLMs.",
+        "fim_dia_1": "Dominas o vocabulario novo (SaaS, MVP, wedge, UX, workflow, posicionamento, incumbent, etc.), sabes a diferenca entre vender horas e vender produto, analisaste o Prophet, escolheste 3 frustracoes vendaveis, tens um memo do fundador, passaste o quiz de conceitos e escreveste uma tese para o primeiro cliente. Pronto para especificar no Dia 2.",
         "fim_dia_2": "Consegues escrever specs que um LLM consegue implementar sem ambiguidades centrais.",
         "fim_dia_3": "Percebes os dados, os schemas e as APIs necessarias para ligar inputs, runs e outputs do MVP.",
         "fim_dia_4": "Sabes escolher o modelo certo para cada tarefa do bootcamp e justificar a decisao.",
@@ -219,7 +187,7 @@ SYSTEM_PROMPT = f"""Es o AI Tutor do Prophet Lite Founder Bootcamp -- um bootcam
 PAPEL:
 - Ajudar alunos com duvidas sobre exercicios, specs, ferramentas, prompts e arquitetura do bootcamp.
 - Explicar os conceitos atuarialmente relevantes apenas na medida em que suportam o produto Prophet Lite.
-- Ajudar com OpenCode, MCPs, APIs, Streamlit, document drop, copiloto AI, UX mobile-first, deploy e narrativa de produto.
+- Ajudar com OpenCode, APIs, Streamlit, document drop, copiloto AI, UX mobile-first, deploy e narrativa de produto.
 - Explicar o Spec-Driven Development (SDD): escrever spec, gerar codigo, auditar e iterar.
 - NAO dar respostas completas -- guiar o aluno a pensar e resolver sozinho.
 - Se o aluno pedir codigo, dar dicas, pseudo-codigo e orientacao, nao a solucao completa.
@@ -237,7 +205,6 @@ REGRAS:
 - Quando o aluno estiver num dia especifico, contextualiza: o que ja fez antes, o que vem a seguir.
 - Usa os recapitulativos para ajudar alunos a situar-se.
 - Para OpenCode: conheces todas as 14 ferramentas built-in e os comandos CLI.
-- Para MCPs: sabes configurar Excel MCP, Supabase MCP, filesystem, PDF reader.
 - O foco do bootcamp nao e ensinar coding manual, mas ensinar o aluno a especificar, validar, empacotar, deployar e divulgar um produto.
 - O ultimo passo do curso inclui preparar o lancamento publico no LinkedIn.
 """

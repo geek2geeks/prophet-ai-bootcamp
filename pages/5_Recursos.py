@@ -36,7 +36,7 @@ resource_totals = {
     "vida_s2": 7,
     "saude_dia3": 9,
     "templates": 8,
-    "stack": 9,
+    "stack": 8,
 }
 total_resources = (
     resource_totals["vida_s1"]
@@ -136,7 +136,6 @@ stack = [
     ("🤖", "OpenCode CLI", t("stack_category_ai_builder")),
     ("🧭", "GLM-5 via Z.ai / Speckit", t("stack_category_planning")),
     ("💬", "DeepSeek API", t("stack_category_llm")),
-    ("🔌", "MCPs (Excel, PDF, Filesystem)", t("stack_category_tooling")),
     ("🌐", "Streamlit", t("stack_category_local_mvp_ui")),
     ("📚", "ChromaDB", t("stack_category_docs_memory")),
     ("🔐", "Supabase Auth + PostgreSQL + RLS", t("stack_category_auth_db")),
