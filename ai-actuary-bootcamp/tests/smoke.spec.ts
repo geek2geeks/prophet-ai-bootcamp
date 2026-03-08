@@ -29,7 +29,7 @@ test("home page loads the Portuguese learning workspace", async ({ page }) => {
 
   await expect(page.getByRole("heading", { name: /Prophet Lite/i })).toBeVisible();
   await expect(page.getByText(/builder com criterio de produto/i)).toBeVisible();
-  await expect(page.getByRole("link", { name: /Comecar Dia 00/i })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Ver roteiro completo/i })).toBeVisible();
   await expect(page.getByText(/Continuar aprendizagem/i)).toBeVisible();
   await expect(page.getByRole("link", { name: /^Entrar$/i })).toBeVisible();
   await expect(page.getByRole("link", { name: /Retomar aula/i })).toBeVisible();

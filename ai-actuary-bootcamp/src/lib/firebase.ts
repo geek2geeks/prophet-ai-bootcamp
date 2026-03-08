@@ -15,4 +15,6 @@ const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-export { app, auth, db };
+const googleLoginEnabled = process.env.NEXT_PUBLIC_ENABLE_GOOGLE_LOGIN === "true";
+
+export { app, auth, db, googleLoginEnabled };
