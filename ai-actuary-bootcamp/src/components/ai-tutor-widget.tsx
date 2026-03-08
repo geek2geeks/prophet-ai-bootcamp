@@ -2,15 +2,19 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { collection, doc, getDoc, getDocs, query, setDoc, where } from "firebase/firestore";
+import { AppLink } from "@/components/app-link";
 import { useAuth } from "@/lib/auth-context";
+import { isAdminEmail } from "@/lib/admin";
 import { db } from "@/lib/firebase";
 import {
   buildMessages,
   type TutorMessage,
 } from "@/lib/ai-tutor-context";
 import {
+  requestDeepSeekChatDetailed,
   streamDeepSeekChat,
   type DeepSeekTool,
+  type DeepSeekToolCall,
   type DeepSeekUsage,
 } from "@/lib/deepseek-client";
 import courseData from "@/data/course.json";
@@ -51,6 +55,12 @@ type SubmissionContext = {
   artifactTitle: string;
   fileName: string | null;
   createdAtMs: number;
+};
+
+type TutorAction = {
+  href: string;
+  label: string;
+  why: string;
 };
 
 // ---------------------------------------------------------------------------
@@ -111,6 +121,23 @@ const TUTOR_TOOLS: DeepSeekTool[] = [
     },
   },
 ];
+
+const ADMIN_TUTOR_TOOL: DeepSeekTool = {
+  type: "function",
+  function: {
+    name: "open_admin",
+    description: "Sugere abrir a area de administracao quando a questao e operacional ou de gestao do bootcamp.",
+    strict: true,
+    parameters: {
+      type: "object",
+      properties: {
+        why: { type: "string", description: "Porque a area admin e o proximo passo certo" },
+      },
+      required: ["why"],
+      additionalProperties: false,
+    },
+  },
+};
 
 // ---------------------------------------------------------------------------
 // Exercise helpers
@@ -295,6 +322,84 @@ function getDynamicSuggestions(
   ];
 }
 
+function toolCallToTutorAction(toolCall: DeepSeekToolCall): TutorAction | null {
+  let args: Record<string, string> = {};
+
+  try {
+    args = JSON.parse(toolCall.function.arguments) as Record<string, string>;
+  } catch {
+    return null;
+  }
+
+  if (toolCall.function.name === "open_mission") {
+    const daySlug = args.daySlug?.trim();
+    if (!daySlug) return null;
+    return {
+      href: `/missions/${daySlug}`,
+      label: `Abrir Dia ${daySlug}`,
+      why: args.why?.trim() || "Este e o proximo passo mais util agora.",
+    };
+  }
+
+  if (toolCall.function.name === "open_resource_hub") {
+    return {
+      href: "/resources",
+      label: "Abrir Recursos",
+      why: args.why?.trim() || "Os recursos ajudam a destravar a tarefa atual.",
+    };
+  }
+
+  if (toolCall.function.name === "open_portfolio") {
+    return {
+      href: "/portfolio",
+      label: "Abrir Portfolio",
+      why: args.why?.trim() || "Vale a pena rever progresso e entregas antes de continuar.",
+    };
+  }
+
+  if (toolCall.function.name === "open_admin") {
+    return {
+      href: "/admin",
+      label: "Abrir Admin",
+      why: args.why?.trim() || "A tarefa atual parece exigir a area de administracao.",
+    };
+  }
+
+  return null;
+}
+
+async function recommendTutorActions(input: {
+  latestUserPrompt: string;
+  latestAssistantReply: string;
+  pageContext: string;
+  includeAdmin: boolean;
+}) {
+  const tools = input.includeAdmin ? [...TUTOR_TOOLS, ADMIN_TUTOR_TOOL] : TUTOR_TOOLS;
+  const result = await requestDeepSeekChatDetailed({
+    messages: [
+      {
+        role: "system",
+        content:
+          "Es um planeador de navegacao dentro do AI Actuary Bootcamp. Escolhe no maximo UMA tool quando houver um proximo passo claro dentro do produto. Se nenhuma tool ajudar, nao chames tools e responde vazio.",
+      },
+      {
+        role: "user",
+        content: `PERGUNTA DO ALUNO:\n${input.latestUserPrompt}\n\nRESPOSTA DO TUTOR:\n${input.latestAssistantReply}\n\nCONTEXTO DA PAGINA:\n${input.pageContext}\n\nSe fizer sentido navegar dentro do produto, chama uma tool. Caso contrario, nao faças nada.`,
+      },
+    ],
+    model: "deepseek-chat",
+    maxTokens: 220,
+    temperature: 0.1,
+    tools,
+    toolChoice: "auto",
+  });
+
+  return (result.toolCalls ?? [])
+    .map(toolCallToTutorAction)
+    .filter((value): value is TutorAction => Boolean(value))
+    .slice(0, 1);
+}
+
 // ---------------------------------------------------------------------------
 // Relative time helper
 // ---------------------------------------------------------------------------
@@ -409,6 +514,7 @@ export function AiTutorWidget({
   const [mode, setMode] = useState<TutorMode>("guide");
   const [usage, setUsage] = useState<DeepSeekUsage | null>(null);
   const [daySubmissionContext, setDaySubmissionContext] = useState<SubmissionContext[]>([]);
+  const [actionSuggestions, setActionSuggestions] = useState<TutorAction[]>([]);
 
   // Firestore progress
   const [firestoreProgress, setFirestoreProgress] =
@@ -419,6 +525,7 @@ export function AiTutorWidget({
   const streamAbortRef = useRef<AbortController | null>(null);
 
   const studentName = user?.displayName?.split(" ")[0] ?? null;
+  const isAdmin = isAdminEmail(user?.email);
 
   // -------------------------------------------------------------------------
   // Load Firestore progress when widget opens
@@ -641,6 +748,7 @@ export function AiTutorWidget({
     setStreaming(true);
     setKeyError("");
     setUsage(null);
+    setActionSuggestions([]);
 
     // Placeholder assistant message for streaming
     const placeholder: TutorMessage = { role: "assistant", content: "" };
@@ -665,6 +773,20 @@ export function AiTutorWidget({
       });
       setUsage(streamResult.usage ?? null);
       const accumulated = streamResult.content || "Sem resposta.";
+
+      if (mode === "guide") {
+        try {
+          const suggestedActions = await recommendTutorActions({
+            latestUserPrompt: text,
+            latestAssistantReply: accumulated,
+            pageContext: contextWithEvidence,
+            includeAdmin: isAdmin,
+          });
+          setActionSuggestions(suggestedActions);
+        } catch {
+          setActionSuggestions([]);
+        }
+      }
 
       // Final settled messages
       const finalMessages: TutorMessage[] = [
@@ -934,6 +1056,24 @@ export function AiTutorWidget({
                     </div>
                   );
                 })}
+
+                {actionSuggestions.length ? (
+                  <div className="space-y-2 rounded-2xl border border-[var(--border)] bg-white/72 p-3">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
+                      Proximo passo sugerido pelo tutor
+                    </p>
+                    {actionSuggestions.map((action) => (
+                      <AppLink
+                        key={`${action.href}-${action.label}`}
+                        href={action.href}
+                        className="block rounded-xl border border-[var(--border)] bg-[var(--surface-subtle)] px-3 py-3 transition hover:border-[var(--cool-accent)] hover:bg-white"
+                      >
+                        <p className="text-xs font-semibold text-[var(--foreground)]">{action.label}</p>
+                        <p className="mt-1 text-[11px] leading-5 text-[var(--muted-foreground)]">{action.why}</p>
+                      </AppLink>
+                    ))}
+                  </div>
+                ) : null}
 
                 <div ref={bottomRef} />
               </div>
