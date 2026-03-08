@@ -103,58 +103,13 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
-  preview:
-    name: Deploy Firebase preview
-    needs: quality
-    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
-
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Download static export
-        uses: actions/download-artifact@v4
-        with:
-          name: ai-actuary-bootcamp-static-export
-          path: ai-actuary-bootcamp/out
-
-      - name: Validate Firebase preview configuration
-        env:
-          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_AI_ACTUARY_BOOTCAMP_DEV_260308 }}
-        run: |
-          if [ "$NEXT_PUBLIC_FIREBASE_API_KEY" = "placeholder-api-key" ]; then
-            echo "Missing GitHub Variables for Firebase public config."
-            exit 1
-          fi
-          if [ -z "$FIREBASE_SERVICE_ACCOUNT_JSON" ]; then
-            echo "Missing FIREBASE_SERVICE_ACCOUNT_AI_ACTUARY_BOOTCAMP_DEV_260308 secret."
-            exit 1
-          fi
-
-      - name: Deploy preview channel
-        uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_AI_ACTUARY_BOOTCAMP_DEV_260308 }}
-          projectId: ${{ env.FIREBASE_PROJECT_ID }}
-          entryPoint: ai-actuary-bootcamp
-          channelId: pr-${{ github.event.pull_request.number }}
-          expires: 7d
-
   deploy:
-    name: Deploy Firebase production
+    name: Deploy Firebase live
     needs: quality
     if: |
       (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
       (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
     runs-on: ubuntu-latest
-    environment:
-      name: production
-      url: https://ai-actuary-bootcamp-dev-260308.web.app
 
     steps:
       - name: Check out repository
@@ -171,7 +126,7 @@ jobs:
           name: ai-actuary-bootcamp-static-export
           path: ai-actuary-bootcamp/out
 
-      - name: Validate Firebase production configuration
+      - name: Validate Firebase deploy configuration
         env:
           FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_AI_ACTUARY_BOOTCAMP_DEV_260308 }}
         run: |
@@ -192,15 +147,6 @@ jobs:
       - name: Install Firebase CLI
         run: npm install --global firebase-tools
 
-      - name: Deploy Firebase Hosting live
-        uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_AI_ACTUARY_BOOTCAMP_DEV_260308 }}
-          projectId: ${{ env.FIREBASE_PROJECT_ID }}
-          entryPoint: ai-actuary-bootcamp
-          channelId: live
-
-      - name: Deploy Firestore rules and indexes
+      - name: Deploy Firebase Hosting and Firestore config
         working-directory: ai-actuary-bootcamp
-        run: firebase deploy --project "$FIREBASE_PROJECT_ID" --only firestore:rules,firestore:indexes --non-interactive
+        run: firebase deploy --project "$FIREBASE_PROJECT_ID" --only hosting,firestore:rules,firestore:indexes --non-interactive
