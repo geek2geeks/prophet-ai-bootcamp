@@ -1,15 +1,18 @@
 import json
 import streamlit as st
+from typing import Any
+from lib.theme import render_html
+from lib.i18n import t
 
 COURSE_CONTEXT = {
     "bootcamp": {
-        "nome": "Prophet AI Bootcamp -- AI & Data Science para Atuarios de Vida",
+        "nome": "Prophet Lite Founder Bootcamp -- AI-Native Software para Atuarios",
         "duracao": "Pre-bootcamp (Dia 0) + 10 dias / 2 semanas",
-        "publico": "Atuarios de Vida (com modulo complementar de Saude/OCR no Dia 3)",
-        "objetivo": "Construir o Prophet AI -- clone do FIS Prophet potenciado por IA, deployado como SaaS",
+        "publico": "Atuarios que querem tornar-se builders e fundadores AI-native, mesmo sem background de coding tradicional",
+        "objetivo": "Construir um Prophet Lite com AI Copilot: local primeiro, deploy depois, com narrativa de mercado e lancamento publico",
         "formador": "Pedro (pedro@stratfordgeek.com)",
         "metodologia": "Spec-Driven Development (SDD) -- escrever spec primeiro, gerar codigo com AI, auditar com checklist",
-        "filosofia": "O atuario e o especificador e auditor. A IA e o codificador. Nao precisas de ser programador -- precisas de saber especificar e validar."
+        "filosofia": "O atuario deixa de ser consumidor de software e passa a fundador de produto. Os LLMs escrevem grande parte do codigo; o humano define, orienta, valida, posiciona e lanca."
     },
 
     "stack_tecnologico": {
@@ -71,14 +74,14 @@ COURSE_CONTEXT = {
             "google_sheets_mcp": "Ler/escrever spreadsheets partilhadas via Google Drive. Packages: @xing5/mcp-google-sheets, mcp-gsheets.",
             "context7_mcp": "Pesquisar documentacao tecnica atualizada. URL: https://mcp.context7.com/mcp (remote, sem auth)."
         },
-        "python": "Python 3.11+. Linguagem principal do bootcamp. Pandas para dados, scikit-learn/XGBoost para ML, Plotly para graficos, Streamlit para web apps.",
-        "z_ai": "Z.ai Coding Plan (GLM-5). Gera planos de implementacao a partir de specs. Complementar ao OpenCode.",
+        "python": "Python 3.11+ como runtime do MVP. O objetivo nao e ensinar programacao profunda, mas permitir que o aluno opere, leia e valide o que o LLM gera.",
+        "z_ai": "Z.ai Coding Plan (GLM-5) para planear implementacoes, rever specs e estruturar trabalho antes de mandar construir.",
         "llm_api": "DeepSeek API (endpoint OpenAI-compatible). Barato ($0.14/M input), rapido, bom para o bootcamp. Alternativas: Anthropic Claude, OpenAI GPT.",
-        "agentes_framework": "Tool calling nativo (API OpenAI/Anthropic) para agentes simples. CrewAI ou LangGraph para multi-agentes complexos. Comecar com tool calling puro (30 linhas), escalar se necessario.",
-        "ml": "Scikit-learn (pipelines, logistic regression), XGBoost (classificacao, pricing), SHAP (explicabilidade). Plotly para visualizacoes interativas.",
+        "agentes_framework": "O foco do bootcamp e um copiloto AI simples e util. Tool calling nativo basta para o MVP; frameworks mais pesados sao opcionais depois.",
+        "ml": "ML nao e o centro do MVP. Pode surgir como extensao futura, mas o produto principal assenta em specs, interfaces, projection deterministic e UX clara.",
         "web": "Streamlit para apps web rapidas. Conceitos: st.title(), st.dataframe(), st.plotly_chart(), st.selectbox(), st.sidebar, st.columns(), st.form(). Deploy: Streamlit Community Cloud (gratuito).",
         "auth_db": "Supabase Auth (Google OAuth + email/password) + PostgreSQL + Row-Level Security (RLS). Roles: admin, actuary, auditor, viewer.",
-        "rag": "ChromaDB (vector database local). Embeddings para converter texto em vetores. Pesquisa semantica sobre documentos (clausulados, regulamentacao).",
+        "rag": "ChromaDB (vector database local). Base para document drop, memoria pesquisavel e copiloto que responde com contexto de documentos reais.",
         "versionamento": "Git + GitHub. Conceitos: commit, push, branch, pull request. OpenCode pode fazer commits e gerir Git.",
         "deploy": "Streamlit Community Cloud (gratuito, deploy de GitHub, SSL, secrets management). Para producao real: Railway, Render, AWS."
     },
@@ -136,7 +139,7 @@ COURSE_CONTEXT = {
         "RAG": "Retrieval-Augmented Generation: documentos -> embeddings -> vector DB -> pesquisa semantica -> LLM gera resposta com contexto recuperado.",
         "embeddings": "Vetores numericos que capturam significado semantico. Textos similares = vetores proximos. Usados em RAG e pesquisa semantica.",
         "tool_calling": "O LLM decide qual funcao chamar e com que parametros. O resultado e devolvido ao LLM. Base dos agentes autonomos.",
-        "RBAC": "Role-Based Access Control. Roles no Prophet AI: admin (tudo), actuary (projecoes), auditor (ver+claims), viewer (dashboards). Implementado com Supabase RLS.",
+        "RBAC": "Role-Based Access Control. Roles no Prophet Lite: admin (tudo), actuary (projecoes), auditor (ver+claims), viewer (dashboards). Implementado com Supabase RLS.",
         "SDD": "Spec-Driven Development: spec.md -> gerar codigo com AI -> auditar com checklist -> iterar. O constitution.md define regras matematicas globais.",
         "SHAP": "SHapley Additive exPlanations: decompoe previsao ML em contribuicao de cada feature. Summary plot (global), force plot (individual). Essencial para regulamentacao."
     },
@@ -165,17 +168,17 @@ COURSE_CONTEXT = {
     },
 
     "estrutura_dias": {
-        "dia_0": "Pre-Bootcamp: OpenCode CLI (14 ferramentas, modo TUI e CLI, sessions, agentes), Excel MCP (ler/escrever spreadsheets via LLM), outros MCPs (filesystem, Supabase, PDF), conceitos LLM (tokens, temperature, JSON mode, streaming, APIs, custos)",
-        "dia_1": "SDD: Spec-Driven Development (spec.md, constitution.md, checklist auditoria), Setup (Python, Git, Z.ai), primeira spec + geracao + auditoria",
-        "dia_2": "Python/Pandas crash course (DataFrame, .describe, .groupby, plotly), Data Wrangling Vida (8 anomalias), Streamlit primer (st.title, st.dataframe, st.plotly_chart), primeiro dashboard",
-        "dia_3": "Recolha dados programatica: OCR (Tesseract vs Vision LLM), pipeline PDF->JSON, regras de negocio (CIDs, exclusoes), pricing saude (frequencia x severidade), modulo TPA como add-on Prophet AI",
-        "dia_4": "ML: classificacao binaria (Logistic Regression, XGBoost), train/test split, AUC-ROC, SHAP, fairness. Modelos: mortalidade, lapse, fraude subscricao. Guardar como pickle para Dia 7",
-        "dia_5": "RAG (ChromaDB, embeddings, pesquisa semantica), agentes (tool calling nativo, loop ReAct), auditor sinistros, analytics conversacional, multi-agente. Consolidacao Semana 1",
-        "dia_6": "FIS Prophet (model points, assumptions, projection, reserves, reporting), arquitetura SDD (constitution, specs, integration), RBAC (roles, Supabase RLS), ligar outputs Semana 1 ao Prophet AI",
-        "dia_7": "Motor deterministico: pressupostos (CSO2017+fumador+melhoramento+lapse), projecao (single/multiple decrement, mid-year), premio liquido (equivalencia), V(t) prospectivo, profit testing (signature, VPN, IRR). pytest",
-        "dia_8": "Stress Solvencia II (7 choques), COVID com dados reais PT, agente co-piloto com tool calling ao motor, tornado chart sensibilidade, guardrails",
-        "dia_9": "Deploy (Streamlit Cloud, secrets, CI), RBAC producao, validacao motor vs mercado PT, modelo negocio SaaS (TAM, tiers, projecao 12m), integrar modulo TPA Saude",
-        "dia_10": "Polimento final, peer code review, retrospetiva skills, apresentacao 8 min (demo + negocio + Q&A), plano 90 dias, caminhos pos-bootcamp"
+        "dia_0": "Setup do builder AI-native: OpenCode, DeepSeek, MCPs, terminal sem medo, prompts reutilizaveis, mapa da stack e operacao segura",
+        "dia_1": "Mudanca de identidade: de atuario a fundador AI-native. Entender Prophet, escolher wedge, definir problema e tese do produto",
+        "dia_2": "Specs com Speckit: spec.md, constitution.md, acceptance criteria, coding plans com GLM-5 e auditoria do output",
+        "dia_3": "Dados como interfaces: CSV, JSON, YAML, model points, assumptions, API calls e contratos de integracao",
+        "dia_4": "Comparar LLMs por tarefa: docs, custos, structured output, benchmarking, scorecards e papel de cada modelo no stack",
+        "dia_5": "Prophet Lite architecture: o que replicar, o que ignorar, modulos MVP, governance minima e user roles",
+        "dia_6": "Document drop e memoria do produto: OCR, extracao, metadata, review humana, RAG e pesquisa semantica",
+        "dia_7": "Founder packaging: UX mobile-first, landing copy, pricing, fluxos core e build plan local-first",
+        "dia_8": "Build local do motor deterministic: assumptions, model points, projection base, resultados e testes minimos",
+        "dia_9": "Build local da app: Streamlit, uploads, dashboard, copiloto AI e document drop ligado ao MVP",
+        "dia_10": "Deploy, demo e ativacao de mercado: secrets, auth basica, app online, README, post no LinkedIn e lancamento publico"
     },
 
     "solvencia_ii_vida": {
@@ -197,27 +200,27 @@ COURSE_CONTEXT = {
     },
 
     "recapitulativos": {
-        "fim_dia_0": "Sabes usar OpenCode CLI e MCPs para tarefas de escritorio. Consegues manipular Excel via LLM. Entendes tokens, temperature, e custos.",
-        "fim_dia_1": "Tens o ambiente completo (Python, Git, OpenCode, Z.ai). Sabes escrever specs e auditar codigo gerado por AI. Fizeste a tua primeira spec independente.",
-        "fim_dia_2": "Sabes Python/pandas o suficiente para auditar. Limpaste a carteira vida. Fizeste o primeiro dashboard Streamlit.",
-        "fim_dia_3": "Sabes extrair dados de PDFs e imagens (OCR). Construiste um motor de regras de negocio. Tens um modulo TPA Saude para integrar no Prophet AI.",
-        "fim_dia_4": "Treinaste modelos ML (mortalidade, lapse, fraude). Sabes avaliar (AUC, SHAP) e explicar previsoes. Guardaste modelos como pickle.",
-        "fim_dia_5": "Construiste RAG sobre clausulados e agentes autonomos para auditoria. Consolidaste tudo da Semana 1. Estas pronto para construir o Prophet AI.",
-        "fim_dia_6": "Tens a arquitetura completa: constitution, 3 specs, RBAC, Supabase configurado. Mapeaste outputs da Semana 1 para modulos do Prophet AI.",
-        "fim_dia_7": "Tens um motor funcional: pressupostos, projecao, premio, reservas V(t), profit testing. Validado com testes pytest.",
-        "fim_dia_8": "Motor suporta 7 cenarios de stress Solvencia II + COVID real. Agente co-piloto responde em linguagem natural. Tornado chart de sensibilidade.",
-        "fim_dia_9": "Prophet AI esta online (Streamlit Cloud), com RBAC funcional, validado contra mercado PT, com modelo de negocio definido.",
-        "fim_dia_10": "Apresentaste ao vivo. Fizeste peer review. Tens plano de 90 dias e skills matrix. O Prophet AI e o teu portfolio."
+        "fim_dia_0": "Tens a stack funcional e sabes operar OpenCode, MCPs e prompts de forma disciplinada.",
+        "fim_dia_1": "Tens uma tese de produto e uma wedge pequena para o teu Prophet Lite.",
+        "fim_dia_2": "Consegues escrever specs que um LLM consegue implementar sem ambiguidades centrais.",
+        "fim_dia_3": "Percebes os dados, os schemas e as APIs necessarias para ligar inputs, runs e outputs do MVP.",
+        "fim_dia_4": "Sabes escolher o modelo certo para cada tarefa do bootcamp e justificar a decisao.",
+        "fim_dia_5": "Tens a arquitetura MVP do Prophet Lite definida com foco, governance minima e utilizadores claros.",
+        "fim_dia_6": "Desenhaste um document drop util e credivel, com memoria pesquisavel e review humana.",
+        "fim_dia_7": "Fechaste UX mobile-first, pricing, landing copy e o plano de build local-first.",
+        "fim_dia_8": "Tens o motor local a correr com assumptions, model points, projection base e validacao minima.",
+        "fim_dia_9": "Tens a app local utilizavel, com copiloto AI e document drop integrados no fluxo principal.",
+        "fim_dia_10": "Tens um MVP online e uma narrativa publica: demo, README e post de lancamento no LinkedIn."
     }
 }
 
-SYSTEM_PROMPT = f"""Es o AI Tutor do Prophet AI Bootcamp -- um bootcamp de AI & Data Science para Atuarios de Vida.
+SYSTEM_PROMPT = f"""Es o AI Tutor do Prophet Lite Founder Bootcamp -- um bootcamp para atuarios se tornarem builders e fundadores AI-native.
 
 PAPEL:
-- Ajudar alunos com duvidas sobre exercicios, conceitos atuariais, e tecnologia do bootcamp.
-- Explicar conceitos de Vida (mortalidade, reservas, profit testing, Solvencia II).
-- Ajudar com OpenCode, MCPs (Excel MCP, Supabase MCP), Python, Pandas, Streamlit, agentes, RAG.
-- Explicar o Spec-Driven Development (SDD): escrever spec, gerar codigo, auditar.
+- Ajudar alunos com duvidas sobre exercicios, specs, ferramentas, prompts e arquitetura do bootcamp.
+- Explicar os conceitos atuarialmente relevantes apenas na medida em que suportam o produto Prophet Lite.
+- Ajudar com OpenCode, MCPs, APIs, Streamlit, document drop, copiloto AI, UX mobile-first, deploy e narrativa de produto.
+- Explicar o Spec-Driven Development (SDD): escrever spec, gerar codigo, auditar e iterar.
 - NAO dar respostas completas -- guiar o aluno a pensar e resolver sozinho.
 - Se o aluno pedir codigo, dar dicas, pseudo-codigo e orientacao, nao a solucao completa.
 - Quando o aluno parecer perdido, RECAPITULAR onde esta no bootcamp e o que ja aprendeu.
@@ -229,14 +232,14 @@ REGRAS:
 - Responde sempre em portugues de Portugal (a menos que o aluno escreva noutra lingua).
 - Se nao sabes algo, diz que nao sabes.
 - Referencia os ficheiros de dados especificos quando relevante.
-- Para formulas, mostra a expressao matematica e explica cada variavel.
+- Para formulas, mostra a expressao matematica so quando isso ajuda a validar o produto ou compreender a logica do run.
 - Para exercicios, lembra o aluno de usar a metodologia SDD (escrever spec primeiro).
 - Quando o aluno estiver num dia especifico, contextualiza: o que ja fez antes, o que vem a seguir.
 - Usa os recapitulativos para ajudar alunos a situar-se.
 - Para OpenCode: conheces todas as 14 ferramentas built-in e os comandos CLI.
 - Para MCPs: sabes configurar Excel MCP, Supabase MCP, filesystem, PDF reader.
-- Para ML: sabes explicar Logistic Regression, XGBoost, SHAP, train/test split, AUC-ROC.
-- Para Solvencia II: conheces os 7 choques do modulo Vida da Standard Formula.
+- O foco do bootcamp nao e ensinar coding manual, mas ensinar o aluno a especificar, validar, empacotar, deployar e divulgar um produto.
+- O ultimo passo do curso inclui preparar o lancamento publico no LinkedIn.
 """
 
 
@@ -267,9 +270,9 @@ def render_tutor_widget():
             )
             col1, col2 = st.columns([4, 1])
             with col1:
-                submitted = st.form_submit_button(t("submit_btn"), use_container_width=True, type="primary")
+                submitted = st.form_submit_button(t("submit_btn"), width="stretch", type="primary")
             with col2:
-                clear = st.form_submit_button(f"🗑", use_container_width=True)
+                clear = st.form_submit_button(f"🗑", width="stretch")
 
         if submitted and user_input:
             st.session_state.tutor_widget_messages.append({"role": "user", "content": user_input})
@@ -283,11 +286,11 @@ def render_tutor_widget():
             st.rerun()
 
 
-def get_ai_response(messages: list) -> str:
+def get_ai_response(messages: list[dict[str, str]]) -> str:
     try:
         api_key = st.secrets["deepseek"]["api_key"]
     except Exception:
-        return "AI Tutor indisponivel -- configura a chave DeepSeek em secrets.toml."
+        return t("tutor_unavailable")
 
     try:
         from openai import OpenAI
@@ -295,10 +298,13 @@ def get_ai_response(messages: list) -> str:
         full_messages = [{"role": "system", "content": SYSTEM_PROMPT}] + messages
         response = client.chat.completions.create(
             model="deepseek-chat",
-            messages=full_messages,
+            messages=full_messages,  # type: ignore[arg-type]
             max_tokens=1024,
             temperature=0.7
         )
-        return response.choices[0].message.content
+        content = response.choices[0].message.content
+        if isinstance(content, str) and content.strip():
+            return content
+        return t("tutor_no_response")
     except Exception as e:
-        return f"Erro ao contactar o AI Tutor: {e}"
+        return t("tutor_contact_error", error=e)

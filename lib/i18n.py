@@ -3,9 +3,9 @@ import streamlit as st
 TRANSLATIONS = {
     # ── Sidebar & Global ──
     "sidebar_subtitle": {
-        "pt": "AI & Data Science | Atuarios",
-        "en": "AI & Data Science | Actuaries",
-        "fr": "AI & Data Science | Actuaires",
+        "pt": "AI-Native Product Builders | Atuarios",
+        "en": "AI-Native Product Builders | Actuaries",
+        "fr": "Builders Produit AI-Native | Actuaires",
     },
     "logout": {
         "pt": "Terminar Sessao",
@@ -13,36 +13,76 @@ TRANSLATIONS = {
         "fr": "Deconnexion",
     },
     "demo_mode": {
-        "pt": "Modo Demo (Auth Mocked)",
-        "en": "Demo Mode (Auth Mocked)",
-        "fr": "Mode Demo (Auth Mocked)",
+        "pt": "Modo Demo",
+        "en": "Demo Mode",
+        "fr": "Mode Demo",
     },
     "login_required": {
         "pt": "Faz login para aceder a esta pagina.",
         "en": "Please log in to access this page.",
         "fr": "Connectez-vous pour acceder a cette page.",
     },
+    "app_page_title": {
+        "pt": "AI Founder Bootcamp",
+        "en": "AI Founder Bootcamp",
+        "fr": "AI Founder Bootcamp",
+    },
+    "ui_review_mode_title": {
+        "pt": "Modo de revisao da interface",
+        "en": "UI review mode",
+        "fr": "Mode revision UI",
+    },
+    "ui_review_mode_body": {
+        "pt": "A autenticacao foi temporariamente ignorada para validar o layout localmente.",
+        "en": "Authentication is temporarily bypassed for local layout verification.",
+        "fr": "L'authentification est temporairement ignoree pour verifier le layout en local.",
+    },
+    "sidebar_brand_title": {
+        "pt": "AI Founder Bootcamp",
+        "en": "AI Founder Bootcamp",
+        "fr": "AI Founder Bootcamp",
+    },
+    "sidebar_footer_title": {
+        "pt": "Prophet Lite Lab",
+        "en": "Prophet Lite Lab",
+        "fr": "Prophet Lite Lab",
+    },
+    "auth_email_placeholder": {
+        "pt": "atuario@exemplo.com",
+        "en": "actuary@example.com",
+        "fr": "actuaire@exemple.com",
+    },
+    "landing_founder_kicker": {
+        "pt": "Percurso do founder",
+        "en": "Founder Flow",
+        "fr": "Parcours Fondateur",
+    },
+    "landing_quote_kicker": {
+        "pt": "AI x Industria",
+        "en": "AI x Industry",
+        "fr": "AI x Industrie",
+    },
 
     # ── Landing Page ──
     "hero_title_1": {
-        "pt": "O Futuro da Atuaria",
+        "pt": "De Atuario a",
         "en": "The Future of Actuarial Science",
         "fr": "Le Futur de l'Actuariat",
     },
     "hero_title_2": {
-        "pt": "Comeca",
+        "pt": "Founder",
         "en": "Starts",
         "fr": "Commence",
     },
     "hero_title_3": {
-        "pt": "Aqui.",
+        "pt": "AI-Native",
         "en": "Here.",
         "fr": "Ici.",
     },
     "hero_subtitle": {
-        "pt": "10 dias intensivos para te transformares num <strong>AI Actuary</strong>. Constroi do zero um motor de Vida escalavel e lanca-o como SaaS.",
-        "en": "10 intensive days to become an <strong>AI Actuary</strong>. Build a scalable Life engine from scratch and launch it as SaaS.",
-        "fr": "10 jours intensifs pour devenir un <strong>AI Actuary</strong>. Construisez un moteur Vie scalable et lancez-le en SaaS.",
+        "pt": "10 dias intensivos para te transformares num <strong>AI founder</strong>. Aprende a usar coding LLMs para criar um Prophet Lite com copiloto AI, primeiro localmente e depois online.",
+        "en": "10 intensive days to become an <strong>AI founder</strong>. Learn to use coding LLMs to create a Prophet Lite with an AI copilot, first locally and then online.",
+        "fr": "10 jours intensifs pour devenir un <strong>fondateur AI</strong>. Apprenez a utiliser des LLMs de code pour creer un Prophet Lite avec copilote AI, d'abord en local puis en ligne.",
     },
     "hero_kicker": {
         "pt": "Bootcamp intensivo para atuarios que querem construir produtos AI",
@@ -70,39 +110,54 @@ TRANSLATIONS = {
         "fr": "A la fin du parcours vous repartez avec",
     },
     "landing_build_1": {
-        "pt": "um motor atuarial de Vida com dados, regras e cashflows prontos a validar",
-        "en": "a Life actuarial engine with data, rules, and cashflows ready to validate",
-        "fr": "un moteur actuariel Vie avec donnees, regles et cashflows prets a valider",
+        "pt": "um Prophet Lite focado: assumptions, model points, runs deterministicos e resultados explicaveis",
+        "en": "a focused Prophet Lite: assumptions, model points, deterministic runs, and explainable results",
+        "fr": "un Prophet Lite cible : hypotheses, model points, runs deterministes et resultats explicables",
     },
     "landing_build_2": {
-        "pt": "assistentes AI para subscricao, fraude, auditoria tecnica e suporte interno",
-        "en": "AI assistants for underwriting, fraud, technical audit, and internal support",
-        "fr": "des assistants AI pour la souscription, la fraude, l'audit technique et le support interne",
+        "pt": "um copiloto AI que explica outputs, ajuda a validar runs e transforma documentos em memoria pesquisavel",
+        "en": "an AI copilot that explains outputs, helps validate runs, and turns documents into searchable memory",
+        "fr": "un copilote AI qui explique les resultats, aide a valider les runs et transforme les documents en memoire consultable",
     },
     "landing_build_3": {
-        "pt": "um MVP demonstravel para portfolio, clientes piloto ou evolucao em equipa",
-        "en": "a demonstrable MVP for your portfolio, pilot clients, or team handoff",
-        "fr": "un MVP demonstrable pour votre portfolio, des clients pilotes ou une reprise en equipe",
+        "pt": "um MVP deployado, uma narrativa de mercado clara e um lancamento publico pronto para LinkedIn e clientes piloto",
+        "en": "a deployed MVP, a clear market narrative, and a public launch ready for LinkedIn and pilot clients",
+        "fr": "un MVP deploye, une narration marche claire et un lancement public pret pour LinkedIn et des clients pilotes",
     },
     "login_title": {
-        "pt": "Entrar na Plataforma",
+        "pt": "Entrar e construir",
         "en": "Sign In",
         "fr": "Se Connecter",
     },
     "login_subtitle": {
-        "pt": "Autentica-te para comecar",
+        "pt": "Autentica-te para continuar o bootcamp",
         "en": "Authenticate to get started",
         "fr": "Authentifiez-vous pour commencer",
     },
     "landing_auth_badge": {
-        "pt": "Candidaturas abertas",
+        "pt": "Entrar e comecar",
         "en": "Applications open",
         "fr": "Candidatures ouvertes",
     },
     "landing_auth_note": {
-        "pt": "Entra com Google ou email para continuares no mesmo ponto em qualquer dispositivo.",
-        "en": "Use Google or email to continue from the same point on any device.",
-        "fr": "Utilisez Google ou l'email pour reprendre au meme point sur n'importe quel appareil.",
+        "pt": "Entra para guardares progresso, iteracoes de produto e o teu launch pack em qualquer dispositivo.",
+        "en": "Sign in to save progress, product iterations, and your launch pack on any device.",
+        "fr": "Connectez-vous pour sauvegarder votre progression, vos iterations produit et votre launch pack sur n'importe quel appareil.",
+    },
+    "auth_benefit_1": {
+        "pt": "Specs e prompts guardados",
+        "en": "Saved specs and prompts",
+        "fr": "Specs et prompts sauvegardes",
+    },
+    "auth_benefit_2": {
+        "pt": "MVP local -> deploy",
+        "en": "Local MVP -> deploy",
+        "fr": "MVP local -> deployement",
+    },
+    "auth_benefit_3": {
+        "pt": "Launch pack para LinkedIn",
+        "en": "LinkedIn launch pack",
+        "fr": "Launch pack LinkedIn",
     },
     "continue_google": {
         "pt": "Continuar com Google",
@@ -160,39 +215,94 @@ TRANSLATIONS = {
         "fr": "Un programme concu pour apprendre en construisant",
     },
     "landing_curriculum_sub": {
-        "pt": "Cada bloco combina teoria aplicada, dados de seguros e entregas prontas para portfolio.",
-        "en": "Each block combines applied theory, insurance datasets, and deliverables ready for your portfolio.",
-        "fr": "Chaque bloc combine theorie appliquee, jeux de donnees assurance et livrables prets pour votre portfolio.",
+        "pt": "Cada bloco traduz conhecimento atuarial em alavanca de produto: specs, dados, copiloto AI, MVP local, deploy e distribuicao publica.",
+        "en": "Each block turns actuarial knowledge into product leverage: specs, data, AI copilot, local MVP, deployment, and public distribution.",
+        "fr": "Chaque bloc transforme le savoir actuariel en levier produit : specs, donnees, copilote AI, MVP local, deployement et distribution publique.",
+    },
+    "landing_founder_title": {
+        "pt": "O percurso em 3 movimentos",
+        "en": "The journey in 3 moves",
+        "fr": "Le parcours en 3 mouvements",
+    },
+    "landing_founder_1_title": {
+        "pt": "Aprender a operar",
+        "en": "Learn to operate",
+        "fr": "Apprendre a operer",
+    },
+    "landing_founder_1_desc": {
+        "pt": "OpenCode, MCPs, APIs, docs e modelos para trabalhares com LLMs como motor de execucao.",
+        "en": "OpenCode, MCPs, APIs, docs, and models to work with LLMs as an execution engine.",
+        "fr": "OpenCode, MCPs, APIs, docs et modeles pour travailler avec les LLMs comme moteur d'execution.",
+    },
+    "landing_founder_2_title": {
+        "pt": "Definir um produto pequeno",
+        "en": "Define a small product",
+        "fr": "Definir un petit produit",
+    },
+    "landing_founder_2_desc": {
+        "pt": "Escolher uma wedge Prophet Lite, escrever specs fortes e desenhar a experiencia mobile-first.",
+        "en": "Choose a Prophet Lite wedge, write strong specs, and design the mobile-first experience.",
+        "fr": "Choisir une wedge Prophet Lite, ecrire de bonnes specs et concevoir une experience mobile-first.",
+    },
+    "landing_founder_3_title": {
+        "pt": "Lancar em publico",
+        "en": "Launch in public",
+        "fr": "Lancer en public",
+    },
+    "landing_founder_3_desc": {
+        "pt": "Construir localmente, fazer deploy, apresentar a demo e transformar o projeto num ativo de mercado.",
+        "en": "Build locally, deploy, present the demo, and turn the project into a market-facing asset.",
+        "fr": "Construire en local, deployer, presenter la demo et transformer le projet en actif visible sur le marche.",
+    },
+    "landing_quote_title": {
+        "pt": "Construir a nova industria",
+        "en": "Building the new industry",
+        "fr": "Construire la nouvelle industrie",
+    },
+    "landing_quote_1": {
+        "pt": "\"The development of AI is as fundamental as the creation of the microprocessor, the personal computer, the Internet, and the mobile phone.\" — Bill Gates",
+        "en": "\"The development of AI is as fundamental as the creation of the microprocessor, the personal computer, the Internet, and the mobile phone.\" — Bill Gates",
+        "fr": "\"The development of AI is as fundamental as the creation of the microprocessor, the personal computer, the Internet, and the mobile phone.\" — Bill Gates",
+    },
+    "landing_quote_2": {
+        "pt": "\"Software is eating the world.\" — Marc Andreessen",
+        "en": "\"Software is eating the world.\" — Marc Andreessen",
+        "fr": "\"Software is eating the world.\" — Marc Andreessen",
+    },
+    "landing_quote_3": {
+        "pt": "\"Plans should be measured in decades, execution should be measured in weeks.\" — Sam Altman",
+        "en": "\"Plans should be measured in decades, execution should be measured in weeks.\" — Sam Altman",
+        "fr": "\"Plans should be measured in decades, execution should be measured in weeks.\" — Sam Altman",
     },
     "feat_agents": {
-        "pt": "Agentes LLM",
-        "en": "LLM Agents",
-        "fr": "Agents LLM",
+        "pt": "AI Builder Stack",
+        "en": "AI Builder Stack",
+        "fr": "Stack AI Builder",
     },
     "feat_agents_desc": {
-        "pt": "CrewAI, RAG, auditoria automatica de sinistros",
-        "en": "CrewAI, RAG, automated claims auditing",
-        "fr": "CrewAI, RAG, audit automatique des sinistres",
+        "pt": "OpenCode, GLM-5, DeepSeek, MCPs e prompts reutilizaveis para construir com velocidade",
+        "en": "OpenCode, GLM-5, DeepSeek, MCPs, and reusable prompts to build with speed",
+        "fr": "OpenCode, GLM-5, DeepSeek, MCPs et prompts reutilisables pour construire rapidement",
     },
     "feat_ml": {
-        "pt": "Python & ML",
-        "en": "Python & ML",
-        "fr": "Python & ML",
+        "pt": "Specs & APIs",
+        "en": "Specs & APIs",
+        "fr": "Specs & APIs",
     },
     "feat_ml_desc": {
-        "pt": "XGBoost, SHAP, mortalidade e lapse preditivos",
-        "en": "XGBoost, SHAP, predictive mortality & lapse",
-        "fr": "XGBoost, SHAP, mortalite et lapse predictifs",
+        "pt": "Speckit, JSON, documentacao, API calls e contratos de dados para dar instrucoes claras aos LLMs",
+        "en": "Speckit, JSON, documentation, API calls, and data contracts to give clear instructions to LLMs",
+        "fr": "Speckit, JSON, documentation, appels API et contrats de donnees pour guider clairement les LLMs",
     },
     "feat_engine": {
-        "pt": "Motor V(t)",
-        "en": "V(t) Engine",
-        "fr": "Moteur V(t)",
+        "pt": "Prophet Lite",
+        "en": "Prophet Lite",
+        "fr": "Prophet Lite",
     },
     "feat_engine_desc": {
-        "pt": "Reservas, profit testing, cenarios Solvencia II",
-        "en": "Reserves, profit testing, Solvency II scenarios",
-        "fr": "Reserves, profit testing, scenarios Solvabilite II",
+        "pt": "Assumptions, model points, runs deterministicos, document drop e copiloto AI num MVP credivel",
+        "en": "Assumptions, model points, deterministic runs, document drop, and an AI copilot in a credible MVP",
+        "fr": "Hypotheses, model points, runs deterministes, depot de documents et copilote AI dans un MVP credible",
     },
     "feat_deploy": {
         "pt": "SaaS Deploy",
@@ -212,9 +322,9 @@ TRANSLATIONS = {
         "fr": "Bonjour, {name}!",
     },
     "progress_msg": {
-        "pt": "O teu Progresso Atuarial. Ja completaste <strong>{done}</strong> de <strong>{total}</strong> tarefas cruciais no bootcamp.",
-        "en": "Your Actuarial Progress. You've completed <strong>{done}</strong> of <strong>{total}</strong> critical bootcamp tasks.",
-        "fr": "Votre Progres Actuariel. Vous avez complete <strong>{done}</strong> sur <strong>{total}</strong> taches cruciales.",
+        "pt": "Ja completaste <strong>{done}</strong> de <strong>{total}</strong> etapas de execucao do bootcamp.",
+        "en": "You have completed <strong>{done}</strong> of <strong>{total}</strong> execution steps in the bootcamp.",
+        "fr": "Vous avez complete <strong>{done}</strong> sur <strong>{total}</strong> etapes d'execution du bootcamp.",
     },
     "completion_rate": {
         "pt": "Taxa de Conclusao",
@@ -257,19 +367,19 @@ TRANSLATIONS = {
         "fr": "Semaine 2",
     },
     "pre_bootcamp_desc": {
-        "pt": "Fundamentos de LLMs e automacao e MCPs.",
-        "en": "LLM fundamentals, automation and MCPs.",
-        "fr": "Fondamentaux LLM, automatisation et MCPs.",
+        "pt": "Setup da stack, terminal sem medo, OpenCode, MCPs e disciplina de operacao.",
+        "en": "Stack setup, fearless terminal use, OpenCode, MCPs, and operating discipline.",
+        "fr": "Setup de la stack, terminal sans peur, OpenCode, MCPs et discipline d'operation.",
     },
     "week1_desc": {
-        "pt": "Engenharia Atuarial com modelos de Machine Learning locais.",
-        "en": "Actuarial Engineering with local Machine Learning models.",
-        "fr": "Ingenierie Actuarielle avec modeles ML locaux.",
+        "pt": "Escolha da wedge, specs, APIs, dados, Prophet Lite e memoria documental.",
+        "en": "Wedge selection, specs, APIs, data, Prophet Lite, and document memory.",
+        "fr": "Choix de la wedge, specs, APIs, donnees, Prophet Lite et memoire documentaire.",
     },
     "week2_desc": {
-        "pt": "Arquitetura e distribuicao do teu Cloud App comercial MVP.",
-        "en": "Architecture and deployment of your commercial Cloud App MVP.",
-        "fr": "Architecture et deploiement de votre MVP Cloud App commercial.",
+        "pt": "UX mobile-first, build local, copiloto AI, deploy e lancamento no LinkedIn.",
+        "en": "Mobile-first UX, local build, AI copilot, deployment, and LinkedIn launch.",
+        "fr": "UX mobile-first, build local, copilote AI, deployement et lancement sur LinkedIn.",
     },
     "progress": {
         "pt": "Progresso",
@@ -284,19 +394,144 @@ TRANSLATIONS = {
         "fr": "Tableau de Bord",
     },
     "dashboard_sub": {
-        "pt": "A tua visao geral de progresso no bootcamp",
-        "en": "Your bootcamp progress overview",
-        "fr": "Votre apercu de progression du bootcamp",
+        "pt": "O teu painel de progresso como AI founder em construcao",
+        "en": "Your progress dashboard as an AI founder in the making",
+        "fr": "Votre tableau de progression en tant que fondateur AI en construction",
     },
     "dashboard_kicker": {
-        "pt": "Ritmo semanal e progresso do cohort",
-        "en": "Weekly cadence and cohort progress",
-        "fr": "Rythme hebdomadaire et progression du cohort",
+        "pt": "Ritmo semanal e progresso do founder",
+        "en": "Weekly cadence and founder progress",
+        "fr": "Rythme hebdomadaire et progression du fondateur",
     },
     "dashboard_focus": {
-        "pt": "O teu painel para acompanhar progresso, niveis e proximas entregas.",
-        "en": "Your control panel for tracking progress, levels, and upcoming deliverables.",
-        "fr": "Votre panneau de controle pour suivre progression, niveaux et prochains livrables.",
+        "pt": "Acompanha o caminho do setup ao deploy: ferramentas, specs, MVP local, lancamento e distribuicao publica.",
+        "en": "Track the path from setup to deployment: tools, specs, local MVP, launch, and public distribution.",
+        "fr": "Suivez le chemin du setup au deployement : outils, specs, MVP local, lancement et distribution publique.",
+    },
+    "dashboard_stage_title": {
+        "pt": "Mapa de Execucao do Founder",
+        "en": "Founder Execution Map",
+        "fr": "Carte d'Execution du Fondateur",
+    },
+    "dashboard_stage_1": {
+        "pt": "Operar a stack",
+        "en": "Operate the stack",
+        "fr": "Operer la stack",
+    },
+    "dashboard_stage_2": {
+        "pt": "Definir o produto",
+        "en": "Define the product",
+        "fr": "Definir le produit",
+    },
+    "dashboard_stage_3": {
+        "pt": "Build local",
+        "en": "Build locally",
+        "fr": "Build local",
+    },
+    "dashboard_stage_4": {
+        "pt": "Lancar em publico",
+        "en": "Launch in public",
+        "fr": "Lancer en public",
+    },
+    "dashboard_focus_title": {
+        "pt": "Foco Atual",
+        "en": "Current Focus",
+        "fr": "Focus Actuel",
+    },
+    "dashboard_next_action": {
+        "pt": "Proxima acao",
+        "en": "Next action",
+        "fr": "Prochaine action",
+    },
+    "dashboard_launch_title": {
+        "pt": "Prontidao para Lancamento",
+        "en": "Launch Readiness",
+        "fr": "Preparation au lancement",
+    },
+    "dashboard_launch_copy": {
+        "pt": "Nao queremos apenas completar tarefas. Queremos chegar a um produto demonstravel, com deploy, narrativa e distribuicao.",
+        "en": "We do not just want to complete tasks. We want to reach a demonstrable product with deployment, narrative, and distribution.",
+        "fr": "Nous ne voulons pas seulement terminer des taches. Nous voulons arriver a un produit demonstrable avec deployement, narration et distribution.",
+    },
+    "dashboard_next_action_stage_1": {
+        "pt": "Configura a stack, domina OpenCode e fecha as primeiras specs.",
+        "en": "Set up the stack, get comfortable with OpenCode, and finish the first specs.",
+        "fr": "Configurez la stack, maitrisez OpenCode et finalisez les premieres specs.",
+    },
+    "dashboard_next_action_stage_2": {
+        "pt": "Aperta a wedge, os contratos de dados e o blueprint do Prophet Lite.",
+        "en": "Tighten the wedge, the data contracts, and the Prophet Lite blueprint.",
+        "fr": "Affinez la wedge, les contrats de donnees et le blueprint Prophet Lite.",
+    },
+    "dashboard_next_action_stage_3": {
+        "pt": "Mantem o fluxo local estavel: inputs, run, output, docs e copiloto.",
+        "en": "Keep the local flow stable: inputs, run, output, docs, and copilot.",
+        "fr": "Gardez le flux local stable : inputs, run, output, docs et copilote.",
+    },
+    "dashboard_next_action_stage_4": {
+        "pt": "Polir deploy, landing, demo e o lancamento em publico.",
+        "en": "Polish deployment, landing, demo, and the public launch.",
+        "fr": "Affinez le deployement, la landing, la demo et le lancement public.",
+    },
+    "dashboard_top_state_copy": {
+        "pt": "Ja estas no topo da progressao. Agora e distribuicao e repeticao.",
+        "en": "You are already at the top tier. Now focus on distribution and repetition.",
+        "fr": "Vous etes deja au sommet. Maintenant, place a la distribution et a la repetition.",
+    },
+    "dashboard_launches_in_motion": {
+        "pt": "lancamentos em curso",
+        "en": "launches in motion",
+        "fr": "lancements en cours",
+    },
+    "dashboard_lessons_title": {
+        "pt": "Abrir as aulas",
+        "en": "Open lessons",
+        "fr": "Ouvrir les lecons",
+    },
+    "dashboard_lessons_open_now": {
+        "pt": "Abrir as aulas agora",
+        "en": "Open lessons now",
+        "fr": "Ouvrir les lecons maintenant",
+    },
+    "dashboard_lessons_pre_bootcamp_short": {
+        "pt": "Pre-Bootcamp",
+        "en": "Pre-Bootcamp",
+        "fr": "Pre-Bootcamp",
+    },
+    "dashboard_lessons_week_2_short": {
+        "pt": "Semana 2",
+        "en": "Week 2",
+        "fr": "Semaine 2",
+    },
+    "dashboard_lessons_help_text": {
+        "pt": "Escolhe uma semana abaixo ou carrega em abrir agora para entrar diretamente no programa.",
+        "en": "Choose a week below or open now to jump straight into the programme.",
+        "fr": "Choisissez une semaine ci-dessous ou ouvrez maintenant pour entrer directement dans le programme.",
+    },
+    "dashboard_lessons_open_pre_bootcamp": {
+        "pt": "Abrir Pre-Bootcamp",
+        "en": "Open Pre-Bootcamp",
+        "fr": "Ouvrir le Pre-Bootcamp",
+    },
+    "dashboard_lessons_open_week_1": {
+        "pt": "Abrir Semana 1",
+        "en": "Open Week 1",
+        "fr": "Ouvrir la Semaine 1",
+    },
+    "dashboard_lessons_open_week_2": {
+        "pt": "Abrir Semana 2",
+        "en": "Open Week 2",
+        "fr": "Ouvrir la Semaine 2",
+    },
+    "dashboard_lessons_open_this_week": {
+        "pt": "Abrir aulas desta semana",
+        "en": "Open this week's lessons",
+        "fr": "Ouvrir les lecons de cette semaine",
+    },
+    "dashboard_lessons_open_prefix": {
+        "pt": "Abrir",
+        "en": "Open",
+        "fr": "Ouvrir",
     },
     "dashboard_challenges_done": {
         "pt": "desafios submetidos",
@@ -319,7 +554,7 @@ TRANSLATIONS = {
         "fr": "Points Totaux",
     },
     "completed": {
-        "pt": "Completos",
+        "pt": "Concluidos",
         "en": "Completed",
         "fr": "Termines",
     },
@@ -329,7 +564,7 @@ TRANSLATIONS = {
         "fr": "Badge",
     },
     "complete": {
-        "pt": "completo",
+        "pt": "concluido",
         "en": "complete",
         "fr": "termine",
     },
@@ -381,9 +616,9 @@ TRANSLATIONS = {
         "fr": "Programme du Bootcamp",
     },
     "programa_sub": {
-        "pt": "Pre-bootcamp + 10 dias de imersao intensiva em AI & Data Science",
-        "en": "Pre-bootcamp + 10 days of intensive AI & Data Science immersion",
-        "fr": "Pre-bootcamp + 10 jours d'immersion intensive en AI & Data Science",
+        "pt": "Pre-bootcamp + 10 dias para passar de atuario a founder AI-native, construir localmente e deployar um Prophet Lite",
+        "en": "Pre-bootcamp + 10 days to go from actuary to AI-native founder, build locally, and deploy a Prophet Lite",
+        "fr": "Pre-bootcamp + 10 jours pour passer d'actuaire a fondateur AI-native, construire en local et deployer un Prophet Lite",
     },
     "pre_bootcamp_tab": {
         "pt": "Pre-Bootcamp (Dia 0)",
@@ -421,14 +656,34 @@ TRANSLATIONS = {
         "fr": "Defi",
     },
     "grading_title": {
-        "pt": "Criterios de Avaliacao",
-        "en": "Grading Criteria",
-        "fr": "Criteres d'Evaluation",
+        "pt": "Sistema de Pontos do Founder",
+        "en": "Founder Points System",
+        "fr": "Systeme de Points du Fondateur",
     },
     "programa_snapshot": {
         "pt": "Visao rapida do modulo",
         "en": "Quick module snapshot",
         "fr": "Vue rapide du module",
+    },
+    "programa_points_hint": {
+        "pt": "O sistema de pontos mede execucao, nao teoria.",
+        "en": "The points system measures execution, not theory.",
+        "fr": "Le systeme de points mesure l'execution, pas la theorie.",
+    },
+    "programa_modules_short": {
+        "pt": "mods",
+        "en": "mods",
+        "fr": "mods",
+    },
+    "programa_exercises_short": {
+        "pt": "ex",
+        "en": "ex",
+        "fr": "ex",
+    },
+    "programa_challenge_points_short": {
+        "pt": "pts desafio",
+        "en": "challenge pts",
+        "fr": "pts defi",
     },
 
     # ── Exercicios Page ──
@@ -507,6 +762,16 @@ TRANSLATIONS = {
         "en": "Project Submitted and Graded",
         "fr": "Projet Soumis et Evalue",
     },
+    "exercise_status_completed": {
+        "pt": "Concluido",
+        "en": "Completed",
+        "fr": "Termine",
+    },
+    "exercise_status_open": {
+        "pt": "Em aberto",
+        "en": "Open",
+        "fr": "Ouvert",
+    },
 
     # ── Recursos Page ──
     "recursos_title": {
@@ -515,9 +780,9 @@ TRANSLATIONS = {
         "fr": "Ressources & Datasets",
     },
     "recursos_sub": {
-        "pt": "Todos os ficheiros necessarios para o bootcamp",
-        "en": "All files needed for the bootcamp",
-        "fr": "Tous les fichiers necessaires pour le bootcamp",
+        "pt": "Datasets, templates, referencias Prophet Lite e stack AI-native para passar da ideia ao MVP deployado",
+        "en": "Datasets, templates, Prophet Lite references, and an AI-native stack to go from idea to deployed MVP",
+        "fr": "Jeux de donnees, templates, references Prophet Lite et stack AI-native pour passer de l'idee au MVP deploye",
     },
     "resources_kicker": {
         "pt": "Biblioteca operacional do bootcamp",
@@ -556,6 +821,202 @@ TRANSLATIONS = {
     },
     "vida_s1_badge": {"pt": "S1", "en": "W1", "fr": "S1"},
     "vida_s2_badge": {"pt": "S2", "en": "W2", "fr": "S2"},
+    "templates_badge": {"pt": "TPL", "en": "TPL", "fr": "TPL"},
+    "stack_category_runtime": {
+        "pt": "Base Runtime",
+        "en": "Base Runtime",
+        "fr": "Runtime de base",
+    },
+    "stack_category_ai_builder": {
+        "pt": "AI Builder",
+        "en": "AI Builder",
+        "fr": "AI Builder",
+    },
+    "stack_category_planning": {
+        "pt": "Planning",
+        "en": "Planning",
+        "fr": "Planification",
+    },
+    "stack_category_llm": {
+        "pt": "LLM",
+        "en": "LLM",
+        "fr": "LLM",
+    },
+    "stack_category_tooling": {
+        "pt": "Tooling",
+        "en": "Tooling",
+        "fr": "Outillage",
+    },
+    "stack_category_local_mvp_ui": {
+        "pt": "UI do MVP Local",
+        "en": "Local MVP UI",
+        "fr": "UI du MVP local",
+    },
+    "stack_category_docs_memory": {
+        "pt": "Docs & Memoria",
+        "en": "Docs & Memory",
+        "fr": "Docs & Memoire",
+    },
+    "stack_category_auth_db": {
+        "pt": "Auth & BD",
+        "en": "Auth & DB",
+        "fr": "Auth & BD",
+    },
+    "stack_category_deploy": {
+        "pt": "Deploy",
+        "en": "Deploy",
+        "fr": "Deploiement",
+    },
+    "resource_vida_s1_carteira_apolices_vida_desc": {
+        "pt": "Carteira de 3K apolices vida: temporario, vida inteira, misto e renda vitalicia.",
+        "en": "3K life policy portfolio: term, whole life, endowment, and annuity.",
+        "fr": "Portefeuille de 3K polices vie : temporaire, vie entiere, mixte et rente viagere.",
+    },
+    "resource_vida_s1_sinistralidade_vida_desc": {
+        "pt": "Historico de eventos vida com obitos, resgates, vencimentos e rendas, incluindo anomalias intencionais.",
+        "en": "Life events history with deaths, surrenders, maturities, and annuities, including intentional anomalies.",
+        "fr": "Historique des evenements vie avec deces, rachats, echeances et rentes, incluant des anomalies intentionnelles.",
+    },
+    "resource_vida_s1_exclusoes_apolice_vida_desc": {
+        "pt": "Exclusoes de apolice: suicidio, guerra, desportos radicais e incontestabilidade.",
+        "en": "Policy exclusions: suicide, war, extreme sports, and incontestability.",
+        "fr": "Exclusions de police : suicide, guerre, sports extremes et incontestabilite.",
+    },
+    "resource_vida_s1_nota_sinistro_vida_desc": {
+        "pt": "Tres processos de sinistro vida para analise e revisao.",
+        "en": "Three life claim files for analysis and review.",
+        "fr": "Trois dossiers de sinistre vie pour analyse et revue.",
+    },
+    "resource_vida_s1_red_flags_fraude_vida_desc": {
+        "pt": "200 sinistros com sinais de alerta de fraude escondidos.",
+        "en": "200 claims with hidden fraud red flags.",
+        "fr": "200 sinistres avec signaux faibles de fraude caches.",
+    },
+    "resource_vida_s1_questionario_subscricao_vida_desc": {
+        "pt": "500 propostas de subscricao com declaracoes falsas e inconsistencias.",
+        "en": "500 underwriting proposals with false declarations and inconsistencies.",
+        "fr": "500 propositions de souscription avec fausses declarations et incoherences.",
+    },
+    "resource_vida_s2_tabua_mortalidade_cso2017_desc": {
+        "pt": "Tabua SOA CSO 2017 com qx por idade e sexo, dos 0 aos 120 anos.",
+        "en": "SOA CSO 2017 table with qx by age and sex, ages 0 to 120.",
+        "fr": "Table SOA CSO 2017 avec qx par age et sexe, de 0 a 120 ans.",
+    },
+    "resource_vida_s2_taxas_resgate_desc": {
+        "pt": "Taxas de lapse por ano de apolice e tipo de produto.",
+        "en": "Lapse rates by policy year and product type.",
+        "fr": "Taux de rachat par annee de police et type de produit.",
+    },
+    "resource_vida_s2_yield_curve_ecb_desc": {
+        "pt": "Curva de taxas de juro ECB para discounting do motor.",
+        "en": "ECB yield curve for discounting in the engine.",
+        "fr": "Courbe de taux ECB pour le discounting du moteur.",
+    },
+    "resource_vida_s2_factores_melhoramento_mortalidade_desc": {
+        "pt": "Melhoramento da mortalidade 2017-2050 com choque COVID incluido.",
+        "en": "Mortality improvement factors from 2017-2050 including a COVID shock.",
+        "fr": "Facteurs d'amelioration de mortalite 2017-2050 incluant un choc COVID.",
+    },
+    "resource_vida_s2_comissoes_mediacao_desc": {
+        "pt": "Comissoes por produto e ano, com regras de clawback.",
+        "en": "Commissions by product and year, including clawback rules.",
+        "fr": "Commissions par produit et par annee, avec regles de clawback.",
+    },
+    "resource_vida_s2_mortalidade_covid_portugal_desc": {
+        "pt": "Excesso de mortalidade em Portugal entre 2019 e 2023 por idade e sexo.",
+        "en": "Excess mortality in Portugal from 2019 to 2023 by age and sex.",
+        "fr": "Surmortalite au Portugal de 2019 a 2023 par age et sexe.",
+    },
+    "resource_vida_s2_benchmark_mercado_vida_pt_desc": {
+        "pt": "Benchmarks do mercado vida em Portugal entre 2018 e 2025.",
+        "en": "Portuguese life market benchmarks from 2018 to 2025.",
+        "fr": "Benchmarks du marche vie portugais entre 2018 et 2025.",
+    },
+    "resource_saude_medical_costs_sample_desc": {
+        "pt": "10K registos de custos medicos com variaveis de risco basicas.",
+        "en": "10K medical cost records with basic risk variables.",
+        "fr": "10K enregistrements de couts medicaux avec variables de risque de base.",
+    },
+    "resource_saude_sinistralidade_historica_desc": {
+        "pt": "5K sinistros saude com anomalias intencionais para exploracao.",
+        "en": "5K health claims with intentional anomalies for exploration.",
+        "fr": "5K sinistres sante avec anomalies intentionnelles pour l'exploration.",
+    },
+    "resource_saude_exclusoes_apolice_desc": {
+        "pt": "Exclusoes saude com codigos CID e regras de negocio.",
+        "en": "Health exclusions with ICD codes and business rules.",
+        "fr": "Exclusions sante avec codes CIM et regles metier.",
+    },
+    "resource_saude_fatura_hospital_desc": {
+        "pt": "Cinco faturas hospitalares para OCR e extracao.",
+        "en": "Five hospital invoices for OCR and extraction.",
+        "fr": "Cinq factures hospitalieres pour OCR et extraction.",
+    },
+    "resource_saude_fatura_farmacia_desc": {
+        "pt": "Tres recibos de farmacia para OCR.",
+        "en": "Three pharmacy receipts for OCR.",
+        "fr": "Trois recus de pharmacie pour OCR.",
+    },
+    "resource_saude_condicoes_gerais_desc": {
+        "pt": "Clausulado geral de seguro saude para RAG e pesquisa.",
+        "en": "General health insurance wording for RAG and retrieval.",
+        "fr": "Conditions generales de sante pour RAG et recherche.",
+    },
+    "resource_saude_nota_alta_hospitalar_desc": {
+        "pt": "Tres notas de alta hospitalar para classificacao e resumo.",
+        "en": "Three discharge notes for classification and summarization.",
+        "fr": "Trois comptes rendus de sortie pour classification et resume.",
+    },
+    "resource_saude_tabua_morbilidade_desc": {
+        "pt": "Frequencia e severidade por faixa etaria para saude.",
+        "en": "Frequency and severity by age band for health.",
+        "fr": "Frequence et severite par tranche d'age pour la sante.",
+    },
+    "resource_saude_carteira_beneficiarios_desc": {
+        "pt": "Carteira de 5K beneficiarios saude para exploracao.",
+        "en": "5K health beneficiaries portfolio for exploration.",
+        "fr": "Portefeuille de 5K beneficiaires sante pour exploration.",
+    },
+    "resource_template_constitution_desc": {
+        "pt": "Template base para constitution.md em Spec-Driven Development.",
+        "en": "Base template for constitution.md in Spec-Driven Development.",
+        "fr": "Template de base pour constitution.md en Spec-Driven Development.",
+    },
+    "resource_template_spec_desc": {
+        "pt": "Template base para spec.md.",
+        "en": "Base template for spec.md.",
+        "fr": "Template de base pour spec.md.",
+    },
+    "resource_template_modelo_negocio_desc": {
+        "pt": "Template para pricing e modelo de negocio no Dia 7.",
+        "en": "Template for pricing and business model work on Day 7.",
+        "fr": "Template pour pricing et modele economique au Jour 7.",
+    },
+    "resource_template_calculadora_premio_desc": {
+        "pt": "Template para o exercicio da calculadora de premio simples.",
+        "en": "Template for the simple premium calculator exercise.",
+        "fr": "Template pour l'exercice de calculatrice de prime simple.",
+    },
+    "resource_checklist_auditoria_codigo_desc": {
+        "pt": "Cinco perguntas para auditar codigo gerado por IA.",
+        "en": "Five questions to audit AI-generated code.",
+        "fr": "Cinq questions pour auditer du code genere par IA.",
+    },
+    "resource_scripts_com_bugs_desc": {
+        "pt": "Cinco scripts com bugs atuariais escondidos para revisao.",
+        "en": "Five scripts with hidden actuarial bugs for review.",
+        "fr": "Cinq scripts avec bugs actuariels caches pour revue.",
+    },
+    "resource_prophet_reference_vida_desc": {
+        "pt": "Referencia funcional do FIS Prophet para desenhar o Prophet Lite.",
+        "en": "Functional FIS Prophet reference to design Prophet Lite.",
+        "fr": "Reference fonctionnelle FIS Prophet pour concevoir Prophet Lite.",
+    },
+    "resource_excel_validacao_cashflow_desc": {
+        "pt": "Calculo manual de referencia para validar cash flows do motor local.",
+        "en": "Manual reference calculation to validate local engine cash flows.",
+        "fr": "Calcul manuel de reference pour valider les cash flows du moteur local.",
+    },
 
     # ── Programa Page (extra) ──
     "select_module": {
@@ -569,29 +1030,29 @@ TRANSLATIONS = {
         "fr": "Pre-Bootcamp: Setup & Fondamentaux",
     },
     "pre_bootcamp_intro_desc": {
-        "pt": "Preparacao antes do arranque oficial. Configurar ferramentas essenciais (OpenCode, Claude Code) e aprender conceitos vitais de LLMs: tokens, parametros de contexto e Model Context Protocol (MCP).",
-        "en": "Preparation before the official launch. Set up essential tools (OpenCode, Claude Code) and learn vital LLM concepts: tokens, context parameters and Model Context Protocol (MCP).",
-        "fr": "Preparation avant le lancement officiel. Configurer les outils essentiels (OpenCode, Claude Code) et apprendre les concepts vitaux des LLM : tokens, parametres de contexte et Model Context Protocol (MCP).",
+        "pt": "Preparacao pratica para operar como builder AI-native: OpenCode, DeepSeek, MCPs, terminal, prompts reutilizaveis e regras de operacao segura.",
+        "en": "Practical preparation to operate as an AI-native builder: OpenCode, DeepSeek, MCPs, terminal, reusable prompts, and safe operating rules.",
+        "fr": "Preparation pratique pour operer comme builder AI-native : OpenCode, DeepSeek, MCPs, terminal, prompts reutilisables et regles d'usage securise.",
     },
     "week1_intro_title": {
-        "pt": "Semana 1: AI Engineering & Competencias Core",
-        "en": "Week 1: AI Engineering & Core Skills",
-        "fr": "Semaine 1 : AI Engineering & Competences Core",
+        "pt": "Semana 1: Fundacao do Founder AI",
+        "en": "Week 1: AI Founder Foundations",
+        "fr": "Semaine 1 : Fondations du Fondateur AI",
     },
     "week1_intro_desc": {
-        "pt": "Dominar a arte de construir com IA. Especificar solucoes, data wrangling massivo, pipelines de saude (OCR, pricing) e agentes autonomos auditores com LLM.",
-        "en": "Master the art of building with AI. Specify solutions, massive data wrangling, health pipelines (OCR, pricing) and autonomous LLM auditing agents.",
-        "fr": "Maitriser l'art de construire avec l'IA. Specifier des solutions, data wrangling massif, pipelines sante (OCR, pricing) et agents autonomes auditeurs LLM.",
+        "pt": "Semana de formacao do fundador: escolher a wedge, operar coding LLMs, escrever specs, trabalhar com APIs e dados, entender Prophet e desenhar um MVP vendavel.",
+        "en": "Founder formation week: choose the wedge, operate coding LLMs, write specs, work with APIs and data, understand Prophet, and design a sellable MVP.",
+        "fr": "Semaine de formation du fondateur : choisir la wedge, utiliser les coding LLMs, ecrire des specs, travailler avec APIs et donnees, comprendre Prophet et concevoir un MVP vendable.",
     },
     "week2_intro_title": {
-        "pt": "Semana 2: Arquitetar & Lancar Produto",
-        "en": "Week 2: Architect & Launch Product",
-        "fr": "Semaine 2 : Architecturer & Lancer le Produit",
+        "pt": "Semana 2: Build, Deploy & Distribuicao",
+        "en": "Week 2: Build, Deploy & Distribution",
+        "fr": "Semaine 2 : Build, Deployement & Distribution",
     },
     "week2_intro_desc": {
-        "pt": "Construir do zero um motor atuarial Vida cloud-native com agentes embutidos. Implementar RBAC e lancar como um SaaS pronto a monetizar.",
-        "en": "Build from scratch a cloud-native Life actuarial engine with embedded agents. Implement RBAC and launch as a monetization-ready SaaS.",
-        "fr": "Construire de zero un moteur actuariel Vie cloud-native avec agents embarques. Implementer RBAC et lancer en SaaS pret a monetiser.",
+        "pt": "Semana de execucao: document drop, UX mobile-first, build local do Prophet Lite, copiloto AI, deploy, demo final e lancamento no LinkedIn.",
+        "en": "Execution week: document drop, mobile-first UX, local Prophet Lite build, AI copilot, deployment, final demo, and LinkedIn launch.",
+        "fr": "Semaine d'execution : depot de documents, UX mobile-first, build local du Prophet Lite, copilote AI, deployement, demo finale et lancement sur LinkedIn.",
     },
 
     # ── Grading table ──
@@ -613,17 +1074,42 @@ TRANSLATIONS = {
     "grading_exercises": {
         "pt": "Exercicios Diarios (Dias 1-9)", "en": "Daily Exercises (Days 1-9)", "fr": "Exercices Quotidiens (Jours 1-9)",
     },
+    "grading_exercises_desc": {
+        "pt": "Checklist diaria de execucao",
+        "en": "Daily execution checklist",
+        "fr": "Checklist quotidienne d'execution",
+    },
     "grading_challenges": {
         "pt": "Desafios Diarios (melhor 8 de 9)", "en": "Daily Challenges (best 8 of 9)", "fr": "Defis Quotidiens (meilleurs 8 sur 9)",
+    },
+    "grading_challenges_desc": {
+        "pt": "Entrega principal de cada dia",
+        "en": "Main deliverable of each day",
+        "fr": "Livrable principal de chaque jour",
     },
     "grading_homework": {
         "pt": "Tarefas para Casa", "en": "Homework", "fr": "Devoirs",
     },
+    "grading_homework_desc": {
+        "pt": "Refino, notas e consolidacao",
+        "en": "Refinement, notes, and consolidation",
+        "fr": "Refinements, notes et consolidation",
+    },
     "grading_participation": {
         "pt": "Participacao & Forum", "en": "Participation & Forum", "fr": "Participation & Forum",
     },
+    "grading_participation_desc": {
+        "pt": "Feedback, colaboracao e presenca ativa",
+        "en": "Feedback, collaboration, and active presence",
+        "fr": "Feedback, collaboration et presence active",
+    },
     "grading_final": {
-        "pt": "Projeto Final (MVP Prophet AI)", "en": "Final Project (MVP Prophet AI)", "fr": "Projet Final (MVP Prophet AI)",
+        "pt": "Projeto Final (MVP Prophet Lite)", "en": "Final Project (Prophet Lite MVP)", "fr": "Projet Final (MVP Prophet Lite)",
+    },
+    "grading_final_desc": {
+        "pt": "MVP online, demo publica e lancamento no LinkedIn",
+        "en": "Online MVP, public demo, and LinkedIn launch",
+        "fr": "MVP en ligne, demo publique et lancement sur LinkedIn",
     },
     "grading_decisive": {
         "pt": "Decisivo", "en": "Decisive", "fr": "Decisif",
@@ -658,14 +1144,14 @@ TRANSLATIONS = {
         "fr": "AI Tuteur",
     },
     "tutor_sub": {
-        "pt": "O teu assistente pessoal para duvidas do bootcamp — powered by DeepSeek",
-        "en": "Your personal assistant for bootcamp questions — powered by DeepSeek",
-        "fr": "Votre assistant personnel pour le bootcamp — powered by DeepSeek",
+        "pt": "O teu copiloto para specs, tools, Prophet Lite, deploy e lancamento — powered by DeepSeek",
+        "en": "Your copilot for specs, tools, Prophet Lite, deployment, and launch — powered by DeepSeek",
+        "fr": "Votre copilote pour specs, outils, Prophet Lite, deployement et lancement — powered by DeepSeek",
     },
     "tutor_ready": {
-        "pt": "Pronto para explicar conceitos, desbloquear exercicios e rever abordagens.",
-        "en": "Ready to explain concepts, unblock exercises, and review approaches.",
-        "fr": "Pret a expliquer les concepts, debloquer les exercices et revoir les approches.",
+        "pt": "Pronto para ajudar com specs, copiloto AI, document drop, deploy, prompts e decisoes de produto.",
+        "en": "Ready to help with specs, AI copilot, document drop, deployment, prompts, and product decisions.",
+        "fr": "Pret a aider sur les specs, le copilote AI, le depot de documents, le deployement, les prompts et les decisions produit.",
     },
     "tutor_prompt_title": {
         "pt": "Prompts sugeridos para arrancar",
@@ -673,24 +1159,24 @@ TRANSLATIONS = {
         "fr": "Prompts suggeres pour commencer",
     },
     "tutor_capability_1": {
-        "pt": "Reservas, cashflows e logica atuarial explicados passo a passo.",
-        "en": "Reserves, cashflows, and actuarial logic explained step by step.",
-        "fr": "Reserves, cashflows et logique actuarielle expliques pas a pas.",
+        "pt": "Ajuda a transformar ideias de negocio em specs claras para LLMs executarem.",
+        "en": "Helps turn business ideas into clear specs that LLMs can execute.",
+        "fr": "Aide a transformer les idees business en specs claires que les LLMs peuvent executer.",
     },
     "tutor_capability_2": {
-        "pt": "Ajuda a destravar Python, ML, Streamlit e debugging do bootcamp.",
-        "en": "Help unblocking Python, ML, Streamlit, and bootcamp debugging.",
-        "fr": "Aide pour debloquer Python, ML, Streamlit et le debugging du bootcamp.",
+        "pt": "Explica tools, APIs, JSON, erros comuns e como operar a stack sem depender de coding manual.",
+        "en": "Explains tools, APIs, JSON, common errors, and how to operate the stack without depending on manual coding.",
+        "fr": "Explique les outils, APIs, JSON, erreurs courantes et comment operer la stack sans dependre du code manuel.",
     },
     "tutor_capability_3": {
-        "pt": "Contexto sobre MCPs, RAG, agentes e arquitetura do produto final.",
-        "en": "Context on MCPs, RAG, agents, and the final product architecture.",
-        "fr": "Contexte sur les MCPs, le RAG, les agents et l'architecture du produit final.",
+        "pt": "Da contexto sobre Prophet Lite, document drop, UX mobile-first e arquitetura do MVP final.",
+        "en": "Provides context on Prophet Lite, document drop, mobile-first UX, and final MVP architecture.",
+        "fr": "Donne du contexte sur Prophet Lite, le depot de documents, l'UX mobile-first et l'architecture finale du MVP.",
     },
     "tutor_capability_4": {
-        "pt": "Sugestoes de proximos passos, testes e melhoria da tua entrega.",
-        "en": "Suggestions for next steps, tests, and improving your submission.",
-        "fr": "Suggestions de prochaines etapes, tests et amelioration de votre livraison.",
+        "pt": "Ajuda a preparar deploy, demo, post de LinkedIn e proximos passos de mercado.",
+        "en": "Helps prepare deployment, demo, LinkedIn post, and next market-facing steps.",
+        "fr": "Aide a preparer le deployement, la demo, le post LinkedIn et les prochaines etapes de marche.",
     },
     "tutor_welcome": {
         "pt": "Ola! Sou o teu AI Tutor",
@@ -698,9 +1184,9 @@ TRANSLATIONS = {
         "fr": "Bonjour! Je suis votre AI Tuteur",
     },
     "tutor_welcome_sub": {
-        "pt": "Posso ajudar-te com conceitos atuariais, exercicios do bootcamp,<br>Python, ML, MCPs, ou qualquer duvida do curso.",
-        "en": "I can help you with actuarial concepts, bootcamp exercises,<br>Python, ML, MCPs, or any course question.",
-        "fr": "Je peux vous aider avec les concepts actuariels, les exercices du bootcamp,<br>Python, ML, MCPs, ou toute question du cours.",
+        "pt": "Posso ajudar-te com specs, OpenCode, MCPs, APIs, Prophet Lite,<br>document drop, deploy, narrativa de produto e qualquer duvida do bootcamp.",
+        "en": "I can help with specs, OpenCode, MCPs, APIs, Prophet Lite,<br>document drop, deployment, product narrative, and any bootcamp question.",
+        "fr": "Je peux aider sur les specs, OpenCode, MCPs, APIs, Prophet Lite,<br>depot de documents, deployement, narration produit et toute question du bootcamp.",
     },
     "chat_placeholder": {
         "pt": "Escreve a tua pergunta...",
@@ -723,34 +1209,146 @@ TRANSLATIONS = {
         "fr": "Posez-moi une question!",
     },
     "tutor_sug_1": {
-        "pt": "O que e a clausula de incontestabilidade e como afeta os sinistros?",
-        "en": "What is the incontestability clause and how does it affect claims?",
-        "fr": "Qu'est-ce que la clause d'incontestabilite et comment affecte-t-elle les sinistres?",
+        "pt": "Ajuda-me a escolher uma wedge pequena e vendavel para o meu Prophet Lite.",
+        "en": "Help me choose a small, sellable wedge for my Prophet Lite.",
+        "fr": "Aide-moi a choisir une petite wedge vendable pour mon Prophet Lite.",
     },
     "tutor_sug_2": {
-        "pt": "Como calculo a reserva V(t) para um seguro temporario?",
-        "en": "How do I calculate the V(t) reserve for a term life policy?",
-        "fr": "Comment calculer la reserve V(t) pour une assurance temporaire?",
+        "pt": "Revê a minha spec de upload de assumptions como se fosses um product engineer.",
+        "en": "Review my assumptions upload spec as if you were a product engineer.",
+        "fr": "Relis ma spec d'upload d'hypotheses comme si tu etais un product engineer.",
     },
     "tutor_sug_3": {
-        "pt": "Quais sao os choques de Solvencia II para o modulo Vida?",
-        "en": "What are the Solvency II shocks for the Life module?",
-        "fr": "Quels sont les chocs de Solvabilite II pour le module Vie?",
+        "pt": "Que dados e schemas preciso para ligar model points, assumptions e run results?",
+        "en": "What data and schemas do I need to connect model points, assumptions, and run results?",
+        "fr": "De quelles donnees et schemas ai-je besoin pour relier model points, hypotheses et run results ?",
     },
     "tutor_sug_4": {
-        "pt": "O que sao MCPs e como os configuro no OpenCode?",
-        "en": "What are MCPs and how do I configure them in OpenCode?",
-        "fr": "Que sont les MCPs et comment les configurer dans OpenCode?",
+        "pt": "Como desenho um document drop simples e fiavel para esta app?",
+        "en": "How do I design a simple, reliable document drop for this app?",
+        "fr": "Comment concevoir un depot de documents simple et fiable pour cette app ?",
     },
     "tutor_sug_5": {
-        "pt": "Diferenca entre Net Premium Reserve e Gross Premium Reserve?",
-        "en": "Difference between Net Premium Reserve and Gross Premium Reserve?",
-        "fr": "Difference entre la reserve de prime nette et la reserve de prime brute?",
+        "pt": "Que modelo devo usar para planear, construir e explicar o MVP?",
+        "en": "Which model should I use to plan, build, and explain the MVP?",
+        "fr": "Quel modele dois-je utiliser pour planifier, construire et expliquer le MVP ?",
     },
     "tutor_sug_6": {
-        "pt": "Como deteto anomalias no sinistralidade_vida.csv?",
-        "en": "How do I detect anomalies in sinistralidade_vida.csv?",
-        "fr": "Comment detecter les anomalies dans sinistralidade_vida.csv?",
+        "pt": "Ajuda-me a escrever o post final de lancamento para o LinkedIn.",
+        "en": "Help me write the final launch post for LinkedIn.",
+        "fr": "Aide-moi a ecrire le post final de lancement pour LinkedIn.",
+    },
+    "tutor_unavailable": {
+        "pt": "AI Tutor indisponivel -- configura a chave DeepSeek em secrets.toml.",
+        "en": "AI Tutor unavailable -- configure the DeepSeek key in secrets.toml.",
+        "fr": "AI Tutor indisponible -- configurez la cle DeepSeek dans secrets.toml.",
+    },
+    "tutor_no_response": {
+        "pt": "Sem resposta do modelo.",
+        "en": "No response from the model.",
+        "fr": "Aucune reponse du modele.",
+    },
+    "tutor_contact_error": {
+        "pt": "Erro ao contactar o AI Tutor: {error}",
+        "en": "Error contacting the AI Tutor: {error}",
+        "fr": "Erreur lors du contact avec l'AI Tutor : {error}",
+    },
+
+    # ── LinkedIn Launch Page ──
+    "launch_title": {
+        "pt": "LinkedIn Launch Kit",
+        "en": "LinkedIn Launch Kit",
+        "fr": "Kit de Lancement LinkedIn",
+    },
+    "launch_sub": {
+        "pt": "Transforma o MVP em narrativa publica, distribuicao e conversa com mercado.",
+        "en": "Turn the MVP into public narrative, distribution, and market conversation.",
+        "fr": "Transformez le MVP en narration publique, distribution et conversation avec le marche.",
+    },
+    "launch_kicker": {
+        "pt": "Construir em publico",
+        "en": "Build in public",
+        "fr": "Build in public",
+    },
+    "launch_why_title": {
+        "pt": "Porque lancar em publico",
+        "en": "Why launch in public",
+        "fr": "Pourquoi lancer en public",
+    },
+    "launch_why_1": {
+        "pt": "Atrai feedback, pilotos e conversas reais com a industria.",
+        "en": "Attracts feedback, pilot users, and real industry conversations.",
+        "fr": "Attire du feedback, des pilotes et de vraies conversations avec l'industrie.",
+    },
+    "launch_why_2": {
+        "pt": "Transforma aprendizagem em reputacao e prova publica de execucao.",
+        "en": "Turns learning into reputation and public proof of execution.",
+        "fr": "Transforme l'apprentissage en reputation et preuve publique d'execution.",
+    },
+    "launch_why_3": {
+        "pt": "Ajuda-te a passar de estudante a fundador ou operador de produto.",
+        "en": "Helps you move from student to founder or product operator.",
+        "fr": "Vous aide a passer d'etudiant a fondateur ou operateur produit.",
+    },
+    "launch_template_title": {
+        "pt": "Template de post",
+        "en": "Post template",
+        "fr": "Template de post",
+    },
+    "launch_template_body": {
+        "pt": "Hoje lancei o meu Prophet Lite com copiloto AI.\n\nProblema: muitas equipas ainda trabalham com processos pesados, ferramentas legacy e demasiada friccao para transformar assumptions, model points e documentos em runs claros.\n\nO que construí: um MVP que permite subir inputs, correr projecoes deterministicas, explicar resultados com AI e capturar conhecimento a partir de documentos.\n\nStack: OpenCode, GLM-5, DeepSeek, MCPs, Streamlit, ChromaDB e Supabase.\n\nO mais importante que aprendi: com coding LLMs nao preciso de ser programador tradicional para construir software; preciso de saber especificar, validar, iterar e lancar.\n\nSe trabalhas em seguros, vida, analytics ou software B2B e isto te interessa, fala comigo.",
+        "en": "Today I launched my Prophet Lite with an AI copilot.\n\nProblem: many teams still work with heavy processes, legacy tools, and too much friction when turning assumptions, model points, and documents into clear runs.\n\nWhat I built: an MVP that lets users upload inputs, run deterministic projections, explain results with AI, and capture knowledge from documents.\n\nStack: OpenCode, GLM-5, DeepSeek, MCPs, Streamlit, ChromaDB, and Supabase.\n\nWhat I learned most: with coding LLMs I do not need to be a traditional programmer to build software; I need to know how to specify, validate, iterate, and launch.\n\nIf you work in insurance, life, analytics, or B2B software and this is relevant, let’s talk.",
+        "fr": "Aujourd'hui j'ai lance mon Prophet Lite avec copilote AI.\n\nProbleme : beaucoup d'equipes travaillent encore avec des processus lourds, des outils legacy et trop de friction pour transformer hypotheses, model points et documents en runs clairs.\n\nCe que j'ai construit : un MVP qui permet d'uploader des inputs, lancer des projections deterministes, expliquer les resultats avec l'AI et capturer la connaissance depuis des documents.\n\nStack : OpenCode, GLM-5, DeepSeek, MCPs, Streamlit, ChromaDB et Supabase.\n\nLe plus important que j'ai appris : avec les coding LLMs je n'ai pas besoin d'etre un programmeur traditionnel pour construire du software ; je dois savoir specifier, valider, iterer et lancer.\n\nSi vous travaillez dans l'assurance, la vie, l'analytics ou le software B2B et que cela vous parle, parlons-en.",
+    },
+    "launch_assets_title": {
+        "pt": "Assets a preparar",
+        "en": "Assets to prepare",
+        "fr": "Assets a preparer",
+    },
+    "launch_assets_1": {
+        "pt": "1 screenshot mobile + 1 screenshot desktop",
+        "en": "1 mobile screenshot + 1 desktop screenshot",
+        "fr": "1 capture mobile + 1 capture desktop",
+    },
+    "launch_assets_2": {
+        "pt": "URL deployada e CTA claro",
+        "en": "Deployed URL and clear CTA",
+        "fr": "URL deployee et CTA clair",
+    },
+    "launch_assets_3": {
+        "pt": "1 frase sobre o problema e 1 frase sobre o resultado",
+        "en": "1 sentence on the problem and 1 sentence on the outcome",
+        "fr": "1 phrase sur le probleme et 1 phrase sur le resultat",
+    },
+    "launch_assets_4": {
+        "pt": "Stack curta, nao uma lista interminavel de buzzwords",
+        "en": "Short stack mention, not an endless list of buzzwords",
+        "fr": "Mention de stack courte, pas une liste interminable de buzzwords",
+    },
+    "launch_checklist_title": {
+        "pt": "Checklist de lancamento",
+        "en": "Launch checklist",
+        "fr": "Checklist de lancement",
+    },
+    "launch_check_1": {
+        "pt": "Mostrar um fluxo completo: input -> run -> output -> copiloto",
+        "en": "Show one complete flow: input -> run -> output -> copilot",
+        "fr": "Montrer un flux complet : input -> run -> output -> copilote",
+    },
+    "launch_check_2": {
+        "pt": "Explicar a wedge em menos de 2 frases",
+        "en": "Explain the wedge in under 2 sentences",
+        "fr": "Expliquer la wedge en moins de 2 phrases",
+    },
+    "launch_check_3": {
+        "pt": "Pedir feedback ou pilotos, nao apenas likes",
+        "en": "Ask for feedback or pilot users, not just likes",
+        "fr": "Demander du feedback ou des pilotes, pas seulement des likes",
+    },
+    "launch_check_4": {
+        "pt": "Fechar com convite para conversa ou demo",
+        "en": "Close with an invitation to talk or request a demo",
+        "fr": "Conclure avec une invitation a parler ou demander une demo",
     },
 
     # ── Settings labels ──

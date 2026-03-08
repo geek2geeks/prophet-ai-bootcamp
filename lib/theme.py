@@ -390,6 +390,13 @@ h1 a, h2 a, h3 a, h4 a { display: none !important; }
     color: #64748B;
 }
 
+.timeline-mini-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin-top: 0.8rem;
+}
+
 .timeline-body {
     padding: 24px;
 }
@@ -412,6 +419,29 @@ h1 a, h2 a, h3 a, h4 a { display: none !important; }
     left: 0;
     top: 0px;
     font-size: 0.9em;
+}
+
+.timeline-topic-list {
+    margin: 0.45rem 0 0.1rem 0;
+    padding-left: 0;
+    list-style: none;
+    display: grid;
+    gap: 0.18rem;
+}
+
+.timeline-topic-list li {
+    font-size: 0.82rem;
+    color: #64748B;
+    font-weight: 400;
+    padding-left: 0.85rem;
+    position: relative;
+}
+
+.timeline-topic-list li::before {
+    content: "-";
+    position: absolute;
+    left: 0;
+    top: 0;
 }
 
 .timeline-exercises {
@@ -438,6 +468,7 @@ h1 a, h2 a, h3 a, h4 a { display: none !important; }
     font-size: 0.85rem;
     color: #64748B;
     line-height: 1.4;
+    word-break: break-word;
 }
 
 /* ── Custom Landing / Auth Elements ── */
@@ -1030,6 +1061,14 @@ section[data-testid="stSidebar"] hr {
     box-shadow: 0 12px 24px -22px rgba(18, 38, 63, 0.5);
 }
 
+.mobile-hero-intro {
+    display: none;
+}
+
+.desktop-hero-only {
+    display: block;
+}
+
 .lang-chip {
     display: inline-flex;
     align-items: center;
@@ -1097,6 +1136,14 @@ section[data-testid="stSidebar"] hr {
     margin: 1.25rem 0;
 }
 
+.landing-metrics > *,
+.feature-grid > *,
+.tool-grid > *,
+.meta-grid > *,
+.resource-summary-grid > * {
+    min-width: 0;
+}
+
 .landing-metric,
 .feature-tile,
 .week-card,
@@ -1154,6 +1201,11 @@ section[data-testid="stSidebar"] hr {
     align-items: flex-start;
 }
 
+.landing-spotlight-item p {
+    margin: 0;
+    word-break: break-word;
+}
+
 .landing-spotlight-icon {
     display: inline-flex;
     align-items: center;
@@ -1168,6 +1220,24 @@ section[data-testid="stSidebar"] hr {
 .auth-panel-intro h3 {
     margin: 0;
     font-size: 1.6rem;
+}
+
+.auth-benefit-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0.85rem 0 0.6rem;
+}
+
+.auth-benefit-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.38rem 0.68rem;
+    border-radius: 999px;
+    background: rgba(44, 140, 123, 0.1);
+    color: var(--brand-teal) !important;
+    font-size: 0.78rem;
+    font-weight: 700;
 }
 
 .auth-panel-intro p,
@@ -1227,6 +1297,76 @@ section[data-testid="stSidebar"] hr {
     font-size: 1.02rem;
 }
 
+.feature-grid-tight {
+    gap: 0.85rem;
+}
+
+.founder-flow-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.feature-tile-tight {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.9rem;
+}
+
+.founder-flow-card {
+    min-height: 100%;
+}
+
+.founder-step {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 18px;
+    background: linear-gradient(135deg, rgba(255, 122, 89, 0.16) 0%, rgba(255, 154, 118, 0.28) 100%);
+    color: var(--brand-accent-strong);
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    flex: 0 0 auto;
+}
+
+.feature-tile-tight .feature-icon {
+    margin-bottom: 0;
+    flex: 0 0 auto;
+}
+
+.feature-tile-tight h4 {
+    margin-bottom: 0.2rem;
+}
+
+.compact-head {
+    margin-bottom: 0.85rem;
+}
+
+.quote-head {
+    margin-top: 2.5rem;
+}
+
+.quote-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.9rem;
+}
+
+.quote-card {
+    padding: 1rem 1.05rem;
+    border-radius: 22px;
+    border: 1px solid rgba(217, 226, 232, 0.92);
+    background: rgba(255, 255, 255, 0.76);
+    box-shadow: 0 16px 32px -28px rgba(18, 38, 63, 0.35);
+}
+
+.quote-card p {
+    margin: 0;
+    color: var(--brand-ink) !important;
+    font-size: 0.96rem;
+    line-height: 1.55;
+}
+
 .dashboard-hero {
     position: relative;
     overflow: hidden;
@@ -1238,6 +1378,10 @@ section[data-testid="stSidebar"] hr {
     border-radius: 28px;
     background: linear-gradient(145deg, var(--brand-deep) 0%, #14324B 62%, #21616B 100%);
     box-shadow: 0 30px 55px -34px rgba(11, 31, 51, 0.85);
+}
+
+.founder-dashboard-hero {
+    margin-bottom: 1rem;
 }
 
 .dashboard-hero::after {
@@ -1308,6 +1452,58 @@ section[data-testid="stSidebar"] hr {
 
 .week-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.founder-focus-grid,
+.founder-stage-grid {
+    display: grid;
+    gap: 0.9rem;
+}
+
+.founder-focus-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-bottom: 1.2rem;
+}
+
+.founder-stage-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin-bottom: 1.25rem;
+}
+
+.founder-focus-card,
+.founder-stage-card,
+.founder-week-card {
+    background: rgba(255, 255, 255, 0.76);
+    border: 1px solid rgba(217, 226, 232, 0.92);
+    box-shadow: var(--shadow-soft);
+}
+
+.founder-focus-card {
+    padding: 1rem 1.05rem;
+    border-radius: 22px;
+}
+
+.founder-focus-card h3,
+.founder-stage-card strong {
+    display: block;
+    margin: 0 0 0.25rem 0;
+    color: var(--brand-ink) !important;
+}
+
+.founder-focus-card p,
+.founder-stage-card p {
+    margin: 0;
+    color: var(--brand-muted) !important;
+}
+
+.founder-stage-card {
+    padding: 0.95rem 1rem;
+    border-radius: 22px;
+}
+
+.founder-level-shell {
+    padding-top: 0.8rem !important;
+    padding-bottom: 0.8rem !important;
 }
 
 .week-card-top {
@@ -1529,6 +1725,11 @@ section[data-testid="stSidebar"] hr {
     border-bottom: 1px solid rgba(217, 226, 232, 0.72);
 }
 
+.resource-item strong,
+.resource-item p {
+    word-break: break-word;
+}
+
 .resource-item:last-child {
     border-bottom: none;
     padding-bottom: 0;
@@ -1666,6 +1867,74 @@ section[data-testid="stSidebar"] hr {
     background: rgba(255, 255, 255, 0.78);
 }
 
+.grading-stack {
+    display: grid;
+    gap: 0.85rem;
+}
+
+.grading-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.05rem;
+    border-radius: 22px;
+    border: 1px solid rgba(217, 226, 232, 0.92);
+    background: rgba(255, 255, 255, 0.78);
+    box-shadow: var(--shadow-soft);
+}
+
+.grading-card strong {
+    display: block;
+    color: var(--brand-ink);
+    margin-bottom: 0.15rem;
+}
+
+.grading-card p {
+    margin: 0;
+    color: var(--brand-muted) !important;
+    font-size: 0.92rem;
+}
+
+.grading-card-side {
+    display: grid;
+    justify-items: end;
+    gap: 0.45rem;
+    flex: 0 0 auto;
+}
+
+.grading-card-points {
+    font-family: 'Manrope', sans-serif;
+    font-size: 1.7rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--brand-ink);
+}
+
+.grading-card-featured {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.88) 0%, rgba(237, 233, 254, 0.92) 100%);
+    border-color: rgba(199, 210, 254, 0.95);
+}
+
+.grading-card-featured .grading-card-points {
+    color: #4F46E5;
+}
+
+.stRadio > div {
+    gap: 0.5rem !important;
+}
+
+.stRadio [role="radiogroup"] {
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+
+.stRadio [role="radiogroup"] label {
+    min-height: 2.9rem;
+    padding: 0.2rem 0.3rem 0.2rem 0 !important;
+}
+
 .tutor-suggestion-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     margin-top: 1rem;
@@ -1708,8 +1977,18 @@ section[data-testid="stSidebar"] hr {
         max-width: none;
         font-size: clamp(2.2rem, 10vw, 3rem) !important;
     }
+    .mobile-hero-intro {
+        display: block;
+        margin-bottom: 1rem;
+    }
+    .desktop-hero-only {
+        display: none !important;
+    }
     .landing-metrics,
     .feature-grid,
+    .founder-flow-grid,
+    .founder-focus-grid,
+    .founder-stage-grid,
     .week-grid,
     .dashboard-hero,
     .tool-grid,
@@ -1718,18 +1997,106 @@ section[data-testid="stSidebar"] hr {
     .resource-hero,
     .exercise-hero,
     .tutor-hero,
-    .tutor-suggestion-grid {
+    .tutor-suggestion-grid,
+    .quote-grid {
         grid-template-columns: 1fr !important;
     }
     .lang-switch {
         width: 100%;
         justify-content: space-between;
+        margin-bottom: 0.85rem;
     }
     .lang-chip {
         flex: 1 1 auto;
     }
+    .auth-benefit-list {
+        margin-top: 0.75rem;
+        gap: 0.42rem;
+    }
+    .auth-benefit-pill {
+        font-size: 0.74rem;
+        padding: 0.34rem 0.58rem;
+    }
     .landing-section-head h3 {
         font-size: 1.55rem;
+    }
+    .compact-head {
+        margin-top: 2rem !important;
+    }
+    .landing-lead,
+    .timeline-header-content p,
+    .timeline-exercise-content p,
+    .resource-item p,
+    .hero-copy p,
+    .suggestion-card p {
+        font-size: 0.95rem !important;
+        line-height: 1.55 !important;
+    }
+    .landing-metric,
+    .feature-tile,
+    .tool-card,
+    .meta-card,
+    .resource-summary-card,
+    .exercise-meta-card {
+        padding: 0.9rem 0.95rem !important;
+        border-radius: 18px !important;
+    }
+    .feature-tile-tight {
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 0.8rem;
+    }
+    .founder-step {
+        width: 2.2rem;
+        height: 2.2rem;
+        border-radius: 14px;
+        font-size: 0.82rem;
+    }
+    .landing-spotlight,
+    .timeline-body,
+    .resource-section-card,
+    .challenge-form-shell,
+    .progress-card-shell,
+    .details-card-shell,
+    .tutor-chat-shell,
+    .founder-focus-card,
+    .founder-stage-card {
+        padding: 0.95rem !important;
+        border-radius: 20px !important;
+    }
+    .timeline-header {
+        padding: 0.95rem !important;
+        gap: 0.7rem !important;
+    }
+    .timeline-badge {
+        font-size: 0.72rem !important;
+        padding: 0.35rem 0.55rem !important;
+    }
+    .timeline-mini-meta {
+        gap: 0.35rem;
+        margin-top: 0.65rem;
+    }
+    .timeline-mini-meta .badge-pill {
+        font-size: 0.68rem !important;
+        padding: 0.24rem 0.5rem !important;
+    }
+    .timeline-modules-list li {
+        padding-left: 1.15rem;
+        font-size: 0.9rem;
+    }
+    .timeline-topic-list li {
+        font-size: 0.79rem;
+        padding-left: 0.72rem;
+    }
+    .hero-title,
+    .timeline-header-content h3 {
+        font-size: 1.2rem !important;
+        line-height: 1.15 !important;
+    }
+    .stButton > button,
+    button[kind="primaryFormSubmit"] {
+        width: 100% !important;
+        min-height: 3.15rem !important;
     }
     .dashboard-progress-card {
         text-align: left;
@@ -1739,10 +2106,28 @@ section[data-testid="stSidebar"] hr {
     .todo-card-header,
     .week-card-top,
     .week-card-progress,
+    .grading-card,
     .exercise-checkbox-wrap,
     .section-title-row {
         flex-direction: column;
         align-items: flex-start !important;
+    }
+    .grading-card {
+        padding: 0.95rem !important;
+    }
+    .grading-card-side {
+        width: 100%;
+        justify-items: start;
+    }
+    .grading-card-points {
+        font-size: 1.45rem;
+    }
+    .quote-card {
+        padding: 0.95rem !important;
+        border-radius: 18px !important;
+    }
+    .timeline-item {
+        border-radius: 20px !important;
     }
 }
 </style>
@@ -1836,7 +2221,7 @@ def stat_cards(items: list[dict]):
 def section_title(title: str, icon: str = "", badge_color: str = "indigo"):
     """Section title with a small accompanying icon/emoji."""
     import textwrap
-    st.markdown(textwrap.dedent(f'''
+    render_html(textwrap.dedent(f'''
     <div class="section-title-row">
         <span class="section-title-icon" style="background:var(--bg-{badge_color}, #F1F5F9);">{icon}</span>
         <h2 class="section-title-text">{title}</h2>

@@ -13,13 +13,18 @@ page_header(t("programa_title"), t("programa_sub"), "🗺️")
 
 # Week selector
 render_html('<div style="margin-bottom:24px;"></div>')
+tabs = [t("pre_bootcamp_tab"), t("week1_tab"), t("week2_tab")]
+target_week = st.session_state.pop("programa_target_week", None)
+if isinstance(target_week, int) and 0 <= target_week < len(tabs):
+    st.session_state.program_module_switch = tabs[target_week]
+
 semana = st.radio(
     t("select_module"),
-    [t("pre_bootcamp_tab"), t("week1_tab"), t("week2_tab")],
+    tabs,
     horizontal=True,
     label_visibility="collapsed",
+    key="program_module_switch",
 )
-tabs = [t("pre_bootcamp_tab"), t("week1_tab"), t("week2_tab")]
 sem_num = tabs.index(semana) if semana in tabs else 0
 
 days_filtered = [d for d in DAYS if d["semana"] == sem_num]
@@ -78,6 +83,8 @@ st.markdown('<div class="timeline-container">', unsafe_allow_html=True)
 
 for day in days_filtered:
     week_cls = "pre-bootcamp" if day["semana"] == 0 else ("" if day["semana"] == 1 else "week2")
+    module_count = len(day["modulos"])
+    exercise_count = len(day["exercicios"])
 
     html = textwrap.dedent(f"""
     <div class="timeline-item {week_cls}">
@@ -86,6 +93,11 @@ for day in days_filtered:
             <div class="timeline-header-content">
                 <h3>{day['titulo']}</h3>
                 <p>{day['objetivo']}</p>
+                <div class="timeline-mini-meta">
+                    <span class="badge-pill slate">{module_count} {t('programa_modules_short')}</span>
+                    <span class="badge-pill slate">{exercise_count} {t('programa_exercises_short')}</span>
+                    <span class="badge-pill indigo">{day['desafio']['pontos']} {t('programa_challenge_points_short')}</span>
+                </div>
             </div>
         </div>
 
@@ -102,9 +114,9 @@ for day in days_filtered:
         if mod_key in conteudo:
             topics = conteudo[mod_key].get("topicos", [])
             if topics:
-                html += '<ul style="margin:6px 0 4px 0; padding-left:20px; list-style:none;">'
+                html += '<ul class="timeline-topic-list">'
                 for topic in topics:
-                    html += f'<li style="font-size:0.85rem; color:#64748B; font-weight:400; padding:1px 0; margin:0;">&mdash; {topic["titulo"]}</li>'
+                    html += f'<li>{topic["titulo"]}</li>'
                 html += '</ul>'
         html += "</li>"
 
@@ -148,51 +160,71 @@ render_html('</div>')
 
 # Grading Table
 section_title(t("grading_title"), "🏅", "amber")
-st.markdown(f"""
-<div class="saas-card table-scroll" style="padding:0; overflow:hidden;">
-    <table style="width:100%; border-collapse:collapse; text-align:left;">
-        <thead>
-            <tr style="background:#F8FAFC; border-bottom:1px solid #E2E8F0;">
-                <th style="padding:16px 24px; color:#475569; font-weight:600; font-size:0.85rem; text-transform:uppercase;">{t('grading_component')}</th>
-                <th style="padding:16px 24px; color:#475569; font-weight:600; font-size:0.85rem; text-transform:uppercase;">{t('grading_points')}</th>
-                <th style="padding:16px 24px; color:#475569; font-weight:600; font-size:0.85rem; text-transform:uppercase;">{t('grading_weight')}</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr style="border-bottom:1px solid #E2E8F0;">
-                <td style="padding:16px 24px; font-weight:500; color:#0F172A;">{t('grading_prebootcamp')}</td>
-                <td style="padding:16px 24px;">85</td>
-                <td style="padding:16px 24px;"><span class="badge-pill amber">{t('grading_bonus')}</span></td>
-            </tr>
-            <tr style="border-bottom:1px solid #E2E8F0;">
-                <td style="padding:16px 24px; font-weight:500; color:#0F172A;">{t('grading_exercises')}</td>
-                <td style="padding:16px 24px;">200</td>
-                <td style="padding:16px 24px;">20%</td>
-            </tr>
-            <tr style="border-bottom:1px solid #E2E8F0;">
-                <td style="padding:16px 24px; font-weight:500; color:#0F172A;">{t('grading_challenges')}</td>
-                <td style="padding:16px 24px;">200</td>
-                <td style="padding:16px 24px;">20%</td>
-            </tr>
-            <tr style="border-bottom:1px solid #E2E8F0;">
-                <td style="padding:16px 24px; font-weight:500; color:#0F172A;">{t('grading_homework')}</td>
-                <td style="padding:16px 24px;">100</td>
-                <td style="padding:16px 24px;">10%</td>
-            </tr>
-            <tr style="border-bottom:1px solid #E2E8F0;">
-                <td style="padding:16px 24px; font-weight:500; color:#0F172A;">{t('grading_participation')}</td>
-                <td style="padding:16px 24px;">100</td>
-                <td style="padding:16px 24px;">10%</td>
-            </tr>
-            <tr style="background:#F8FAFC;">
-                <td style="padding:16px 24px; font-weight:700; color:#4F46E5;">{t('grading_final')}</td>
-                <td style="padding:16px 24px; font-weight:700;">400</td>
-                <td style="padding:16px 24px; font-weight:700;"><span class="badge-pill indigo" style="font-size:0.85rem;">40% {t('grading_decisive')}</span></td>
-            </tr>
-        </tbody>
-    </table>
+render_html(f"<p class='hero-note' style='margin-top:-0.35rem; margin-bottom:0.95rem;'>{t('programa_points_hint')}</p>")
+render_html(f"""
+<div class="grading-stack">
+    <div class="grading-card">
+        <div>
+            <strong>{t('grading_prebootcamp')}</strong>
+            <p>{t('grading_bonus')}</p>
+        </div>
+        <div class="grading-card-side">
+            <span class="grading-card-points">85</span>
+            <span class="badge-pill amber">{t('grading_bonus')}</span>
+        </div>
+    </div>
+    <div class="grading-card">
+        <div>
+            <strong>{t('grading_exercises')}</strong>
+            <p>{t('grading_exercises_desc')}</p>
+        </div>
+        <div class="grading-card-side">
+            <span class="grading-card-points">200</span>
+            <span class="badge-pill slate">20%</span>
+        </div>
+    </div>
+    <div class="grading-card">
+        <div>
+            <strong>{t('grading_challenges')}</strong>
+            <p>{t('grading_challenges_desc')}</p>
+        </div>
+        <div class="grading-card-side">
+            <span class="grading-card-points">200</span>
+            <span class="badge-pill slate">20%</span>
+        </div>
+    </div>
+    <div class="grading-card">
+        <div>
+            <strong>{t('grading_homework')}</strong>
+            <p>{t('grading_homework_desc')}</p>
+        </div>
+        <div class="grading-card-side">
+            <span class="grading-card-points">100</span>
+            <span class="badge-pill slate">10%</span>
+        </div>
+    </div>
+    <div class="grading-card">
+        <div>
+            <strong>{t('grading_participation')}</strong>
+            <p>{t('grading_participation_desc')}</p>
+        </div>
+        <div class="grading-card-side">
+            <span class="grading-card-points">100</span>
+            <span class="badge-pill slate">10%</span>
+        </div>
+    </div>
+    <div class="grading-card grading-card-featured">
+        <div>
+            <strong>{t('grading_final')}</strong>
+            <p>{t('grading_final_desc')}</p>
+        </div>
+        <div class="grading-card-side">
+            <span class="grading-card-points">400</span>
+            <span class="badge-pill indigo">40% {t('grading_decisive')}</span>
+        </div>
+    </div>
 </div>
-""", unsafe_allow_html=True)
+""")
 
 st.markdown("---")
 render_tutor_widget()

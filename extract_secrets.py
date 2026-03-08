@@ -164,7 +164,7 @@ def main():
     st_manager = StreamlitSecretsManager()
     
     print("\n" + "=" * 80)
-    print("Prophet AI Bootcamp - Secrets & Deployment Manager")
+    print("AI Founder Bootcamp - Secrets & Deployment Manager")
     print("=" * 80)
     
     # List GitHub secrets

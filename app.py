@@ -5,21 +5,20 @@ from lib.theme import inject_css, page_header, stat_cards, section_title, render
 from lib.i18n import init_i18n, t, LANGUAGES, get_lang
 
 st.set_page_config(
-    page_title="Prophet AI Bootcamp",
+    page_title=t("app_page_title") if "lang" in st.session_state else "AI Founder Bootcamp",
     page_icon="https://img.icons8.com/nolan/64/graduation-cap.png",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
-
 init_session()
 init_i18n()
 inject_css()
 
 if os.getenv("PROPHET_UI_REVIEW") == "1":
-    render_html("""
+    render_html(f"""
     <div class="review-banner">
-        <strong style="color:#F05A37;">UI review mode</strong>
-        <span style="color:#5C6B7B;">Authentication is temporarily bypassed for local layout verification.</span>
+        <strong style="color:#F05A37;">{t('ui_review_mode_title')}</strong>
+        <span style="color:#5C6B7B;">{t('ui_review_mode_body')}</span>
     </div>
     """)
 
@@ -29,8 +28,8 @@ with st.sidebar:
     <div class="sidebar-shell">
         <div class="sidebar-brand">
             <div class="sidebar-mark">P</div>
-            <div class="sidebar-title">Prophet AI Bootcamp</div>
-            <div class="sidebar-subtitle">AI & Data Science | Atuarios</div>
+            <div class="sidebar-title">""" + t("sidebar_brand_title") + """</div>
+            <div class="sidebar-subtitle">""" + t("sidebar_subtitle") + """</div>
         </div>
     </div>
     """)
@@ -60,13 +59,13 @@ with st.sidebar:
             """)
 
         if is_demo_mode():
-            render_html("""
+            render_html(f"""
             <div class="sidebar-alert">
-                ⚠️ Modo Demo (Auth Mocked)
+                ⚠️ {t('demo_mode')}
             </div>
             """)
 
-        if st.button(t("logout"), use_container_width=True):
+        if st.button(t("logout"), width="stretch"):
             logout()
             st.rerun()
 
@@ -94,8 +93,8 @@ with st.sidebar:
 
     render_html("""
     <div class="sidebar-footer-card">
-        <strong>Prophet AI</strong><br>
-        &copy; 2026 Prophet AI<br>pedro@stratfordgeek.com
+        <strong>""" + t("sidebar_footer_title") + """</strong><br>
+        &copy; 2026 Prophet Lite Lab<br>pedro@stratfordgeek.com
     </div>
     """)
 
@@ -115,15 +114,25 @@ if st.session_state.user is None:
         + "</div>"
     )
 
+    render_html(f"""
+    <div class="mobile-hero-intro">
+        <div class="landing-kicker">{t('hero_kicker')}</div>
+        <h1 class="landing-title mobile-only-title">
+            {t('hero_title_1')}<br>{t('hero_title_2')} <span class="accent">{t('hero_title_3')}</span>
+        </h1>
+        <p class="landing-lead">{t('hero_subtitle')}</p>
+    </div>
+    """)
+
     col_hero, col_auth = st.columns([1.15, 0.85], gap="large")
 
     with col_hero:
         render_html(f"""
-        <div class="landing-kicker">{t('hero_kicker')}</div>
-        <h1 class="landing-title">
+        <div class="landing-kicker desktop-hero-only">{t('hero_kicker')}</div>
+        <h1 class="landing-title desktop-hero-only">
             {t('hero_title_1')}<br>{t('hero_title_2')} <span class="accent">{t('hero_title_3')}</span>
         </h1>
-        <p class="landing-lead">{t('hero_subtitle')}</p>
+        <p class="landing-lead desktop-hero-only">{t('hero_subtitle')}</p>
 
         <div class="landing-metrics">
             <div class="landing-metric">
@@ -167,6 +176,11 @@ if st.session_state.user is None:
                 <h3>{t('login_title')}</h3>
                 <p>{t('login_subtitle')}</p>
             </div>
+            <div class="auth-benefit-list">
+                <span class="auth-benefit-pill">{t('auth_benefit_1')}</span>
+                <span class="auth-benefit-pill">{t('auth_benefit_2')}</span>
+                <span class="auth-benefit-pill">{t('auth_benefit_3')}</span>
+            </div>
             """)
 
             google_url = get_google_login_url()
@@ -197,9 +211,9 @@ if st.session_state.user is None:
 
             with tab_login:
                 with st.form("login_form"):
-                    email = st.text_input(t("email"), placeholder="actuary@example.com")
+                    email = st.text_input(t("email"), placeholder=t("auth_email_placeholder"))
                     password = st.text_input(t("password"), type="password")
-                    submitted = st.form_submit_button(t("btn_login"), use_container_width=True, type="primary")
+                    submitted = st.form_submit_button(t("btn_login"), width="stretch", type="primary")
                     if submitted and email and password:
                         if login_email(email, password):
                             st.rerun()
@@ -207,9 +221,9 @@ if st.session_state.user is None:
             with tab_register:
                 with st.form("register_form"):
                     nome = st.text_input(t("full_name"))
-                    email_r = st.text_input(t("email"), key="reg_email", placeholder="actuary@example.com")
+                    email_r = st.text_input(t("email"), key="reg_email", placeholder=t("auth_email_placeholder"))
                     password_r = st.text_input(t("password"), type="password", key="reg_pass")
-                    submitted_r = st.form_submit_button(t("btn_register"), use_container_width=True, type="primary")
+                    submitted_r = st.form_submit_button(t("btn_register"), width="stretch", type="primary")
                     if submitted_r and nome and email_r and password_r:
                         if register_email(email_r, password_r, nome):
                             st.rerun()
@@ -217,32 +231,82 @@ if st.session_state.user is None:
             render_html(f"<p class='auth-panel-note'>{t('landing_auth_note')}</p>")
 
     render_html(f"""
-    <div class="landing-section-head">
+    <div class="landing-section-head compact-head">
         <span>{t('what_you_learn')}</span>
         <h3>{t('landing_curriculum_title')}</h3>
         <p>{t('landing_curriculum_sub')}</p>
     </div>
-    <div class="feature-grid">
-        <div class="feature-tile">
+    <div class="feature-grid feature-grid-tight">
+        <div class="feature-tile feature-tile-tight">
             <div class="feature-icon">🤖</div>
-            <h4>{t('feat_agents')}</h4>
-            <p>{t('feat_agents_desc')}</p>
+            <div>
+                <h4>{t('feat_agents')}</h4>
+                <p>{t('feat_agents_desc')}</p>
+            </div>
         </div>
-        <div class="feature-tile">
+        <div class="feature-tile feature-tile-tight">
             <div class="feature-icon">⚙️</div>
-            <h4>{t('feat_ml')}</h4>
-            <p>{t('feat_ml_desc')}</p>
+            <div>
+                <h4>{t('feat_ml')}</h4>
+                <p>{t('feat_ml_desc')}</p>
+            </div>
         </div>
-        <div class="feature-tile">
+        <div class="feature-tile feature-tile-tight">
             <div class="feature-icon">🏦</div>
-            <h4>{t('feat_engine')}</h4>
-            <p>{t('feat_engine_desc')}</p>
+            <div>
+                <h4>{t('feat_engine')}</h4>
+                <p>{t('feat_engine_desc')}</p>
+            </div>
         </div>
-        <div class="feature-tile">
+        <div class="feature-tile feature-tile-tight">
             <div class="feature-icon">☁️</div>
-            <h4>{t('feat_deploy')}</h4>
-            <p>{t('feat_deploy_desc')}</p>
+            <div>
+                <h4>{t('feat_deploy')}</h4>
+                <p>{t('feat_deploy_desc')}</p>
+            </div>
         </div>
+    </div>
+    """)
+
+    render_html(f"""
+    <div class="landing-section-head compact-head">
+        <span>{t('landing_founder_kicker')}</span>
+        <h3>{t('landing_founder_title')}</h3>
+    </div>
+    <div class="feature-grid feature-grid-tight founder-flow-grid">
+        <div class="feature-tile feature-tile-tight founder-flow-card">
+            <div class="founder-step">01</div>
+            <div>
+                <h4>{t('landing_founder_1_title')}</h4>
+                <p>{t('landing_founder_1_desc')}</p>
+            </div>
+        </div>
+        <div class="feature-tile feature-tile-tight founder-flow-card">
+            <div class="founder-step">02</div>
+            <div>
+                <h4>{t('landing_founder_2_title')}</h4>
+                <p>{t('landing_founder_2_desc')}</p>
+            </div>
+        </div>
+        <div class="feature-tile feature-tile-tight founder-flow-card">
+            <div class="founder-step">03</div>
+            <div>
+                <h4>{t('landing_founder_3_title')}</h4>
+                <p>{t('landing_founder_3_desc')}</p>
+            </div>
+        </div>
+    </div>
+    """)
+
+    render_html(f"""
+    <div class="landing-section-head compact-head quote-head">
+        <span>{t('landing_quote_kicker')}</span>
+        <h3>{t('landing_quote_title')}</h3>
+    </div>
+    <div class="quote-grid">
+        <div class="quote-card"><p>{t('landing_quote_1')}</p></div>
+        <div class="quote-card"><p>{t('landing_quote_2')}</p></div>
+        <div class="quote-card"><p>{t('landing_quote_3')}</p></div>
     </div>
     """)
 

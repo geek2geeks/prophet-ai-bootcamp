@@ -7,6 +7,8 @@ from typing import Optional
 
 import streamlit as st
 from cryptography.fernet import Fernet, InvalidToken
+from supabase.lib.client_options import SyncClientOptions
+from lib.i18n import t
 
 SUPABASE_URL = "https://naecdtkxxlawxlkljtkt.supabase.co"
 
@@ -58,12 +60,13 @@ def get_admin_client():
 
 
 def _fresh_auth_client():
-    """Fresh client for auth operations (PKCE needs clean state)."""
+    """Fresh client for auth operations."""
     try:
         from supabase import create_client
         url = st.secrets.get("supabase", {}).get("url", SUPABASE_URL)
         key = st.secrets["supabase"]["key"]
-        return create_client(url, key)
+        options = SyncClientOptions(flow_type="pkce")
+        return create_client(url, key, options=options)
     except Exception:
         return None
 
@@ -146,40 +149,33 @@ def _decode_oauth_context(token: Optional[str]) -> dict:
         return {}
 
 
-def get_oauth_cache():
-    if "oauth_cache" not in st.session_state:
-        st.session_state.oauth_cache = {}
-    return st.session_state.oauth_cache
-
-@st.cache_resource
-def get_global_oauth_cache():
-    return {}
-
 def _handle_oauth_callback():
     params = st.query_params
     code = params.get("code")
-    auth_state = params.get("auth_state")
     oauth_ctx = params.get("oauth_ctx")
-    
+    error_description = params.get("error_description")
+
+    if error_description and st.session_state.get("user") is None:
+        st.query_params.clear()
+        st.error(f"Erro no callback OAuth: {error_description}")
+        return
+
     if code and st.session_state.get("user") is None:
         sb = _fresh_auth_client()
         if sb:
             try:
                 oauth_data = _decode_oauth_context(oauth_ctx)
                 code_verifier = oauth_data.get("code_verifier")
+                if not code_verifier:
+                    raise ValueError("Missing PKCE verifier in callback. Start login again.")
 
-                if not code_verifier and auth_state:
-                    cache = get_global_oauth_cache()
-                    saved_storage = cache.get(auth_state, {})
-                    for k, v in saved_storage.items():
-                        sb.auth._storage.set_item(k, v)
-
-                exchange_params = {"auth_code": code}
-                if code_verifier:
-                    exchange_params["code_verifier"] = code_verifier
-
-                res = sb.auth.exchange_code_for_session(exchange_params)
+                res = sb.auth.exchange_code_for_session(
+                    {"auth_code": code, "code_verifier": code_verifier}
+                )
                 user = res.user
+                if user is None:
+                    raise ValueError("Supabase did not return a user session.")
+
                 st.session_state.user = {
                     "id": str(user.id),
                     "email": user.email,
@@ -188,11 +184,6 @@ def _handle_oauth_callback():
                 }
                 _ensure_profile(user)
                 st.session_state.role = _get_role(str(user.id))
-                
-                if auth_state:
-                    cache = get_global_oauth_cache()
-                    if auth_state in cache:
-                        del cache[auth_state]
 
                 st.query_params.clear()
             except Exception as e:
@@ -231,16 +222,7 @@ def get_google_login_url() -> str:
     if sb is None:
         return ""
     try:
-        import uuid
-        auth_state = str(uuid.uuid4())
-
-        base_url = _get_redirect_url()
-        parsed = urllib.parse.urlparse(base_url)
-        q = urllib.parse.parse_qs(parsed.query)
-        q["auth_state"] = [auth_state]
-        new_query = urllib.parse.urlencode(q, doseq=True)
-        redirect_url = urllib.parse.urlunparse(parsed._replace(query=new_query))
-        
+        redirect_url = _get_redirect_url()
         res = sb.auth.sign_in_with_oauth({
             "provider": "google",
             "options": {
@@ -250,36 +232,25 @@ def get_google_login_url() -> str:
 
         code_verifier = sb.auth._storage.get_item(f"{sb.auth._storage_key}-code-verifier")
         oauth_ctx = _encode_oauth_context(code_verifier) if code_verifier else ""
-        oauth_url = res.url
-        if oauth_ctx:
-            auth_parsed = urllib.parse.urlparse(res.url)
-            auth_query = urllib.parse.parse_qs(auth_parsed.query)
-            auth_redirect = auth_query.get("redirect_to", [redirect_url])[0]
-            redirect_parsed = urllib.parse.urlparse(auth_redirect)
-            redirect_query = urllib.parse.parse_qs(redirect_parsed.query)
-            redirect_query["oauth_ctx"] = [oauth_ctx]
-            auth_query["redirect_to"] = [
-                urllib.parse.urlunparse(
-                    redirect_parsed._replace(
-                        query=urllib.parse.urlencode(redirect_query, doseq=True)
-                    )
-                )
-            ]
-            oauth_url = urllib.parse.urlunparse(
-                auth_parsed._replace(query=urllib.parse.urlencode(auth_query, doseq=True))
-            )
+        if not oauth_ctx:
+            return res.url
 
-        try:
-            cache = get_global_oauth_cache()
-            storage_dict = {}
-            if hasattr(sb.auth._storage, 'storage'):
-                for k, v in sb.auth._storage.storage.items():
-                    if "code-verifier" in k or "auth-token" in k or "provider" in k:
-                        storage_dict[k] = v
-            cache[auth_state] = storage_dict
-        except Exception:
-            pass
-        return oauth_url
+        auth_parsed = urllib.parse.urlparse(res.url)
+        auth_query = urllib.parse.parse_qs(auth_parsed.query)
+        auth_redirect = auth_query.get("redirect_to", [redirect_url])[0]
+        redirect_parsed = urllib.parse.urlparse(auth_redirect)
+        redirect_query = urllib.parse.parse_qs(redirect_parsed.query)
+        redirect_query["oauth_ctx"] = [oauth_ctx]
+        auth_query["redirect_to"] = [
+            urllib.parse.urlunparse(
+                redirect_parsed._replace(
+                    query=urllib.parse.urlencode(redirect_query, doseq=True)
+                )
+            )
+        ]
+        return urllib.parse.urlunparse(
+            auth_parsed._replace(query=urllib.parse.urlencode(auth_query, doseq=True))
+        )
     except Exception:
         return ""
 
@@ -349,7 +320,7 @@ def require_auth():
     if _auth_bypass_enabled():
         return
     if st.session_state.user is None:
-        st.warning("Faz login para aceder a esta pagina.")
+        st.warning(t("login_required"))
         st.stop()
 
 

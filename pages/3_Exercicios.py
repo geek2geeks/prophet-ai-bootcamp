@@ -72,9 +72,9 @@ for ex in day["exercicios"]:
             new_state = st.checkbox(t("mark_complete"), value=is_done, key=f"cb_{ex['id']}")
         with col_status:
             if is_done:
-                render_html('<div class="exercise-status-chip">✓ Concluido</div>')
+                render_html(f'<div class="exercise-status-chip">✓ {t("exercise_status_completed")}</div>')
             else:
-                render_html('<div class="exercise-status-chip">○ Em aberto</div>')
+                render_html(f'<div class="exercise-status-chip">○ {t("exercise_status_open")}</div>')
 
         if new_state != is_done:
             if new_state:
@@ -130,7 +130,7 @@ with st.container():
                 """)
 
         render_html('<div style="margin-top:16px;"></div>')
-        submitted = st.form_submit_button(t("submit_btn"), use_container_width=True, type="primary")
+        submitted = st.form_submit_button(t("submit_btn"), width="stretch", type="primary")
         if submitted and repo_url:
             submit_challenge(user_id, d["id"], repo_url, pontos)
             st.success(t("submitted_success"))

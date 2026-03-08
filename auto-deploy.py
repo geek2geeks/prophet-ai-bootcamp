@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Full Automated Deployment - Complete Setup for Prophet AI Bootcamp
+Full Automated Deployment - Complete Setup for AI Founder Bootcamp
 This script configures everything programmatically without manual interaction.
 """
 
@@ -238,7 +238,7 @@ url = "{self.app_url}"
         self.print_step(6, "Generate Documentation")
         
         try:
-            report = f"""# Prophet AI Bootcamp - Automated Deployment Report
+            report = f"""# AI Founder Bootcamp - Automated Deployment Report
 
 **Generated:** {datetime.now().isoformat()}
 **Repository:** {self.repo}

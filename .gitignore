@@ -7,3 +7,9 @@ __pycache__/
 venv/
 supabase/.temp/
 supabase/.branches/
+node_modules/
+package-lock.json
+package.json
+NUL
+*.log
+screens/

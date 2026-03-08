@@ -54,7 +54,7 @@ if not st.session_state.chat_messages:
     cols = st.columns(2)
     for i, (icon, text) in enumerate(suggestions):
         with cols[i % 2]:
-            if st.button(f"{icon}  {text}", key=f"sug_{i}", use_container_width=True):
+            if st.button(f"{icon}  {text}", key=f"sug_{i}", width="stretch"):
                 st.session_state.chat_messages.append({"role": "user", "content": text})
                 st.rerun()
 
