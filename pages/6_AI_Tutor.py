@@ -1,6 +1,6 @@
 import streamlit as st
 from lib.auth import require_auth
-from lib.ai import get_ai_response
+from lib.ai import get_ai_response_stream, get_user_context
 from lib.theme import inject_css, page_header, render_html
 from lib.i18n import t
 
@@ -71,9 +71,12 @@ if prompt := st.chat_input(t("chat_placeholder")):
         st.markdown(prompt)
 
     with st.chat_message("assistant"):
-        with st.spinner(t("thinking")):
-            response = get_ai_response(st.session_state.chat_messages)
-        st.markdown(response)
+        response = st.write_stream(
+            get_ai_response_stream(
+                st.session_state.chat_messages,
+                page_context=get_user_context(),
+            )
+        )
 
     st.session_state.chat_messages.append({"role": "assistant", "content": response})
 render_html('</div>')

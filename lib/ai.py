@@ -1,8 +1,13 @@
 import json
 import streamlit as st
-from typing import Any
+from typing import Any, Generator
 from lib.theme import render_html
 from lib.i18n import t
+
+# Keep at most this many conversation turns to control token costs.
+# DeepSeek V3.2 auto-caches the static system prompt prefix (10x cheaper on cache hits),
+# so trimming only the conversation window — not the prompt — is the right trade-off.
+MAX_HISTORY_MESSAGES = 20
 
 COURSE_CONTEXT = {
     "bootcamp": {
@@ -125,7 +130,7 @@ COURSE_CONTEXT = {
     },
 
     "dados_disponiveis": {
-        "dia_0": "carteira_vida_sample.csv (30 apolices vida com idade, capital, premio, estado, fumador), tabua_mortalidade_CSO2017.csv (121 idades, qx M/F, lx, ex) -- ambos em data/day0/",
+        "dia_0": "carteira_vida_sample.csv (30 apolices vida em EUR: 14 Temporario, 10 Vida Inteira, 6 Misto; com idade, sexo, capital, premio anual com loading fumador +50%, estado, moeda), tabua_mortalidade_CSO2017.csv (121 idades, qx M/F, lx, ex -- tabua US para fins educativos) -- ambos em data/day0/",
         "dia_2": "carteira_apolices_vida.csv (3000 apolices, 4 produtos), sinistralidade_vida.csv (1500 eventos, 8 anomalias), red_flags_fraude_vida.csv (200 sinistros, ~40 red flags)",
         "dia_3": "medical_costs_sample.csv (10K registos saude), sinistralidade_historica.csv (5K sinistros saude, 10 anomalias), exclusoes_apolice.json (CIDs), 5 faturas PDF + 3 recibos JPG, condicoes_gerais_saude.pdf, nota_alta_hospitalar.txt, tabua_morbilidade_saude.csv, carteira_beneficiarios.csv",
         "dia_4": "tabua_mortalidade_CSO2017.csv (121 idades, M/F), taxas_resgate.csv (30 anos x 4 produtos), questionario_subscricao_vida.csv (500 propostas, ~35 falsas)",
@@ -210,6 +215,119 @@ REGRAS:
 """
 
 
+# ── Helpers ────────────────────────────────────────────────────────────────────
+
+def get_user_context() -> str:
+    """Return a short string describing the student's current progress.
+
+    Reads from session_state so the tutor knows which day the student is on
+    and can give contextually relevant guidance without needing to ask.
+    """
+    parts = []
+    # Support both real-user and demo-mode progress keys
+    for key in ("demo_progress", "user_progress", "progress"):
+        raw = st.session_state.get(key)
+        if raw and isinstance(raw, dict):
+            completed = [str(k) for k, v in raw.items() if v]
+            incomplete = [k for k, v in raw.items() if not v]
+            if completed:
+                parts.append(f"Dias ja completados: {', '.join(completed)}")
+            if incomplete:
+                try:
+                    current_day = min(int(k) for k in incomplete)
+                    parts.append(f"Dia atual do aluno: {current_day}")
+                except (ValueError, TypeError):
+                    pass
+            break  # use first key found
+    return "\n".join(parts) if parts else ""
+
+
+def _build_full_messages(
+    messages: list[dict[str, str]],
+    page_context: str = "",
+) -> list[dict[str, str]]:
+    """Assemble the final messages list sent to the API.
+
+    * The static SYSTEM_PROMPT is always first — DeepSeek's disk cache means
+      this large prefix is only billed at $0.028/M tokens after the first call.
+    * Any dynamic student context (current day, completed days) is appended at
+      the *end* of the system message so it doesn't break the cached prefix.
+    * Conversation history is trimmed to MAX_HISTORY_MESSAGES to cap costs.
+    """
+    system_content = SYSTEM_PROMPT
+    if page_context:
+        system_content += f"\n\nCONTEXTO ATUAL DO ALUNO:\n{page_context}"
+    trimmed = (
+        messages[-MAX_HISTORY_MESSAGES:]
+        if len(messages) > MAX_HISTORY_MESSAGES
+        else messages
+    )
+    return [{"role": "system", "content": system_content}] + trimmed
+
+
+def get_ai_response(messages: list[dict[str, str]], page_context: str = "") -> str:
+    """Non-streaming call — used in the sidebar widget (inside st.form)."""
+    try:
+        api_key = st.secrets["deepseek"]["api_key"]
+    except Exception:
+        return t("tutor_unavailable")
+
+    try:
+        from openai import OpenAI
+        client = OpenAI(api_key=api_key, base_url="https://api.deepseek.com")
+        response = client.chat.completions.create(
+            model="deepseek-chat",
+            messages=_build_full_messages(messages, page_context),  # type: ignore[arg-type]
+            max_tokens=2048,
+            temperature=0.4,
+        )
+        content = response.choices[0].message.content
+        if isinstance(content, str) and content.strip():
+            return content
+        return t("tutor_no_response")
+    except Exception as e:
+        return t("tutor_contact_error", error=e)
+
+
+def get_ai_response_stream(
+    messages: list[dict[str, str]],
+    page_context: str = "",
+) -> Generator[str, None, None]:
+    """Streaming call — yields text chunks as they arrive.
+
+    Use with ``st.write_stream()`` in the full-page tutor so the student sees
+    tokens appearing instantly instead of waiting for the full response.
+
+    DeepSeek V3.2 notes:
+    - ``deepseek-chat`` = non-thinking mode, fast, good for tutoring.
+    - Context caching is automatic: the static SYSTEM_PROMPT prefix is cached
+      on disk and billed at ~$0.028/M tokens (10× cheaper than a cache miss).
+    - 128 K context window, up to 8 K output tokens.
+    """
+    try:
+        api_key = st.secrets["deepseek"]["api_key"]
+    except Exception:
+        yield t("tutor_unavailable")
+        return
+
+    try:
+        from openai import OpenAI
+        client = OpenAI(api_key=api_key, base_url="https://api.deepseek.com")
+        stream = client.chat.completions.create(  # type: ignore[call-overload]
+            model="deepseek-chat",
+            messages=_build_full_messages(messages, page_context),  # type: ignore[arg-type]
+            max_tokens=2048,
+            temperature=0.4,
+            stream=True,
+        )
+        for chunk in stream:
+            delta = chunk.choices[0].delta.content
+            if delta:
+                yield delta
+    except Exception as e:
+        yield t("tutor_contact_error", error=e)
+
+
 def render_tutor_widget():
     """Render a compact AI Tutor chat widget. Call at the bottom of any page."""
     from lib.i18n import t
@@ -244,34 +362,13 @@ def render_tutor_widget():
         if submitted and user_input:
             st.session_state.tutor_widget_messages.append({"role": "user", "content": user_input})
             with st.spinner(t("thinking")):
-                response = get_ai_response(st.session_state.tutor_widget_messages)
+                response = get_ai_response(
+                    st.session_state.tutor_widget_messages,
+                    page_context=get_user_context(),
+                )
             st.session_state.tutor_widget_messages.append({"role": "assistant", "content": response})
             st.rerun()
 
         if clear:
             st.session_state.tutor_widget_messages = []
             st.rerun()
-
-
-def get_ai_response(messages: list[dict[str, str]]) -> str:
-    try:
-        api_key = st.secrets["deepseek"]["api_key"]
-    except Exception:
-        return t("tutor_unavailable")
-
-    try:
-        from openai import OpenAI
-        client = OpenAI(api_key=api_key, base_url="https://api.deepseek.com")
-        full_messages = [{"role": "system", "content": SYSTEM_PROMPT}] + messages
-        response = client.chat.completions.create(
-            model="deepseek-chat",
-            messages=full_messages,  # type: ignore[arg-type]
-            max_tokens=1024,
-            temperature=0.7
-        )
-        content = response.choices[0].message.content
-        if isinstance(content, str) and content.strip():
-            return content
-        return t("tutor_no_response")
-    except Exception as e:
-        return t("tutor_contact_error", error=e)
