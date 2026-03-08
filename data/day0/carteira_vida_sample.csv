@@ -1,31 +1,31 @@
-apolice_id,nome_segurado,idade,sexo,tipo_produto,capital_segurado,premio_anual,data_inicio,data_fim,estado,fumador
-POL001,Ana Beatriz Silva,32,F,Temporario,150000,480,2020-03-15,2040-03-15,Ativa,Nao
-POL002,Carlos Alberto Mendes,55,M,Vida Inteira,300000,5640,2019-07-01,Vitalicio,Ativa,Sim
-POL003,Maria Fernanda Costa,28,F,Temporario,100000,290,2022-01-10,2042-01-10,Ativa,Nao
-POL004,Jose Eduardo Pereira,63,M,Renda Vitalicia,250000,6200,2018-04-20,Vitalicio,Ativa,Nao
-POL005,Lucia Helena Rodrigues,45,F,Misto,200000,1850,2021-06-01,2046-06-01,Ativa,Nao
-POL006,Ricardo Almeida Santos,50,M,Temporario,500000,4750,2019-11-15,2039-11-15,Ativa,Sim
-POL007,Patricia Oliveira Lima,37,F,Vida Inteira,175000,980,2023-02-01,Vitalicio,Ativa,Nao
-POL008,Fernando Henrique Souza,70,M,Renda Vitalicia,100000,7800,2018-01-01,Vitalicio,Sinistrada,Nao
-POL009,Claudia Regina Martins,41,F,Temporario,250000,1120,2020-09-10,2040-09-10,Ativa,Nao
-POL010,Antonio Carlos Ferreira,58,M,Vida Inteira,400000,6100,2019-03-22,Vitalicio,Ativa,Sim
-POL011,Mariana Duarte Campos,25,F,Temporario,75000,200,2024-01-15,2054-01-15,Ativa,Nao
-POL012,Pedro Henrique Barbosa,47,M,Misto,300000,2950,2020-05-01,2045-05-01,Ativa,Nao
-POL013,Sofia Cristina Araujo,52,F,Vida Inteira,200000,2480,2018-08-10,Vitalicio,Resgatada,Sim
-POL014,Marcos Vinicius Ribeiro,34,M,Temporario,150000,620,2022-11-01,2042-11-01,Ativa,Nao
-POL015,Juliana Aparecida Gomes,60,F,Renda Vitalicia,350000,5300,2019-02-15,Vitalicio,Ativa,Nao
-POL016,Rafael Augusto Carvalho,43,M,Temporario,200000,1680,2021-07-20,2041-07-20,Ativa,Sim
-POL017,Beatriz Moreira Nunes,29,F,Misto,125000,390,2023-04-01,2053-04-01,Ativa,Nao
-POL018,Gustavo Henrique Teixeira,66,M,Vida Inteira,250000,5850,2018-06-15,Vitalicio,Ativa,Nao
-POL019,Camila Sousa Monteiro,39,F,Temporario,300000,1250,2020-12-01,2040-12-01,Ativa,Nao
-POL020,Roberto Carlos Dias,51,M,Renda Vitalicia,200000,3600,2021-01-10,Vitalicio,Ativa,Nao
-POL021,Isabela Fernandes Castro,33,F,Vida Inteira,100000,520,2022-08-15,Vitalicio,Ativa,Nao
-POL022,Joao Pedro Nascimento,48,M,Temporario,450000,4200,2019-10-01,2039-10-01,Ativa,Sim
-POL023,Daniela Vieira Rocha,56,F,Misto,175000,2750,2020-04-20,2040-04-20,Ativa,Nao
-POL024,Lucas Gabriel Correia,27,M,Temporario,100000,350,2023-06-01,2053-06-01,Ativa,Nao
-POL025,Renata Cristina Pinto,44,F,Vida Inteira,225000,1720,2019-09-15,Vitalicio,Resgatada,Nao
-POL026,Alexandre Miguel Lopes,62,M,Renda Vitalicia,350000,6450,2018-03-10,Vitalicio,Ativa,Sim
-POL027,Vanessa Aparecida Moura,36,F,Temporario,200000,780,2021-11-01,2041-11-01,Ativa,Nao
-POL028,Thiago Santos Azevedo,54,M,Misto,275000,3900,2020-02-15,2045-02-15,Sinistrada,Nao
-POL029,Carolina Mendes Freitas,68,F,Vida Inteira,150000,4850,2018-05-20,Vitalicio,Ativa,Sim
-POL030,Paulo Ricardo Cardoso,40,M,Temporario,350000,1950,2022-03-01,2042-03-01,Ativa,Nao
+apolice_id,nome_segurado,idade,sexo,tipo_produto,capital_segurado,premio_anual,data_inicio,data_fim,estado,fumador,moeda
+POL001,Ana Rita Sousa,30,F,Temporario,150000,158,2020-03-15,2040-03-15,Ativa,Nao,EUR
+POL002,Carlos Alberto Mendes,55,M,Vida Inteira,300000,6000,2019-07-01,Vitalicio,Ativa,Sim,EUR
+POL003,Maria Fernanda Costa,28,F,Temporario,100000,91,2022-01-10,2042-01-10,Ativa,Nao,EUR
+POL004,Jose Eduardo Pereira,63,M,Temporario,200000,2400,2018-04-20,2028-04-20,Sinistrada,Nao,EUR
+POL005,Lucia Helena Rodrigues,45,F,Misto,200000,2600,2021-06-01,2046-06-01,Ativa,Nao,EUR
+POL006,Ricardo Almeida Santos,50,M,Temporario,500000,5250,2019-11-15,2039-11-15,Ativa,Sim,EUR
+POL007,Patricia Isabel Oliveira,37,F,Vida Inteira,175000,3063,2023-02-01,Vitalicio,Ativa,Nao,EUR
+POL008,Fernando Henrique Teixeira,42,M,Temporario,250000,1125,2020-05-01,2040-05-01,Ativa,Nao,EUR
+POL009,Claudia Regina Martins,41,F,Temporario,250000,770,2020-09-10,2040-09-10,Ativa,Nao,EUR
+POL010,Antonio Carlos Ferreira,58,M,Vida Inteira,400000,10000,2019-03-22,Vitalicio,Ativa,Sim,EUR
+POL011,Mariana Sofia Gomes,25,F,Temporario,75000,59,2024-01-15,2054-01-15,Ativa,Nao,EUR
+POL012,Pedro Miguel Lopes,47,M,Misto,300000,4200,2020-05-01,2045-05-01,Ativa,Nao,EUR
+POL013,Sofia Cristina Marques,52,F,Vida Inteira,200000,4200,2018-08-10,Vitalicio,Resgatada,Sim,EUR
+POL014,Marco Alexandre Silva,34,M,Temporario,150000,360,2022-11-01,2042-11-01,Ativa,Nao,EUR
+POL015,Joana Beatriz Pinto,60,F,Vida Inteira,150000,3375,2019-02-15,Vitalicio,Ativa,Nao,EUR
+POL016,Rafael Augusto Soares,43,M,Temporario,200000,1440,2021-07-20,2041-07-20,Ativa,Sim,EUR
+POL017,Beatriz Moreira Nunes,29,F,Misto,125000,1500,2023-04-01,2053-04-01,Ativa,Nao,EUR
+POL018,Gustavo Henrique Vieira,66,M,Vida Inteira,250000,6250,2018-06-15,Vitalicio,Ativa,Nao,EUR
+POL019,Catarina Sousa Monteiro,39,F,Temporario,300000,882,2020-12-01,2040-12-01,Ativa,Nao,EUR
+POL020,Roberto Manuel Almeida,51,M,Vida Inteira,200000,4400,2021-01-10,Vitalicio,Ativa,Nao,EUR
+POL021,Isabel Fernanda Pereira,33,F,Vida Inteira,100000,1750,2022-08-15,Vitalicio,Ativa,Nao,EUR
+POL022,Joao Pedro Santos,48,M,Temporario,450000,4725,2019-10-01,2039-10-01,Sinistrada,Sim,EUR
+POL023,Daniela Vieira Rodrigues,56,F,Misto,175000,2625,2020-04-20,2040-04-20,Ativa,Nao,EUR
+POL024,Lucas Gabriel Ferreira,27,M,Temporario,100000,190,2023-06-01,2053-06-01,Ativa,Nao,EUR
+POL025,Renata Cristina Costa,44,F,Vida Inteira,225000,4050,2019-09-15,Vitalicio,Resgatada,Nao,EUR
+POL026,Andre Miguel Martins,35,M,Temporario,350000,945,2022-03-10,2042-03-10,Ativa,Nao,EUR
+POL027,Vanessa Filipa Silva,36,F,Temporario,200000,554,2021-11-01,2041-11-01,Ativa,Nao,EUR
+POL028,Tiago Alexandre Soares,38,M,Misto,275000,3575,2020-02-15,2045-02-15,Ativa,Nao,EUR
+POL029,Carolina Mendes Oliveira,68,F,Vida Inteira,150000,4500,2018-05-20,Vitalicio,Resgatada,Sim,EUR
+POL030,Paulo Ricardo Lopes,40,M,Temporario,350000,1400,2022-03-01,2042-03-01,Ativa,Nao,EUR
