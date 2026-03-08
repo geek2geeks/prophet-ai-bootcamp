@@ -65,7 +65,7 @@ npm run lint && npm run build && npx playwright test && npx firebase deploy --on
 
 The repo-root workflow `.github/workflows/deploy.yml` verifies and deploys the app from `ai-actuary-bootcamp/`.
 
-Add this GitHub repository secret before relying on preview or production deploys:
+Add this GitHub repository secret before relying on deploys:
 
 - `FIREBASE_SERVICE_ACCOUNT_AI_ACTUARY_BOOTCAMP_DEV_260308`
 
@@ -78,7 +78,7 @@ Add these GitHub repository variables so CI can build the static export and depl
 - `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`
 - `NEXT_PUBLIC_FIREBASE_APP_ID`
 
-The workflow runs quality checks on pull requests, publishes Firebase Hosting preview channels for PRs, and deploys Hosting plus Firestore rules/indexes on `main`.
+The workflow runs quality checks on pull requests and deploys Hosting plus Firestore rules/indexes from `main` only. There is no preview/live branch split anymore.
 
 To also update Firestore security rules:
 
