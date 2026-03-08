@@ -126,27 +126,40 @@ render_html(f"""
 """)
 
 section_title(t("featured_modules"), "📚", "indigo")
-render_html('<div class="week-grid">')
-for idx, (label, done_items, total_items) in enumerate(week_progress):
+feat_cols = st.columns(3, gap="medium")
+for idx, col in enumerate(feat_cols):
+    label, done_items, total_items = week_progress[idx]
     desc = [t("pre_bootcamp_desc"), t("week1_desc"), t("week2_desc")][idx]
     icon = ["🛠️", "⚡", "🚀"][idx]
     accent = ["amber", "emerald", "indigo"][idx]
     pct_week = int((done_items / total_items) * 100) if total_items else 0
-    render_html(f"""
-    <div class="week-card founder-week-card">
-        <div class="week-card-top">
-            <div class="week-card-icon">{icon}</div>
-            <span class="badge-pill {accent}">{done_items}/{total_items}</span>
+    with col:
+        render_html(f"""
+        <div class="week-card founder-week-card">
+            <div class="week-card-top">
+                <div class="week-card-icon">{icon}</div>
+                <span class="badge-pill {accent}">{done_items}/{total_items}</span>
+            </div>
+            <h4>{label}</h4>
+            <p>{desc}</p>
+            <div class="week-card-progress">
+                <span>{t('progress')}</span>
+                <span>{pct_week}%</span>
+            </div>
         </div>
-        <h4>{label}</h4>
-        <p>{desc}</p>
-        <div class="week-card-progress">
-            <span>{t('progress')}</span>
-            <span>{pct_week}%</span>
-        </div>
-    </div>
-    """)
-render_html('</div>')
+        """)
+        btn_c = st.columns(2, gap="small")
+        with btn_c[0]:
+            if st.button(f"📖 {label}", key=f"dash_prog_{idx}", use_container_width=True):
+                open_program_week(idx)
+        with btn_c[1]:
+            if st.button(f"📝 {t('dashboard_go_exercises')}", key=f"dash_ex_{idx}", use_container_width=True):
+                for target in ("pages/3_Exercicios.py", "3_Exercicios.py"):
+                    try:
+                        st.switch_page(target)
+                        break
+                    except StreamlitAPIException:
+                        continue
 
 section_title(t("dashboard_lessons_title"), "➡️", "rose")
 hero_cta_cols = st.columns([2, 1, 1, 1], gap="small")

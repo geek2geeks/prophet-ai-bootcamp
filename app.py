@@ -1,5 +1,6 @@
 import os
 import streamlit as st
+from streamlit.errors import StreamlitAPIException
 from lib.auth import init_session, login_email, register_email, logout, is_demo_mode, get_google_login_url
 from lib.theme import inject_css, page_header, stat_cards, section_title, render_html
 from lib.i18n import init_i18n, t, LANGUAGES, get_lang
@@ -365,32 +366,57 @@ else:
     # Day cards layout
     section_title(t("featured_modules"), "📚", "indigo")
 
-    def render_week_card(week_idx, title, desc, icon, accent_cls):
-        days = [d for d in DAYS if d["semana"] == week_idx]
-        total_week_ex = sum(len(d["exercicios"]) + 1 for d in days)
-        done_week_ex = 0
-        for day in days:
-            done_week_ex += sum(1 for ex in day["exercicios"] if ex["id"] in progress)
-            done_week_ex += 1 if day["desafio"]["id"] in progress or day["desafio"]["id"] in submissions else 0
-        return f"""
-        <div class="week-card">
-            <div class="week-card-top">
-                <div class="week-card-icon">{icon}</div>
-                <span class="badge-pill {accent_cls}">{done_week_ex} / {total_week_ex}</span>
-            </div>
-            <h4>{title}</h4>
-            <p>{desc}</p>
-            <div class="week-card-progress">
-                <span style="font-size:0.8rem; font-weight:700; color:#5C6B7B; text-transform:uppercase; letter-spacing:0.08em;">{t('progress')}</span>
-                <span style="font-size:0.9rem; font-weight:700; color:#12263F;">{int((done_week_ex / total_week_ex) * 100) if total_week_ex else 0}%</span>
-            </div>
-        </div>
-        """
+    def _go_to_programa(week_idx):
+        st.session_state.programa_target_week = week_idx
+        for target in ("pages/2_Programa.py", "2_Programa.py"):
+            try:
+                st.switch_page(target)
+                return
+            except StreamlitAPIException:
+                continue
 
-    render_html(
-        "<div class='week-grid'>"
-        + render_week_card(0, t("pre_bootcamp"), t("pre_bootcamp_desc"), "🛠️", "amber")
-        + render_week_card(1, t("week_1"), t("week1_desc"), "⚡", "emerald")
-        + render_week_card(2, t("week_2"), t("week2_desc"), "🚀", "indigo")
-        + "</div>"
-    )
+    def _go_to_exercicios():
+        for target in ("pages/3_Exercicios.py", "3_Exercicios.py"):
+            try:
+                st.switch_page(target)
+                return
+            except StreamlitAPIException:
+                continue
+
+    week_cols = st.columns(3, gap="medium")
+    for idx, col in enumerate(week_cols):
+        week_idx = idx
+        title = [t("pre_bootcamp"), t("week_1"), t("week_2")][idx]
+        desc = [t("pre_bootcamp_desc"), t("week1_desc"), t("week2_desc")][idx]
+        icon = ["🛠️", "⚡", "🚀"][idx]
+        accent_cls = ["amber", "emerald", "indigo"][idx]
+        days_w = [d for d in DAYS if d["semana"] == week_idx]
+        total_week_ex = sum(len(d["exercicios"]) + 1 for d in days_w)
+        done_week_ex = 0
+        for day_w in days_w:
+            done_week_ex += sum(1 for ex in day_w["exercicios"] if ex["id"] in progress)
+            done_week_ex += 1 if day_w["desafio"]["id"] in progress or day_w["desafio"]["id"] in submissions else 0
+        pct_w = int((done_week_ex / total_week_ex) * 100) if total_week_ex else 0
+
+        with col:
+            render_html(f"""
+            <div class="week-card">
+                <div class="week-card-top">
+                    <div class="week-card-icon">{icon}</div>
+                    <span class="badge-pill {accent_cls}">{done_week_ex} / {total_week_ex}</span>
+                </div>
+                <h4>{title}</h4>
+                <p>{desc}</p>
+                <div class="week-card-progress">
+                    <span style="font-size:0.8rem; font-weight:700; color:#5C6B7B; text-transform:uppercase; letter-spacing:0.08em;">{t('progress')}</span>
+                    <span style="font-size:0.9rem; font-weight:700; color:#12263F;">{pct_w}%</span>
+                </div>
+            </div>
+            """)
+            btn_cols = st.columns(2, gap="small")
+            with btn_cols[0]:
+                if st.button(f"📖 {t('start_exercises_btn')}", key=f"home_view_{idx}", use_container_width=True):
+                    _go_to_programa(idx)
+            with btn_cols[1]:
+                if st.button(f"📝 {t('dashboard_go_exercises')}", key=f"home_ex_{idx}", use_container_width=True):
+                    _go_to_exercicios()
