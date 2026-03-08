@@ -102,5 +102,5 @@ jobs:
       - name: Install Firebase CLI
         run: npm install --global firebase-tools
 
-      - name: Deploy hosting
-        run: firebase deploy --only hosting --project ai-actuary-bootcamp-dev-260308
+      - name: Deploy hosting and Firestore config
+        run: firebase deploy --only hosting,firestore:rules,firestore:indexes --project ai-actuary-bootcamp-dev-260308
