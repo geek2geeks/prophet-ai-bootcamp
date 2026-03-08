@@ -367,9 +367,44 @@ TRANSLATIONS = {
         "fr": "Semaine 2",
     },
     "pre_bootcamp_desc": {
-        "pt": "Setup da stack, terminal sem medo, OpenCode, MCPs e disciplina de operacao.",
-        "en": "Stack setup, fearless terminal use, OpenCode, MCPs, and operating discipline.",
-        "fr": "Setup de la stack, terminal sans peur, OpenCode, MCPs et discipline d'operation.",
+        "pt": "Terminal sem medo, API key, OpenCode configurado, dados reais analisados e regras de operacao segura.",
+        "en": "Fearless terminal use, API key, OpenCode configured, real data analyzed, and safe operating rules.",
+        "fr": "Terminal sans peur, cle API, OpenCode configure, donnees reelles analysees et regles d'operation securisee.",
+    },
+    "bootcamp_keys_title": {
+        "pt": "Chaves do Bootcamp",
+        "en": "Bootcamp Keys",
+        "fr": "Cles du Bootcamp",
+    },
+    "bootcamp_keys_desc": {
+        "pt": "Estas sao as chaves partilhadas do bootcamp. Usa-as para configurar o DeepSeek e o OpenCode. As chaves so sao visiveis para alunos autenticados.",
+        "en": "These are the shared bootcamp keys. Use them to configure DeepSeek and OpenCode. Keys are only visible to authenticated students.",
+        "fr": "Voici les cles partagees du bootcamp. Utilisez-les pour configurer DeepSeek et OpenCode. Les cles ne sont visibles que pour les etudiants authentifies.",
+    },
+    "bootcamp_keys_deepseek_hint": {
+        "pt": "Cola este comando no terminal para configurar a key do DeepSeek antes de abrir o OpenCode.",
+        "en": "Paste this command in your terminal to configure the DeepSeek key before opening OpenCode.",
+        "fr": "Collez cette commande dans votre terminal pour configurer la cle DeepSeek avant d'ouvrir OpenCode.",
+    },
+    "bootcamp_keys_opencode_hint": {
+        "pt": "Key para o plano OpenCode do bootcamp. Configura-se nas definicoes do OpenCode.",
+        "en": "Key for the bootcamp OpenCode plan. Configure it in OpenCode settings.",
+        "fr": "Cle pour le plan OpenCode du bootcamp. Configurez-la dans les parametres OpenCode.",
+    },
+    "bootcamp_keys_config_cmd": {
+        "pt": "Comando para configurar:",
+        "en": "Configuration command:",
+        "fr": "Commande de configuration :",
+    },
+    "bootcamp_keys_not_configured": {
+        "pt": "Chaves do bootcamp nao configuradas. Contacta o instrutor.",
+        "en": "Bootcamp keys not configured. Contact the instructor.",
+        "fr": "Cles du bootcamp non configurees. Contactez l'instructeur.",
+    },
+    "bootcamp_keys_opencode_usage": {
+        "pt": "Usa esta key nas definicoes do OpenCode ou como variavel de ambiente OPENCODE_API_KEY.",
+        "en": "Use this key in OpenCode settings or as the OPENCODE_API_KEY environment variable.",
+        "fr": "Utilisez cette cle dans les parametres OpenCode ou comme variable d'environnement OPENCODE_API_KEY.",
     },
     "week1_desc": {
         "pt": "Escolha da wedge, specs, APIs, dados, Prophet Lite e memoria documental.",
@@ -1030,9 +1065,9 @@ TRANSLATIONS = {
         "fr": "Pre-Bootcamp: Setup & Fondamentaux",
     },
     "pre_bootcamp_intro_desc": {
-        "pt": "Preparacao pratica para operar como builder AI-native: OpenCode, DeepSeek, MCPs, terminal, prompts reutilizaveis e regras de operacao segura.",
-        "en": "Practical preparation to operate as an AI-native builder: OpenCode, DeepSeek, MCPs, terminal, reusable prompts, and safe operating rules.",
-        "fr": "Preparation pratique pour operer comme builder AI-native : OpenCode, DeepSeek, MCPs, terminal, prompts reutilisables et regles d'usage securise.",
+        "pt": "Preparacao pratica para operar como builder AI-native: terminal desde zero, API key configurada, OpenCode operacional, analise de dados reais com prompts e regras de seguranca para atuarios.",
+        "en": "Practical preparation to operate as an AI-native builder: terminal from zero, API key configured, OpenCode operational, real data analysis with prompts, and security rules for actuaries.",
+        "fr": "Preparation pratique pour operer comme builder AI-native : terminal depuis zero, cle API configuree, OpenCode operationnel, analyse de donnees reelles avec prompts et regles de securite pour actuaires.",
     },
     "week1_intro_title": {
         "pt": "Semana 1: Fundacao do Founder AI",
@@ -1072,7 +1107,7 @@ TRANSLATIONS = {
         "pt": "Bonus Extra", "en": "Extra Bonus", "fr": "Bonus Extra",
     },
     "grading_exercises": {
-        "pt": "Exercicios Diarios (Dias 1-9)", "en": "Daily Exercises (Days 1-9)", "fr": "Exercices Quotidiens (Jours 1-9)",
+        "pt": "Exercicios Diarios (Dias 1-10)", "en": "Daily Exercises (Days 1-10)", "fr": "Exercices Quotidiens (Jours 1-10)",
     },
     "grading_exercises_desc": {
         "pt": "Checklist diaria de execucao",
@@ -1080,7 +1115,7 @@ TRANSLATIONS = {
         "fr": "Checklist quotidienne d'execution",
     },
     "grading_challenges": {
-        "pt": "Desafios Diarios (melhor 8 de 9)", "en": "Daily Challenges (best 8 of 9)", "fr": "Defis Quotidiens (meilleurs 8 sur 9)",
+        "pt": "Desafios Diarios (melhor 8 de 10)", "en": "Daily Challenges (best 8 of 10)", "fr": "Defis Quotidiens (meilleurs 8 sur 10)",
     },
     "grading_challenges_desc": {
         "pt": "Entrega principal de cada dia",
@@ -1361,6 +1396,22 @@ TRANSLATIONS = {
         "pt": "Modo Escuro",
         "en": "Dark Mode",
         "fr": "Mode Sombre",
+    },
+    # ── Navigation: Programa → Exercicios ──
+    "start_exercises_btn": {
+        "pt": "Iniciar Exercicios",
+        "en": "Start Exercises",
+        "fr": "Commencer les Exercices",
+    },
+    "go_to_exercises_hint": {
+        "pt": "Abre a pagina de exercicios para completar e submeter o teu trabalho.",
+        "en": "Open the exercises page to complete and submit your work.",
+        "fr": "Ouvrez la page des exercices pour completer et soumettre votre travail.",
+    },
+    "dashboard_go_exercises": {
+        "pt": "Ir para Exercicios",
+        "en": "Go to Exercises",
+        "fr": "Aller aux Exercices",
     },
 }
 

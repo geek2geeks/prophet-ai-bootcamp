@@ -18,7 +18,9 @@ submissions = get_submissions(user_id)
 # Day selector
 render_html('<div style="margin-bottom:24px;"></div>')
 day_options = [f"{t('day')} {d['dia']} — {d['titulo']}" for d in DAYS]
-selected = st.selectbox(t("select_day"), day_options, index=0, label_visibility="collapsed")
+target_day = st.session_state.pop("exercicios_target_day", None)
+default_idx = target_day if isinstance(target_day, int) and 0 <= target_day < len(day_options) else 0
+selected = st.selectbox(t("select_day"), day_options, index=default_idx, label_visibility="collapsed")
 day_idx = day_options.index(selected)
 day = DAYS[day_idx]
 
@@ -50,6 +52,48 @@ render_html(f"""
     </div>
 </div>
 """)
+
+# --- Bootcamp Keys (Day 0 only) ---
+if day["dia"] == 0:
+    with st.expander("🔑 " + t("bootcamp_keys_title"), expanded=False):
+        render_html(f"""
+        <div style="padding:8px 0;">
+            <p style="color:#64748B; font-size:0.9rem; line-height:1.6; margin-bottom:16px;">{t('bootcamp_keys_desc')}</p>
+        </div>
+        """)
+
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown("**🤖 DeepSeek API Key**")
+            st.caption(t("bootcamp_keys_deepseek_hint"))
+            try:
+                dk = st.secrets["bootcamp"]["deepseek_api_key"]
+                st.code(dk, language=None)
+                st.markdown(f"**{t('bootcamp_keys_config_cmd')}**")
+                st.code(f"set DEEPSEEK_API_KEY={dk}", language="bash")
+                st.caption("☝️ Windows (CMD)")
+                st.code(f"export DEEPSEEK_API_KEY={dk}", language="bash")
+                st.caption("☝️ Mac / Linux")
+            except Exception:
+                st.warning(t("bootcamp_keys_not_configured"))
+
+        with col2:
+            st.markdown("**⚡ OpenCode Key**")
+            st.caption(t("bootcamp_keys_opencode_hint"))
+            try:
+                ok = st.secrets["bootcamp"]["opencode_api_key"]
+                st.code(ok, language=None)
+                st.caption(t("bootcamp_keys_opencode_usage"))
+            except Exception:
+                st.warning(t("bootcamp_keys_not_configured"))
+
+        render_html("""
+        <div style="margin-top:12px; padding:12px; background:#FEF3C7; border:1px solid #FDE68A; border-radius:8px;">
+            <p style="margin:0; color:#92400E; font-size:0.85rem;">
+                ⚠️ <strong>Seguranca:</strong> Estas chaves sao exclusivas do bootcamp. Nao as partilhes fora do curso nem as coloques em codigo publico.
+            </p>
+        </div>
+        """)
 
 # --- Exercises ---
 section_title(t("exercise_checklist"), "✅", "emerald")

@@ -149,14 +149,22 @@ for idx, (label, done_items, total_items) in enumerate(week_progress):
 render_html('</div>')
 
 section_title(t("dashboard_lessons_title"), "➡️", "rose")
-hero_cta_cols = st.columns([2, 1, 1], gap="small")
+hero_cta_cols = st.columns([2, 1, 1, 1], gap="small")
 with hero_cta_cols[0]:
     if st.button(f"▶ {t('dashboard_lessons_open_now')}", width="stretch", key="open_lessons_now"):
         open_program_week(1)
 with hero_cta_cols[1]:
+    if st.button(f"📝 {t('dashboard_go_exercises')}", width="stretch", key="open_exercises_top"):
+        for target in ("pages/3_Exercicios.py", "3_Exercicios.py"):
+            try:
+                st.switch_page(target)
+                break
+            except StreamlitAPIException:
+                continue
+with hero_cta_cols[2]:
     if st.button(f"🛠 {t('dashboard_lessons_pre_bootcamp_short')}", width="stretch", key="open_lessons_pre_top"):
         open_program_week(0)
-with hero_cta_cols[2]:
+with hero_cta_cols[3]:
     if st.button(f"🚀 {t('dashboard_lessons_week_2_short')}", width="stretch", key="open_lessons_week2_top"):
         open_program_week(2)
 

@@ -1,10 +1,21 @@
 import streamlit as st
 import textwrap
+from streamlit.errors import StreamlitAPIException
 from lib.auth import require_auth
 from lib.course import DAYS
 from lib.theme import inject_css, page_header, section_title, render_html
 from lib.i18n import t
 from lib.ai import render_tutor_widget
+
+
+def open_exercises(day_idx: int):
+    st.session_state.exercicios_target_day = day_idx
+    for target in ("pages/3_Exercicios.py", "3_Exercicios.py"):
+        try:
+            st.switch_page(target)
+            return
+        except StreamlitAPIException:
+            continue
 
 require_auth()
 inject_css()
@@ -107,8 +118,9 @@ for day in days_filtered:
     """)
 
     conteudo = day.get("conteudo", {})
+    mod_offset = sum(len(d["modulos"]) for d in DAYS if d["dia"] < day["dia"])
     for i, mod in enumerate(day["modulos"], 1):
-        mod_num = (day['dia'] - 1) * 2 + i if day['dia'] > 0 else i
+        mod_num = mod_offset + i
         html += f"<li><strong>{t('module')} {mod_num}:</strong> {mod}"
         mod_key = f"modulo_{i}"
         if mod_key in conteudo:
@@ -116,7 +128,10 @@ for day in days_filtered:
             if topics:
                 html += '<ul class="timeline-topic-list">'
                 for topic in topics:
-                    html += f'<li>{topic["titulo"]}</li>'
+                    html += f'<li><strong>{topic["titulo"]}</strong>'
+                    if topic.get("conteudo"):
+                        html += f'<p class="timeline-topic-content">{topic["conteudo"]}</p>'
+                    html += '</li>'
                 html += '</ul>'
         html += "</li>"
 
@@ -155,6 +170,15 @@ for day in days_filtered:
     </div>
     """
     render_html(html)
+
+    full_day_idx = next(i for i, d in enumerate(DAYS) if d["dia"] == day["dia"])
+    if st.button(
+        f"▶ {t('start_exercises_btn')} — {t('day')} {day['dia']}",
+        key=f"go_ex_day_{day['dia']}",
+        type="primary",
+        use_container_width=True,
+    ):
+        open_exercises(full_day_idx)
 
 render_html('</div>')
 
