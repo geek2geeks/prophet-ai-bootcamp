@@ -159,8 +159,8 @@ jobs:
           try:
               from lib.auth import init_session, get_google_login_url
               from lib.db import get_supabase
-              from lib.ai import analyze_text
-              from lib.course import get_course_data
+              from lib.ai import get_ai_response
+              from lib.course import get_all_exercises
               from lib.i18n import t, init_i18n
               from lib.theme import inject_css
               print("✅ All modules import successfully")
