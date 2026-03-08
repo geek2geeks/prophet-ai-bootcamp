@@ -294,6 +294,8 @@ function buildWorkflowSummary(state: Day6DocumentPipelineWorkbenchState) {
     "- O OCR inicial corre localmente para reduzir fuga de dados e apanhar ruido cedo.",
     "- O modelo remoto so recebe texto mais limpo, curto e com melhor contexto.",
     "- A equipa guarda evidencia entre original, OCR bruto e versao limpa.",
+    "- Se precisares de metadata fiavel, pede JSON mode em vez de texto livre.",
+    "- Se precisares de comparacao ou raciocinio mais fundo, usa o reasoner so depois da limpeza.",
     "",
     "Checks de qualidade:",
     ...checkLines,

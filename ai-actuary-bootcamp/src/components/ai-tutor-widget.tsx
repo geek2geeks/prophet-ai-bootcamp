@@ -1,13 +1,18 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, query, setDoc, where } from "firebase/firestore";
 import { useAuth } from "@/lib/auth-context";
 import { db } from "@/lib/firebase";
 import {
   buildMessages,
   type TutorMessage,
 } from "@/lib/ai-tutor-context";
+import {
+  streamDeepSeekChat,
+  type DeepSeekTool,
+  type DeepSeekUsage,
+} from "@/lib/deepseek-client";
 import courseData from "@/data/course.json";
 
 // ---------------------------------------------------------------------------
@@ -39,9 +44,13 @@ interface Session {
   messages: TutorMessage[];
 }
 
-type SharedKeys = {
-  deepseek?: string;
-  zai?: string;
+type TutorMode = "guide" | "deep-review";
+
+type SubmissionContext = {
+  summary: string;
+  artifactTitle: string;
+  fileName: string | null;
+  createdAtMs: number;
 };
 
 // ---------------------------------------------------------------------------
@@ -50,6 +59,58 @@ type SharedKeys = {
 
 const MAX_SESSIONS = 20;
 const SESSION_TITLE_MAX = 40;
+
+const TUTOR_TOOLS: DeepSeekTool[] = [
+  {
+    type: "function",
+    function: {
+      name: "open_mission",
+      description: "Sugere abrir uma missao especifica do bootcamp.",
+      strict: true,
+      parameters: {
+        type: "object",
+        properties: {
+          daySlug: { type: "string", description: "Slug do dia, ex: 01 ou 10" },
+          why: { type: "string", description: "Porque esta missao e o proximo passo certo" },
+        },
+        required: ["daySlug", "why"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "open_resource_hub",
+      description: "Sugere abrir a pagina de recursos quando faltam docs, ficheiros ou referencias.",
+      strict: true,
+      parameters: {
+        type: "object",
+        properties: {
+          why: { type: "string", description: "Porque os recursos ajudam neste bloqueio" },
+        },
+        required: ["why"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "open_portfolio",
+      description: "Sugere abrir o portfolio para rever progresso, entregas ou proximos passos.",
+      strict: true,
+      parameters: {
+        type: "object",
+        properties: {
+          why: { type: "string", description: "Porque o portfolio ajuda neste momento" },
+        },
+        required: ["why"],
+        additionalProperties: false,
+      },
+    },
+  },
+];
 
 // ---------------------------------------------------------------------------
 // Exercise helpers
@@ -345,7 +406,9 @@ export function AiTutorWidget({
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
   const [keyError, setKeyError] = useState("");
-  const [deepseekKey, setDeepseekKey] = useState("");
+  const [mode, setMode] = useState<TutorMode>("guide");
+  const [usage, setUsage] = useState<DeepSeekUsage | null>(null);
+  const [daySubmissionContext, setDaySubmissionContext] = useState<SubmissionContext[]>([]);
 
   // Firestore progress
   const [firestoreProgress, setFirestoreProgress] =
@@ -353,6 +416,7 @@ export function AiTutorWidget({
   const [progressLoaded, setProgressLoaded] = useState(false);
 
   const bottomRef = useRef<HTMLDivElement>(null);
+  const streamAbortRef = useRef<AbortController | null>(null);
 
   const studentName = user?.displayName?.split(" ")[0] ?? null;
 
@@ -407,25 +471,39 @@ export function AiTutorWidget({
   }, [user]);
 
   useEffect(() => {
-    if (!user) {
-      setDeepseekKey("");
+    if (!open || !user || dayNumber !== 1) {
+      setDaySubmissionContext([]);
       return;
     }
 
-    getDoc(doc(db, "config", "keys"))
-      .then((snap) => {
-        if (!snap.exists()) {
-          setDeepseekKey("");
-          return;
-        }
+    getDocs(
+      query(
+        collection(db, "submissions"),
+        where("missionId", "==", "01"),
+        where("userId", "==", user.uid),
+      ),
+    )
+      .then((snapshot) => {
+        const items = snapshot.docs
+          .map((entry) => {
+            const data = entry.data() as Record<string, unknown>;
+            return {
+              summary: typeof data.summary === "string" ? data.summary.trim() : "",
+              artifactTitle: typeof data.artifactTitle === "string" ? data.artifactTitle.trim() : "",
+              fileName: typeof data.fileName === "string" ? data.fileName : null,
+              createdAtMs: typeof data.createdAtMs === "number" ? data.createdAtMs : 0,
+            };
+          })
+          .filter((item) => item.summary || item.artifactTitle || item.fileName)
+          .sort((left, right) => right.createdAtMs - left.createdAtMs)
+          .slice(0, 3);
 
-        const data = snap.data() as SharedKeys;
-        setDeepseekKey(data.deepseek?.trim() ?? "");
+        setDaySubmissionContext(items);
       })
       .catch(() => {
-        setDeepseekKey("");
+        setDaySubmissionContext([]);
       });
-  }, [user]);
+  }, [dayNumber, open, user]);
 
   // -------------------------------------------------------------------------
   // When panel opens, show session list
@@ -456,6 +534,21 @@ export function AiTutorWidget({
     firestoreProgress,
     studentName,
   );
+  const submissionContextBlock =
+    dayNumber === 1 && daySubmissionContext.length
+      ? `\n\nEVIDENCIA SUBMETIDA NO DIA 1:\n${daySubmissionContext
+          .map((item, index) => {
+            const parts = [
+              `Entrega ${index + 1}:`,
+              item.artifactTitle ? `Titulo: ${item.artifactTitle}` : null,
+              item.fileName ? `Ficheiro: ${item.fileName}` : null,
+              item.summary ? `Resumo: ${item.summary}` : null,
+            ].filter(Boolean);
+
+            return parts.join(" | ");
+          })
+          .join("\n")}`
+      : "";
   const suggestions = getDynamicSuggestions(dayNumber, firestoreProgress);
   const hasActiveSession = activeSessionId !== null;
 
@@ -547,58 +640,31 @@ export function AiTutorWidget({
     setInput("");
     setStreaming(true);
     setKeyError("");
-
-    if (!deepseekKey) {
-      setStreaming(false);
-      setKeyError("Tutor indisponivel: chave DeepSeek ausente em config/keys.");
-      const missingKeyMessages: TutorMessage[] = [
-        ...nextMessages,
-        {
-          role: "assistant",
-          content:
-            "O tutor nao esta disponivel agora porque a chave partilhada do DeepSeek nao foi carregada.",
-        },
-      ];
-      setMessages(missingKeyMessages);
-      persistSession(missingKeyMessages, activeSessionId);
-      return;
-    }
+    setUsage(null);
 
     // Placeholder assistant message for streaming
     const placeholder: TutorMessage = { role: "assistant", content: "" };
     setMessages([...nextMessages, placeholder]);
 
     try {
-      const response = await fetch("https://api.deepseek.com/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${deepseekKey}`,
+      const contextWithEvidence = `${pageContext}${submissionContextBlock}`;
+      const abortController = new AbortController();
+      streamAbortRef.current = abortController;
+      const streamResult = await streamDeepSeekChat({
+        messages: buildMessages(nextMessages, contextWithEvidence),
+        model: mode === "deep-review" ? "deepseek-reasoner" : "deepseek-chat",
+        maxTokens: mode === "deep-review" ? 2800 : 2048,
+        temperature: mode === "deep-review" ? undefined : 0.4,
+        thinking: mode === "deep-review" ? { type: "enabled" } : undefined,
+        tools: mode === "guide" ? TUTOR_TOOLS : undefined,
+        toolChoice: mode === "guide" ? "auto" : undefined,
+        signal: abortController.signal,
+        onToken: (_token, accumulated) => {
+          setMessages([...nextMessages, { role: "assistant", content: accumulated || "" }]);
         },
-        body: JSON.stringify({
-          model: "deepseek-chat",
-          messages: buildMessages(nextMessages, pageContext),
-          max_tokens: 2048,
-          temperature: 0.4,
-          stream: false,
-        }),
       });
-
-      if (!response.ok) {
-        const errorPayload = (await response.json().catch(() => null)) as
-          | { error?: { message?: string }; message?: string }
-          | null;
-        throw new Error(
-          errorPayload?.error?.message ||
-            errorPayload?.message ||
-            `DeepSeek API error: ${response.status}`,
-        );
-      }
-
-      const payload = (await response.json()) as {
-        choices?: Array<{ message?: { content?: string | null } }>;
-      };
-      const accumulated = payload.choices?.[0]?.message?.content?.trim() || "Sem resposta.";
+      setUsage(streamResult.usage ?? null);
+      const accumulated = streamResult.content || "Sem resposta.";
 
       // Final settled messages
       const finalMessages: TutorMessage[] = [
@@ -609,6 +675,18 @@ export function AiTutorWidget({
       persistSession(finalMessages, activeSessionId);
     } catch (err: unknown) {
       console.error(err);
+      if (err instanceof Error && err.name === "AbortError") {
+        const cancelledMessages: TutorMessage[] = [
+          ...nextMessages,
+          {
+            role: "assistant",
+            content: "Resposta interrompida. Podes reformular a pergunta ou pedir ao Peter para continuar.",
+          },
+        ];
+        setMessages(cancelledMessages);
+        persistSession(cancelledMessages, activeSessionId);
+        return;
+      }
       setKeyError(err instanceof Error ? err.message : "Erro ao contactar o tutor AI.");
       const errorMessages: TutorMessage[] = [
         ...nextMessages,
@@ -620,12 +698,13 @@ export function AiTutorWidget({
       ];
       setMessages(errorMessages);
     } finally {
+      streamAbortRef.current = null;
       setStreaming(false);
     }
   }
 
   function cancelStream() {
-    setStreaming(false);
+    streamAbortRef.current?.abort();
   }
 
   // -------------------------------------------------------------------------
@@ -665,9 +744,14 @@ export function AiTutorWidget({
                   {view === "chat"
                     ? dayNumber !== undefined
                       ? `Dia ${dayNumber} — ${dayTitle ?? ""}`
-                      : "Bootcamp Assistant"
+                    : "Bootcamp Assistant"
                     : "Conversas"}
                 </p>
+                {view === "chat" ? (
+                  <p className="mt-1 text-[10px] uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
+                    {mode === "guide" ? "Modo guia" : "Modo review profunda"}
+                  </p>
+                ) : null}
               </div>
             </div>
             <button
@@ -776,6 +860,31 @@ export function AiTutorWidget({
                   </div>
                 ) : null}
 
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setMode("guide")}
+                    className={`rounded-full px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] transition ${
+                      mode === "guide"
+                        ? "bg-[var(--accent)] text-white"
+                        : "border border-[var(--border)] bg-[var(--surface-subtle)] text-[var(--muted-foreground)]"
+                    }`}
+                  >
+                    Guia rapido
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMode("deep-review")}
+                    className={`rounded-full px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] transition ${
+                      mode === "deep-review"
+                        ? "bg-[linear-gradient(145deg,#132330,#274358)] text-white"
+                        : "border border-[var(--border)] bg-[var(--surface-subtle)] text-[var(--muted-foreground)]"
+                    }`}
+                  >
+                    Review profunda
+                  </button>
+                </div>
+
                 {messages.length === 0 && !keyError ? (
                   <div className="mt-6 space-y-2 text-center">
                     <p className="text-sm font-semibold text-[var(--foreground)]">
@@ -831,6 +940,21 @@ export function AiTutorWidget({
 
               {/* Input */}
               <div className="border-t border-[var(--border)] p-3">
+                {usage ? (
+                  <div className="mb-2 flex flex-wrap gap-2 text-[10px] uppercase tracking-[0.14em] text-[var(--muted-foreground)]">
+                    <span className="glass-pill rounded-full px-2.5 py-1">
+                      tokens {usage.total_tokens ?? "-"}
+                    </span>
+                    <span className="glass-pill rounded-full px-2.5 py-1">
+                      cache hit {usage.prompt_cache_hit_tokens ?? 0}
+                    </span>
+                    {usage.completion_tokens_details?.reasoning_tokens ? (
+                      <span className="glass-pill rounded-full px-2.5 py-1">
+                        reasoning {usage.completion_tokens_details.reasoning_tokens}
+                      </span>
+                    ) : null}
+                  </div>
+                ) : null}
                 <div className="flex items-end gap-2 rounded-2xl border border-[var(--border)] bg-[var(--surface-subtle)] px-3 py-2">
                   <textarea
                     value={input}

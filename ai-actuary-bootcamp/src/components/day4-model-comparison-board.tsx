@@ -315,6 +315,9 @@ export function Day4ModelComparisonBoard() {
               <p>- Compara sempre a mesma tarefa e o mesmo prompt antes de mudar de modelo.</p>
               <p>- Guarda o provider vencedor e a razao. O objetivo e criar um playbook, nao uma opiniao vaga.</p>
               <p>- OpenCode pode ganhar como cockpit local mesmo quando o raciocinio vem de outro provider.</p>
+              <p>- DeepSeek ganha mais valor quando separas modos: `deepseek-chat` para velocidade e streaming, `deepseek-reasoner` para review exigente.</p>
+              <p>- Quando a resposta precisa de formato fiavel, usa JSON mode; quando precisa de acao dentro do produto, pensa em tool calling.</p>
+              <p>- Mantem prompts base estaveis para aproveitar context caching e baixar custo em tarefas repetidas.</p>
             </div>
           </div>
         </div>

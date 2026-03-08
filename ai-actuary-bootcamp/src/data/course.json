@@ -480,7 +480,7 @@
             },
             {
               "titulo": "O Que Importa nas Docs",
-              "conteudo": "Structured output, custos, janela de contexto, tool use, limites de rate e exemplos contam mais no dia a dia do que benchmarks abstratos."
+              "conteudo": "Structured output, streaming, context caching, tool use, thinking mode, limites e exemplos contam mais no dia a dia do que benchmarks abstratos."
             },
             {
               "titulo": "Evitar Fe no Primeiro Output",
@@ -497,7 +497,7 @@
           "topicos": [
             {
               "titulo": "Benchmark por Workflow",
-              "conteudo": "Comparar modelos faz mais sentido quando usas tarefas reais: rever specs, explicar resultados, validar documentos e propor proximos passos."
+              "conteudo": "Comparar modelos faz mais sentido quando usas tarefas reais: rever specs, explicar resultados, validar documentos, streamar respostas e propor proximos passos."
             },
             {
               "titulo": "Rubrica Repetivel",
@@ -505,11 +505,11 @@
             },
             {
               "titulo": "Escolha por Papel",
-              "conteudo": "Podes usar um modelo para planeamento, outro para execucao e outro para explicacao. O stack ideal e combinado, nao monolitico."
+              "conteudo": "Podes usar deepseek-chat para respostas rapidas com streaming, deepseek-reasoner para reviews exigentes, JSON mode para output estruturado e tool calling para guiar workflows. O stack ideal e combinado, nao monolitico."
             },
             {
               "titulo": "Registo de Decisao",
-              "conteudo": "Guardar porque escolheste um modelo hoje ajuda a rever custos e qualidade quando o produto comecar a ser usado em serio."
+              "conteudo": "Guardar porque escolheste um modelo hoje ajuda a rever custos, cache hits, latencia e qualidade quando o produto comecar a ser usado em serio."
             }
           ]
         }
