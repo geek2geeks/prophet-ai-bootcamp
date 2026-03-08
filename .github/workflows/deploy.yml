@@ -1,50 +1,204 @@
-name: Deploy to Streamlit Cloud
+name: AI Actuary Bootcamp CI/CD
 
 on:
+  pull_request:
+    paths:
+      - "ai-actuary-bootcamp/**"
+      - ".github/workflows/deploy.yml"
   push:
-    branches: [main]
+    branches:
+      - main
+    paths:
+      - "ai-actuary-bootcamp/**"
+      - ".github/workflows/deploy.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: ai-actuary-bootcamp-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  WORKDIR: ai-actuary-bootcamp
+  NODE_VERSION: "20"
+  FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'ai-actuary-bootcamp-dev-260308' }}
+  NEXT_PUBLIC_FIREBASE_API_KEY: ${{ vars.NEXT_PUBLIC_FIREBASE_API_KEY || 'placeholder-api-key' }}
+  NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ vars.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || 'placeholder.firebaseapp.com' }}
+  NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'ai-actuary-bootcamp-dev-260308' }}
+  NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ vars.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || 'placeholder.firebasestorage.app' }}
+  NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '000000000000' }}
+  NEXT_PUBLIC_FIREBASE_APP_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_APP_ID || '1:000000000000:web:placeholder' }}
 
 jobs:
-  deploy:
+  quality:
+    name: Lint, typecheck, build and test
     runs-on: ubuntu-latest
-    
+    defaults:
+      run:
+        working-directory: ${{ env.WORKDIR }}
+
     steps:
-      - uses: actions/checkout@v4
-      
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          python-version: '3.9'
-      
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: ai-actuary-bootcamp/package-lock.json
+
       - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Run lint
+        run: npm run lint
+
+      - name: Run typecheck
+        run: npm run typecheck
+
+      - name: Build static export
+        run: npm run build
+
+      - name: Start local static server
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-      
-      - name: Create secrets.toml for Streamlit
+          npx serve out -p 3000 --no-clipboard --no-port-switching > serve.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl --silent --fail http://127.0.0.1:3000/ > /dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Static server did not start in time."
+          cat serve.log
+          exit 1
+
+      - name: Run Playwright smoke tests
+        run: npm run test:e2e:ci
+        env:
+          PLAYWRIGHT_BASE_URL: http://127.0.0.1:3000
+
+      - name: Upload static export
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-actuary-bootcamp-static-export
+          path: ai-actuary-bootcamp/out
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Upload Playwright artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-actuary-bootcamp-playwright-report
+          path: |
+            ai-actuary-bootcamp/playwright-report
+            ai-actuary-bootcamp/test-results
+          if-no-files-found: ignore
+          retention-days: 7
+
+  preview:
+    name: Deploy Firebase preview
+    needs: quality
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Download static export
+        uses: actions/download-artifact@v4
+        with:
+          name: ai-actuary-bootcamp-static-export
+          path: ai-actuary-bootcamp
+
+      - name: Validate Firebase preview configuration
+        env:
+          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_AI_ACTUARY_BOOTCAMP_DEV_260308 }}
         run: |
-          mkdir -p ~/.streamlit
-          cat > ~/.streamlit/secrets.toml << 'EOF'
-          [supabase]
-          url = "https://naecdtkxxlawxlkljtkt.supabase.co"
-          key = "${{ secrets.SUPABASE_ANON_KEY }}"
-          service_key = "${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}"
-          
-          [deepseek]
-          api_key = "${{ secrets.DEEPSEEK_API_KEY }}"
-          
-          [app]
-          url = "https://ai-actuary.streamlit.app"
-          EOF
-      
-      - name: Run Streamlit tests
+          if [ "$NEXT_PUBLIC_FIREBASE_API_KEY" = "placeholder-api-key" ]; then
+            echo "Missing GitHub Variables for Firebase public config."
+            exit 1
+          fi
+          if [ -z "$FIREBASE_SERVICE_ACCOUNT_JSON" ]; then
+            echo "Missing FIREBASE_SERVICE_ACCOUNT_AI_ACTUARY_BOOTCAMP_DEV_260308 secret."
+            exit 1
+          fi
+
+      - name: Deploy preview channel
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_AI_ACTUARY_BOOTCAMP_DEV_260308 }}
+          projectId: ${{ env.FIREBASE_PROJECT_ID }}
+          entryPoint: ai-actuary-bootcamp
+          channelId: pr-${{ github.event.pull_request.number }}
+          expires: 7d
+
+  deploy:
+    name: Deploy Firebase production
+    needs: quality
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://ai-actuary-bootcamp-dev-260308.web.app
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Download static export
+        uses: actions/download-artifact@v4
+        with:
+          name: ai-actuary-bootcamp-static-export
+          path: ai-actuary-bootcamp
+
+      - name: Validate Firebase production configuration
+        env:
+          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_AI_ACTUARY_BOOTCAMP_DEV_260308 }}
         run: |
-          streamlit run app.py --logger.level=debug &
-          sleep 10
-          kill %1 || true
-      
-      - name: Deploy notification
-        run: |
-          echo "✅ Deployment complete!"
-          echo "App: https://ai-actuary.streamlit.app"
-          echo "Google OAuth: Enabled"
+          if [ "$NEXT_PUBLIC_FIREBASE_API_KEY" = "placeholder-api-key" ]; then
+            echo "Missing GitHub Variables for Firebase public config."
+            exit 1
+          fi
+          if [ -z "$FIREBASE_SERVICE_ACCOUNT_JSON" ]; then
+            echo "Missing FIREBASE_SERVICE_ACCOUNT_AI_ACTUARY_BOOTCAMP_DEV_260308 secret."
+            exit 1
+          fi
+
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_AI_ACTUARY_BOOTCAMP_DEV_260308 }}
+
+      - name: Install Firebase CLI
+        run: npm install --global firebase-tools
+
+      - name: Deploy Firebase Hosting live
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_AI_ACTUARY_BOOTCAMP_DEV_260308 }}
+          projectId: ${{ env.FIREBASE_PROJECT_ID }}
+          entryPoint: ai-actuary-bootcamp
+          channelId: live
+
+      - name: Deploy Firestore rules and indexes
+        working-directory: ai-actuary-bootcamp
+        run: firebase deploy --project "$FIREBASE_PROJECT_ID" --only firestore:rules,firestore:indexes --non-interactive

@@ -36,7 +36,7 @@ npm install
 
 ### Environment variables
 
-Create `.env.local` in the project root:
+Copy `.env.example` to `.env.local` in the project root and fill in the real values:
 
 ```env
 NEXT_PUBLIC_FIREBASE_API_KEY=...
@@ -63,9 +63,13 @@ npm run lint && npm run build && npx playwright test && npx firebase deploy --on
 
 ## GitHub automation
 
-The repo-root workflow `.github/workflows/ai-actuary-bootcamp.yml` verifies and deploys the app from `ai-actuary-bootcamp/`.
+The repo-root workflow `.github/workflows/deploy.yml` verifies and deploys the app from `ai-actuary-bootcamp/`.
 
-Set these GitHub repository secrets before relying on CI or hosting deploys:
+Add this GitHub repository secret before relying on preview or production deploys:
+
+- `FIREBASE_SERVICE_ACCOUNT_AI_ACTUARY_BOOTCAMP_DEV_260308`
+
+Add these GitHub repository variables so CI can build the static export and deploy to the right Firebase project:
 
 - `NEXT_PUBLIC_FIREBASE_API_KEY`
 - `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
@@ -73,7 +77,8 @@ Set these GitHub repository secrets before relying on CI or hosting deploys:
 - `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`
 - `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`
 - `NEXT_PUBLIC_FIREBASE_APP_ID`
-- `FIREBASE_SERVICE_ACCOUNT_AI_ACTUARY_BOOTCAMP_DEV_260308`
+
+The workflow runs quality checks on pull requests, publishes Firebase Hosting preview channels for PRs, and deploys Hosting plus Firestore rules/indexes on `main`.
 
 To also update Firestore security rules:
 
