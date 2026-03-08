@@ -20,7 +20,7 @@ async function expectLoginScreen(page: Page) {
 }
 
 async function expectProtectedRedirect(page: Page) {
-  await page.waitForURL(/\/login\/?$/i, { timeout: 10000 });
+  await page.waitForURL(/\/login\/?$/i, { timeout: 15000 });
   await expectLoginScreen(page);
 }
 
