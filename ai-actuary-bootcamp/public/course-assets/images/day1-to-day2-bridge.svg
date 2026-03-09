@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 300">
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .box { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; rx: 8; }
+      .box-highlight { fill: #eff6ff; stroke: #3b82f6; stroke-width: 2; rx: 8; }
+      .text-title { font-family: system-ui, sans-serif; font-size: 16px; font-weight: bold; fill: #0f172a; text-anchor: middle; }
+      .text-desc { font-family: system-ui, sans-serif; font-size: 13px; fill: #475569; text-anchor: middle; }
+      .text-actuary { font-family: system-ui, sans-serif; font-size: 12px; font-weight: 600; fill: #10b981; text-anchor: middle; }
+      .arrow { stroke: #94a3b8; stroke-width: 2; fill: none; }
+      .arrow-head { fill: #94a3b8; }
+    </style>
+  </defs>
+
+  <rect width="100%" height="100%" class="bg" />
+
+  <!-- Dia 1: Negócio -->
+  <g transform="translate(50, 50)">
+    <rect width="200" height="120" class="box" />
+    <text x="100" y="35" class="text-title">Dia 1: Ideia de Negócio</text>
+    <text x="100" y="60" class="text-desc">Problema, Cliente, Wedge</text>
+    <line x1="20" y1="80" x2="180" y2="80" stroke="#e2e8f0" stroke-width="1" />
+    <text x="100" y="100" class="text-actuary">Analogia: Estratégia / Produto</text>
+  </g>
+
+  <!-- Seta -->
+  <path d="M 260 110 L 290 110" class="arrow" />
+  <polygon points="290,105 300,110 290,115" class="arrow-head" />
+
+  <!-- Dia 2: Especificação (A Ponte) -->
+  <g transform="translate(310, 30)">
+    <rect width="200" height="160" class="box-highlight" />
+    <text x="100" y="35" class="text-title">Dia 2: A Ponte (Spec Kit)</text>
+    <text x="100" y="60" class="text-desc">O Que construir e Porquê</text>
+    <text x="100" y="80" class="text-desc">(Regras, Edge Cases, Testes)</text>
+    <line x1="20" y1="100" x2="180" y2="100" stroke="#bfdbfe" stroke-width="1" />
+    <text x="100" y="125" class="text-actuary">Analogia: Nota Técnica /</text>
+    <text x="100" y="145" class="text-actuary">Instrução Operacional</text>
+  </g>
+
+  <!-- Seta -->
+  <path d="M 520 110 L 550 110" class="arrow" />
+  <polygon points="550,105 560,110 550,115" class="arrow-head" />
+
+  <!-- Dias 8-10: Software -->
+  <g transform="translate(570, 50)">
+    <rect width="200" height="120" class="box" />
+    <text x="100" y="35" class="text-title">Dias 8-10: Software</text>
+    <text x="100" y="60" class="text-desc">Código, App, Deploy</text>
+    <line x1="20" y1="80" x2="180" y2="80" stroke="#e2e8f0" stroke-width="1" />
+    <text x="100" y="100" class="text-actuary">Analogia: Sistema de IT / Motor</text>
+  </g>
+
+  <!-- Banner Bottom -->
+  <text x="400" y="240" font-family="system-ui, sans-serif" font-size="15" font-weight="500" fill="#334155" text-anchor="middle">
+    Como Founder AI-Native, o teu foco está no Negócio (Dia 1) e na Especificação (Dia 2). O LLM faz o Código.
+  </text>
+</svg>

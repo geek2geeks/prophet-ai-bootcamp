@@ -17,6 +17,8 @@ export type Challenge = {
 export type Topic = {
   titulo: string;
   conteudo: string;
+  imagemUrl?: string;
+  mermaid?: string;
 };
 
 export type ModuleContent = {

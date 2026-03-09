@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { AppLink } from "@/components/app-link";
 
 export default function NotFound() {
   return (
@@ -11,13 +11,13 @@ export default function NotFound() {
         <p className="mt-4 text-sm leading-7 text-[#6c5560]">
           Head back to the mission grid and continue from a valid day workspace.
         </p>
-        <Link
+        <AppLink
           href="/"
           className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#351f29] px-5 py-3 text-sm font-semibold text-[#fff5f6]"
         >
           Back home
           <span aria-hidden="true">{"->"}</span>
-        </Link>
+        </AppLink>
       </div>
     </main>
   );

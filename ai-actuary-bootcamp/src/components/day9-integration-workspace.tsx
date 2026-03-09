@@ -2,6 +2,13 @@
 
 import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 
+import {
+  DEEPSEEK_READABLE_FILE_EXTENSIONS,
+  DEEPSEEK_READABLE_FILE_SUMMARY,
+  getDeepSeekReadableFileError,
+  isDeepSeekReadableTextFile,
+} from "@/lib/deepseek-readable-files";
+
 type StageId = "upload" | "run" | "explain" | "guardar";
 type CheckpointId =
   | "repo"
@@ -164,6 +171,7 @@ export function Day9IntegrationWorkspace() {
     }
   });
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const [uploadMessage, setUploadMessage] = useState<string | null>(null);
 
   useEffect(() => {
     try {
@@ -306,6 +314,14 @@ export function Day9IntegrationWorkspace() {
       return;
     }
 
+    if (!isDeepSeekReadableTextFile(file)) {
+      setUploadMessage(getDeepSeekReadableFileError("Este lab"));
+      event.target.value = "";
+      return;
+    }
+
+    setUploadMessage(null);
+
     const sizeKb = Math.max(1, Math.round(file.size / 1024));
     setState((current) => ({
       ...current,
@@ -419,7 +435,7 @@ export function Day9IntegrationWorkspace() {
                 label="Ficheiro teste"
                 value={state.uploadedFileName}
                 onChange={(value) => setField("uploadedFileName", value)}
-                placeholder="sample.txt ou policy.pdf"
+                placeholder="sample.txt ou policy.md"
               />
             </div>
 
@@ -442,14 +458,29 @@ export function Day9IntegrationWorkspace() {
                   Upload local
                 </p>
                 <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">
-                  Faz upload do documento, guarda um preview curto e mantem a app capaz de continuar sem cloud.
+                  Faz upload de um ficheiro textual que o DeepSeek 3.2 consiga ler diretamente, guarda um preview curto e mantem a app capaz de continuar sem cloud.
                 </p>
               </div>
               <label className="rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[var(--accent-strong)]">
                 Escolher ficheiro
-                <input type="file" onChange={handleFileUpload} className="hidden" />
+                <input
+                  type="file"
+                  accept={DEEPSEEK_READABLE_FILE_EXTENSIONS}
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
               </label>
             </div>
+
+            <p className="mt-4 text-xs leading-6 text-[var(--muted-foreground)]">
+              Formatos aceites: {DEEPSEEK_READABLE_FILE_SUMMARY}.
+            </p>
+
+            {uploadMessage ? (
+              <div className="mt-4 rounded-[1rem] border border-[#d8a1a1] bg-[#fff5f5] px-4 py-3 text-sm text-[#8b3f3f]">
+                {uploadMessage}
+              </div>
+            ) : null}
 
             <div className="mt-4 grid gap-4 md:grid-cols-2">
               <Field

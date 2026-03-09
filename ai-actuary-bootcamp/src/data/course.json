@@ -277,79 +277,110 @@
     },
     {
       "dia": 2,
-      "titulo": "Specs com Speckit -- Diz ao LLM o Que Construir",
+      "titulo": "GitHub Spec Kit -- Diz ao LLM o Que Construir",
       "semana": 1,
-      "objetivo": "Aprender a trabalhar por especificacao. Usar Speckit, spec.md e constitution.md para transformar ideias vagas em instrucoes claras que o LLM consegue implementar e que o fundador consegue validar.",
+      "objetivo": "Aprender a trabalhar por especificacao sem assumir background tecnico. Usar o fluxo do GitHub Spec Kit -- constitution, specify, clarify, plan, tasks e implement -- para transformar a wedge escolhida no Dia 1 numa spec clara, auditavel e suficientemente concreta para um LLM construir sem adivinhacao. O foco do dia e aprender a descrever o que e porque antes de discutir como.",
       "modulos": [
-        "Spec-Driven Development com Speckit",
-        "Acceptance Criteria, Git & Iteracao"
+        "Da Ideia do Dia 1 a uma Spec Executavel",
+        "GitHub Spec Kit na Pratica",
+        "Acceptance Criteria, Git & Iteracao Leve"
       ],
       "exercicios": [
         {
           "id": "ex2.1",
           "titulo": "Spec para Upload de Assumptions",
           "pontos": 10,
-          "descricao": "Pedir a um LLM para \"fazer um upload de assumptions\" é a receita certa para ter problemas. Usa o template_spec.md para ser absolutamente explícito sobre o fluxo de upload e validação das tábuas de mortalidade, lapsos e taxas de desconto. Define os inputs, os erros esperados e o output final. A qualidade do que a máquina constrói escala em proporção direta à qualidade da tua spec."
+            "descricao": "Parte do memo do fundador e da wedge definidos no Dia 1 e traduz esse raciocinio para uma feature concreta. Em vez de pedir ao LLM para \"fazer um upload de assumptions\", usa o template_spec.md para descrever em linguagem simples quem usa a feature, porque ela existe, qual o fluxo principal, que erros devem ser apanhados e como o founder sabe que esta pronta. O objetivo e sair do discurso de produto e entrar numa instrucao operacional que a maquina nao interprete mal."
         },
         {
           "id": "ex2.2",
           "titulo": "Spec para Document Drop",
           "pontos": 10,
-          "descricao": "Arrastar PDFs para a app não chega; precisas de definir o que acontece depois. Escreve a spec para a feature de Document Drop: o utilizador faz upload de ficheiros, e a app deve classificar, extrair metadados e indexar a informação. Pensa nisto como desenhar um processo fabril. Se não especificares como a máquina deve tratar os dados, o valor da feature será zero."
+            "descricao": "Arrastar PDFs para a app nao chega; precisas de definir o que acontece depois. Escreve a spec para a feature de Document Drop usando a logica do GitHub Spec Kit: o que o utilizador quer obter, o que fica fora de ambito nesta versao, que duvidas precisam de clarificacao e que sinais mostram que a feature funciona. Pensa nisto como desenhar um processo operacional antes de pedir a alguem para o executar."
         },
         {
           "id": "ex2.3",
           "titulo": "Auditar uma Spec com GLM-5 e OpenCode",
           "pontos": 10,
-          "descricao": "O verdadeiro teste a uma ideia é tentar encontrar os seus pontos de falha antes de escrever código. Pede ao modelo base para fazer um plano de execução da tua spec, e usa as tuas ferramentas locais para uma auditoria impiedosa. O objetivo é destapar ambiguidades, edge cases e critérios de aceite em falta. É um stress-test à tua lógica antes de investires tempo a construir."
+            "descricao": "O verdadeiro teste a uma ideia e tentar encontrar os seus pontos de falha antes de escrever codigo. Usa o fluxo de clarificacao e auditoria do GitHub Spec Kit: primeiro identifica o que ainda esta vago, depois pede um plano de execucao e por fim verifica se os criterios de aceite sao observaveis e testaveis. O objetivo e destapar ambiguidades, edge cases e perguntas em falta antes de investires tempo a construir."
+        },
+        {
+          "id": "ex2.4",
+          "titulo": "Exercício Prático End-to-End: Do CSV à Web",
+          "pontos": 20,
+          "descricao": "Neste exercício guiado, vais viver o fluxo completo do GitHub Spec Kit. 1) Instala o spec kit (`npm install -g specify-cli`). 2) Carrega um ficheiro CSV de dados (ex: `carteira_vida_sample.csv`). 3) Usa `/speckit.specify` para definir uma spec: 'Quero uma página web bonita (usando React/Vercel) que leia este CSV, mostre o total de apólices e a média de idades'. 4) Usa `/speckit.clarify` e `/speckit.plan`. 5) Usa `/speckit.implement` para construir o código. 6) Por fim, cria uma spec adicional para gerar um PDF executivo resumindo os dados da página. Este exercício liga o que aprendeste no Dia 0 (analisar CSV) ao objetivo de criar software visível."
         }
       ],
       "desafio": {
         "id": "des2",
         "titulo": "Pacote de Especificacao MVP",
         "pontos": 25,
-        "descricao": "Entrega o teu pacote de especificação: spec.md, constitution.md e a checklist de aceite para o MVP (Prophet Lite). Este conjunto tem de ser claro o suficiente para que o LLM execute o projeto com autonomia, sem te interromper constantemente com perguntas básicas. Boas fundações hoje poupam-te muita dívida técnica amanhã."
+          "descricao": "Entrega o teu pacote de especificacao do MVP: constitution.md, spec.md, clarificacoes pendentes ou resolvidas e checklist de aceite. O pacote deve mostrar uma cadeia logica clara: a ideia comercial do Dia 1 virou requisitos, os requisitos viraram regras e validacoes, e tudo esta descrito de forma suficientemente concreta para que um LLM trabalhe com autonomia sem inventar comportamento critico."
       },
       "conteudo": {
         "modulo_1": {
-          "titulo": "Spec-Driven Development com Speckit",
+          "titulo": "Da Ideia do Dia 1 a uma Spec Executavel",
           "topicos": [
             {
-              "titulo": "A Skill Central",
-              "conteudo": "A grande vantagem de um founder com LLMs nao e velocidade a programar. E a capacidade de descrever com clareza o comportamento que quer."
+              "titulo": "A Ponte Entre Dia 1 e Dia 2",
+              "conteudo": "No Dia 1 escolheste um cliente, uma dor e uma wedge. Hoje nao começas a programar; começas a traduzir essa ideia para comportamento observavel. Em termos atuariais, e a passagem de um racional de negocio para uma nota tecnica que outra pessoa consegue executar sem inventar pressupostos pelo caminho.",
+              "imagemUrl": "/course-assets/images/day1-to-day2-bridge.svg"
             },
             {
-              "titulo": "Speckit como Estrutura",
-              "conteudo": "Speckit ajuda a transformar requisitos dispersos em blocos claros: objetivo, fluxos, validacoes, edge cases, criterios de aceite e entregaveis."
+              "titulo": "O Que o GitHub Spec Kit E na Pratica",
+              "conteudo": "O GitHub Spec Kit nao e um framework nem uma biblioteca. E um workflow de trabalho com AI: definir principios do projeto, escrever a spec funcional, clarificar zonas vagas, planear a implementacao, quebrar em tarefas e so depois construir. Para um estudante sem background tecnico, isto reduz o risco de pedir codigo cedo demais."
             },
             {
-              "titulo": "Boa Spec, Mau Codigo Evitado",
-              "conteudo": "Muitos erros atribuimos ao modelo quando, na verdade, a instrucao estava vaga. Uma boa spec reduz retrabalho e melhora a qualidade do output."
+              "titulo": "Escrever o Que e Porque Antes do Como",
+              "conteudo": "A metodologia insiste em separar duas conversas. Primeiro: o que a feature faz, para quem serve e como sabemos que esta certa. Depois: tecnologia, arquitetura e ferramentas. Esta ordem e especialmente importante para atuarios sem experiencia tecnica, porque evita misturar regras de negocio com detalhes de implementacao demasiado cedo."
             },
             {
-              "titulo": "Escrever para Maquina e para Equipa",
-              "conteudo": "A spec serve o LLM hoje e uma equipa humana amanha. E documentacao operacional, nao papel burocratico."
+              "titulo": "Uma Boa Spec Parece uma Instrucao Operacional",
+              "conteudo": "Uma boa spec deve ler-se como algo entre procedimento, requisito funcional e checklist de controlo. Se um colega, fornecedor ou LLM nao conseguir perceber o fluxo feliz, os erros previstos e a definicao de pronto, a spec ainda nao esta madura."
             }
           ]
         },
         "modulo_2": {
-          "titulo": "Acceptance Criteria, Git & Iteracao",
+          "titulo": "GitHub Spec Kit na Pratica",
           "topicos": [
             {
-              "titulo": "Constitution.md",
-              "conteudo": "O constitution define regras globais: convencoes de arredondamento, assumptions de referencia, politicas de validacao e principios de interface. Evita inconsistencias entre modulos."
+              "titulo": "Constitution antes de Spec",
+              "conteudo": "No GitHub Spec Kit, o constitution.md vem primeiro. Funciona como um conjunto de principios permanentes: arredondamentos, linguagem de erro, regras de UX, limites de scope e politicas de validacao. Para um atuario, e o equivalente a definir convencoes de modelacao antes de abrir dezenas de folhas e scripts.",
+              "imagemUrl": "/course-assets/images/day2-constitution-flow.svg"
             },
             {
-              "titulo": "Acceptance Criteria",
-              "conteudo": "Cada feature deve responder a uma pergunta simples: como sei que isto esta feito? Sem essa resposta, o LLM vai produzir algo plausivel mas dificil de aprovar."
+              "titulo": "Specify e Clarify",
+              "conteudo": "Depois do constitution, a spec descreve user stories, requisitos e edge cases. A seguir vem a clarificacao: perguntas estruturadas para apanhar zonas cinzentas antes do plano tecnico. Isto e diferente de escrever um prompt unico e esperar que a primeira resposta esteja certa.",
+              "imagemUrl": "/course-assets/images/day2-specify-clarify.svg"
             },
             {
-              "titulo": "Git como Memoria de Decisao",
-              "conteudo": "Nao precisas de dominar Git em profundidade, mas precisas de o usar para guardar versoes de specs, prompts e iteracoes relevantes."
+              "titulo": "Plan, Tasks e Implement",
+              "conteudo": "So depois da spec estar mais solida e que a metodologia entra no como: stack, arquitetura, tarefas e execucao. A grande licao do dia nao e decorar comandos; e perceber que o plano tecnico fica melhor quando os requisitos ja foram limpos, priorizados e testados em linguagem natural."
             },
             {
-              "titulo": "Iterar sem Perder o Norte",
-              "conteudo": "O ciclo ideal e curto: escrever spec, gerar, rever, corrigir, documentar. A velocidade vem da clareza, nao da pressa."
+              "titulo": "Comparacao com Prompting Solto",
+              "conteudo": "Prompting solto e rapido para explorar, mas falha quando ha requisitos, excecoes e verificacoes de negocio. O GitHub Spec Kit acrescenta memoria, ordem e pontos formais de revisao. Perde alguma velocidade inicial, mas ganha previsibilidade e auditabilidade."
+            }
+          ]
+        },
+        "modulo_3": {
+          "titulo": "Acceptance Criteria, Git & Iteracao Leve",
+          "topicos": [
+            {
+              "titulo": "Criterios de Aceite Sao o Teu Teste de Realidade",
+              "conteudo": "Cada feature deve responder a uma pergunta simples: como sei que isto esta feito? Sem essa resposta, o LLM ou a equipa vao produzir algo plausivel mas dificil de aprovar. O criterio de aceite deve ser visivel, especifico e verificavel por alguem nao tecnico."
+            },
+            {
+              "titulo": "Git como Memoria, Nao como Obstaculo",
+              "conteudo": "Nao precisas de dominar Git em profundidade neste dia. Basta perceber a ideia central: guardar versoes das specs, das clarificacoes e dos planos para nao perder decisoes. Para iniciantes, Git entra como historico e seguranca, nao como fim em si mesmo."
+            },
+            {
+              "titulo": "Iterar sem Voltar a Folha em Branco",
+              "conteudo": "O ciclo ideal e curto: escrever, clarificar, rever, corrigir e documentar. A grande vantagem da metodologia e evitar que cada nova conversa com o LLM recomece do zero. Em vez de depender de memoria do chat, dependes de artefactos claros."
+            },
+            {
+              "titulo": "Comparacao com Outras Metodologias",
+              "conteudo": "Comparado com PRDs classicos, o GitHub Spec Kit e mais operativo porque foi pensado para alimentar agentes de AI. Comparado com Agile puro, e menos centrado em cerimonias e mais centrado em artefactos. Comparado com Waterfall, mantem estrutura documental mas permite iteracao curta. Comparado com TDD, age mais a montante: melhora a definicao do problema antes dos testes e antes do codigo."
             }
           ]
         }
@@ -568,7 +599,8 @@
             },
             {
               "titulo": "Prophet Lite",
-              "conteudo": "A proposta deste bootcamp e um workspace pequeno para Vida: assumptions, model points, run deterministic, resultados, copiloto AI e memos/documentos ligados ao trabalho."
+              "conteudo": "A proposta deste bootcamp e um workspace pequeno para Vida: assumptions, model points, run deterministic, resultados, copiloto AI e memos/documentos ligados ao trabalho.",
+              "mermaid": "graph TD\n    A[Model Points CSV] --> C{Motor de Projeção}\n    B[Assumptions / Tábuas] --> C\n    C --> D[Resultados (Dashboard)]\n    E[Document Drop / Memos] --> F[AI Copilot]\n    D --> F\n    F --> G[Insights & Audit Trail]\n    style C fill:#f0fdf4,stroke:#10b981\n    style F fill:#eff6ff,stroke:#3b82f6"
             }
           ]
         },
@@ -657,7 +689,8 @@
           "topicos": [
             {
               "titulo": "RAG como Memoria",
-              "conteudo": "RAG ajuda a recuperar contexto de documentos sem fingir que o modelo sabe tudo. E especialmente util para clausulados, memos e docs internos."
+              "conteudo": "RAG ajuda a recuperar contexto de documentos sem fingir que o modelo sabe tudo. E especialmente util para clausulados, memos e docs internos.",
+              "mermaid": "sequenceDiagram\n    participant U as Utilizador\n    participant A as Aplicação\n    participant DB as Vector DB (Chroma)\n    participant AI as Modelo (DeepSeek)\n    U->>A: Faz pergunta sobre as assumptions\n    A->>DB: Procura documentos similares\n    DB-->>A: Retorna Memos Relevantes\n    A->>AI: Pede resposta usando Memos + Pergunta\n    AI-->>U: Responde com base nos factos (com fonte)"
             },
             {
               "titulo": "Review Humano e Obrigatorio",
@@ -804,7 +837,8 @@
             },
             {
               "titulo": "Cash Flows Primeiro",
-              "conteudo": "Antes de pensar em features sofisticadas, o motor tem de conseguir produzir cash flows coerentes e consistentes com a spec."
+              "conteudo": "Antes de pensar em features sofisticadas, o motor tem de conseguir produzir cash flows coerentes e consistentes com a spec.",
+              "mermaid": "stateDiagram-v2\n    direction LR\n    [*] --> Input_Data\n    Input_Data --> Projection\n    state Projection {\n      [*] --> Calc_Decrements\n      Calc_Decrements --> Calc_Cashflows\n      Calc_Cashflows --> Calc_Reserves\n      Calc_Reserves --> Profit_Signature\n    }\n    Projection --> Output_Results\n    Output_Results --> [*]"
             },
             {
               "titulo": "Assumptions como Camada Separada",
@@ -956,7 +990,8 @@
           "topicos": [
             {
               "titulo": "Local Primeiro, Cloud Depois",
-              "conteudo": "Esta ordem reduz stress e acelera aprendizagem. So faz sentido deployar depois de o fluxo principal funcionar localmente."
+              "conteudo": "Esta ordem reduz stress e acelera aprendizagem. So faz sentido deployar depois de o fluxo principal funcionar localmente.",
+              "mermaid": "flowchart LR\n    subgraph Local [A Tua Máquina]\n        C[Código e Motor] \n        K[.env / API Keys]\n    end\n    C -- git push --> G[GitHub]\n    subgraph Cloud [Servidor Web / Streamlit]\n        A[A Tua App Online]\n        S[Secrets / Variáveis de Ambiente]\n    end\n    G -->|Faz Build automático| A\n    K -. Copias à mão .-> S\n    A --> U((O teu Cliente))\n    style Local fill:#f8fafc,stroke:#cbd5e1\n    style Cloud fill:#f0fdf4,stroke:#10b981\n    style K fill:#fee2e2,stroke:#ef4444"
             },
             {
               "titulo": "Secrets e Higiene",

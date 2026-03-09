@@ -31,6 +31,8 @@ export default function ResourcesPage() {
             title={`Recursos ${group.title}`}
             subtitle={group.description}
             resources={group.files}
+            collapsible
+            startExpanded={group.id === "day-0"}
           />
         ))}
       </div>

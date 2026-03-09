@@ -137,11 +137,23 @@ src/
 
 The floating AI Tutor widget (`src/components/ai-tutor-widget.tsx`) is available on every page for authenticated students. It:
 
-- Fetches the shared DeepSeek API key from `config/keys` in Firestore
-- Calls `https://api.deepseek.com/chat/completions` (model: `deepseek-chat`, temperature: 0.4)
+- Calls DeepSeek through the server route `src/app/api/tutor/route.ts` for tutor chat
+- Calls DeepSeek through the server route `src/app/api/review/route.ts` for structured exercise review
 - Sends the full bootcamp system prompt + current day context
 - Keeps up to 20 conversation turns (trims older messages to control cost)
 - Guides students without giving complete answers
+
+Structured review is now embedded directly into high-value mission days:
+
+- Day 1 — all exercises + challenge
+- Day 2 — spec work and MVP package
+- Day 5 — MVP scope, governance and blueprint
+- Day 6 — document drop, schema and knowledge workspace
+- Day 10 — deploy, launch narrative and final public release
+
+Review results are stored on `students/{uid}` under `day1Answers` and `day1Reviews` for now, so portfolio and admin views can surface the latest coach-style feedback.
+
+For production, set `DEEPSEEK_API_KEY` on the server so neither tutor chat nor structured review expose the provider key in the browser.
 
 The system prompt is in `src/lib/ai-tutor-context.ts`, ported from the original `lib/ai.py`.
 
@@ -151,7 +163,7 @@ The system prompt is in `src/lib/ai-tutor-context.ts`, ported from the original 
 
 Route: `/admin`
 
-Access is restricted to emails in `ADMIN_EMAILS` (`src/app/admin/page.tsx`). Currently: `pedro@stratfordgeek.com`.
+Access is restricted to emails in `src/lib/admin.ts`. Currently: `fixola1986@gmail.com`.
 
 Features:
 - **Keys tab** — view and update `config/keys` in Firestore

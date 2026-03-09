@@ -13,7 +13,7 @@ export function getReviewPreset(itemId: string): ReviewPreset {
     case "ex1.4":
       return {
         extraContext:
-          "A resposta deve apontar dores concretas, recorrentes e vendaveis; respostas vagas ou demasiado amplas devem ser penalizadas.",
+          "A resposta deve apontar dores concretas, recorrentes e vendaveis; se estiver vaga ou demasiado ampla, ajuda o aluno a torná-la mais concreta.",
       };
     case "des1":
       return {
@@ -34,13 +34,13 @@ export function getReviewPreset(itemId: string): ReviewPreset {
     case "des5":
       return {
         extraContext:
-          "Penaliza scope creep e valoriza cortes de scope que tornem o MVP mais vendavel e mais rapido de construir.",
+          "Ajuda o aluno a evitar scope creep e valoriza cortes de scope que tornem o MVP mais vendavel e mais rapido de construir.",
       };
     case "ex6.3":
     case "des6":
       return {
         extraContext:
-          "Valoriza workflows com review humana, memoria util e queries de negocio concretas; nao premiar automacao total vaga.",
+          "Valoriza workflows com review humana, memoria util e queries de negocio concretas; ajuda o aluno a evitar automacao total vaga.",
       };
     case "ex10.1":
     case "des10":

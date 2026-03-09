@@ -8,24 +8,6 @@ import { isAdminEmail } from "@/lib/admin";
 import { course, days, missionItems } from "@/lib/course";
 import { useStudentState } from "@/lib/use-student-state";
 
-const buildLoop = [
-  {
-    step: "01",
-    title: "Escolhe o foco do dia",
-    body: "Entra, vê o próximo passo e evita cair numa homepage de marketing sempre que voltas ao workspace.",
-  },
-  {
-    step: "02",
-    title: "Constrói localmente",
-    body: "O site orienta, mas o progresso real acontece no terminal, no código e nas entregas que guardas.",
-  },
-  {
-    step: "03",
-    title: "Fecha com prova",
-    body: "Checklist, notas e artefactos ficam ligados ao teu perfil para continuares sem perder contexto.",
-  },
-];
-
 const publicSignals = [
   { value: `${days.length}`, label: "dias com missões reais" },
   { value: `${course.totalPoints}`, label: "pontos ligados a entregas" },
@@ -35,10 +17,16 @@ const publicSignals = [
 export default function Home() {
   const { user, loading } = useAuth();
   const { stickyNotes, progress } = useStudentState();
-
-  const startedItems = missionItems.filter((item) => progress[item.id]).length;
+  const completedItems = missionItems.filter((item) => progress[item.id]);
+  const completedCount = completedItems.length;
+  const completedPoints = completedItems.reduce((sum, item) => sum + item.points, 0);
+  const completedDays = days.filter((day) => {
+    const missionIds = [...day.exercicios.map((item) => item.id), day.desafio.id];
+    return missionIds.every((id) => progress[id]);
+  }).length;
   const nextMission =
     missionItems.find((item) => !progress[item.id])?.slug ?? days.at(-1)?.slug ?? "00";
+  const currentDay = days.find((day) => day.slug === nextMission) ?? days[0];
   const isAdmin = isAdminEmail(user?.email);
 
   if (!loading && user) {
@@ -61,14 +49,14 @@ export default function Home() {
                 </div>
 
                 <h1 className="mt-6 max-w-5xl font-serif text-[3.1rem] leading-[0.92] tracking-[-0.04em] text-[var(--foreground)] sm:text-[4.4rem] xl:text-[5rem]">
-                  Bem-vindo de volta.
+                  Retoma o Dia {nextMission}.
                   <br />
-                  <span className="text-[var(--accent)]">Continua a construir</span> sem ruído.
+                  <span className="text-[var(--accent)]">Sem clutter.</span>
                 </h1>
 
                 <p className="mt-5 max-w-2xl text-base leading-8 text-[var(--muted-foreground)] sm:text-lg">
-                  Esta home passa a ser o teu cockpit: próximo dia, progresso, notas e acessos úteis.
-                  Menos landing. Mais sistema de trabalho.
+                  O dashboard deve fazer uma coisa primeiro: levar-te de volta ao trabalho certo.
+                  O resto fica como apoio, nao como distração.
                 </p>
 
                 <div className="mt-7 flex flex-wrap gap-3">
@@ -86,75 +74,92 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
-                <div className="metric-card rounded-[1.5rem] p-5">
-                  <p className="text-xs uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
-                    Itens tocados
-                  </p>
-                  <p className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-[var(--foreground)]">
-                    {startedItems}
-                  </p>
-                </div>
-                <div className="metric-card rounded-[1.5rem] p-5">
-                  <p className="text-xs uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
-                    Notas ativas
-                  </p>
-                  <p className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-[var(--foreground)]">
-                    {stickyNotes.length}
-                  </p>
-                </div>
-                <div className="metric-card rounded-[1.5rem] p-5">
-                  <p className="text-xs uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
-                    Próximo foco
-                  </p>
-                  <p className="mt-3 text-xl font-semibold tracking-[-0.03em] text-[var(--foreground)]">
-                    Dia {nextMission}
-                  </p>
+              <div className="panel-soft rounded-[1.8rem] p-5 sm:p-6">
+                <p className="text-xs uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
+                  Agora
+                </p>
+                <h2 className="mt-3 text-2xl font-semibold tracking-[-0.03em] text-[var(--foreground)]">
+                  Dia {currentDay.slug}: {currentDay.titulo}
+                </h2>
+                <p className="mt-3 text-sm leading-7 text-[var(--muted-foreground)]">
+                  {currentDay.objetivo}
+                </p>
+                <div className="mt-5 flex flex-wrap gap-2">
+                  <span className="glass-pill rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">
+                    {currentDay.exercicios.length} exercicios
+                  </span>
+                  <span className="glass-pill rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">
+                    {currentDay.totalMissionPoints} pts
+                  </span>
+                  <span className="glass-pill rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">
+                    {stickyNotes.length} notas
+                  </span>
                 </div>
               </div>
             </div>
           </section>
 
-          <ProgressHub items={missionItems} days={days} />
-
-          <section className="grid gap-5 lg:grid-cols-[0.88fr_1.12fr]">
-            <div className="panel shell-frame rounded-[2rem] p-6 sm:p-8">
-              <p className="kicker">Ritmo de trabalho</p>
+          <section className="grid gap-5 xl:grid-cols-[0.95fr_1.05fr]">
+            <div className="panel-tech shell-frame soft-grid rounded-[2rem] p-6 sm:p-8">
+              <p className="kicker">Progresso</p>
               <h2 className="mt-3 font-serif text-3xl tracking-[-0.03em] text-[var(--foreground)] sm:text-4xl">
-                Três momentos. Zero clutter.
+                O que ja ficou feito.
               </h2>
-
-              <div className="mt-6 space-y-4">
-                {buildLoop.map((item) => (
-                  <div key={item.step} className="panel-soft relative rounded-[1.5rem] p-4 pl-16 sm:p-5 sm:pl-18">
-                    <div className="absolute left-4 top-4 flex h-10 w-10 items-center justify-center rounded-2xl bg-[var(--cool-accent-soft)] text-sm font-semibold text-[var(--cool-accent)]">
-                      {item.step}
-                    </div>
-                    <p className="text-base font-semibold text-[var(--foreground)]">{item.title}</p>
-                    <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">{item.body}</p>
-                  </div>
-                ))}
+              <div className="mt-6 grid gap-3 sm:grid-cols-3 xl:grid-cols-1">
+                <div className="metric-card rounded-[1.45rem] p-5">
+                  <p className="text-xs uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
+                    Dias concluidos
+                  </p>
+                  <p className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+                    {completedDays}
+                    <span className="ml-2 text-base font-normal text-[var(--muted-foreground)]">
+                      / {days.length}
+                    </span>
+                  </p>
+                </div>
+                <div className="metric-card rounded-[1.45rem] p-5">
+                  <p className="text-xs uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
+                    Itens fechados
+                  </p>
+                  <p className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+                    {completedCount}
+                    <span className="ml-2 text-base font-normal text-[var(--muted-foreground)]">
+                      / {missionItems.length}
+                    </span>
+                  </p>
+                </div>
+                <div className="metric-card rounded-[1.45rem] p-5">
+                  <p className="text-xs uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
+                    Pontos capturados
+                  </p>
+                  <p className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+                    {completedPoints}
+                    <span className="ml-2 text-base font-normal text-[var(--muted-foreground)]">
+                      / {course.totalPoints}
+                    </span>
+                  </p>
+                </div>
               </div>
             </div>
 
             <div className="panel shell-frame rounded-[2rem] p-6 sm:p-8">
-              <p className="kicker">Acessos rápidos</p>
+              <p className="kicker">Ferramentas</p>
               <h2 className="mt-3 font-serif text-3xl tracking-[-0.03em] text-[var(--foreground)] sm:text-4xl">
-                O que precisas agora.
+                Atalhos uteis, sem repeticao.
               </h2>
               <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                <AppLink href={`/missions/${nextMission}`} className="panel-soft rounded-[1.45rem] p-5 transition duration-300 hover:border-[var(--cool-accent)] hover:bg-white">
-                  <p className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[var(--accent)]">Missão</p>
-                  <p className="mt-3 text-base font-semibold text-[var(--foreground)]">Retomar Dia {nextMission}</p>
-                </AppLink>
                 <AppLink href="/portfolio" className="panel-soft rounded-[1.45rem] p-5 transition duration-300 hover:border-[var(--cool-accent)] hover:bg-white">
                   <p className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[var(--accent)]">Portfolio</p>
-                  <p className="mt-3 text-base font-semibold text-[var(--foreground)]">Ver progresso e entregas</p>
+                  <p className="mt-3 text-base font-semibold text-[var(--foreground)]">Ver entregas e progresso</p>
                 </AppLink>
                 <AppLink href="/resources" className="panel-soft rounded-[1.45rem] p-5 transition duration-300 hover:border-[var(--cool-accent)] hover:bg-white">
                   <p className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[var(--accent)]">Recursos</p>
-                  <p className="mt-3 text-base font-semibold text-[var(--foreground)]">Abrir ficheiros e referências</p>
+                  <p className="mt-3 text-base font-semibold text-[var(--foreground)]">Abrir ficheiros e referencias</p>
                 </AppLink>
+                <div className="panel-soft rounded-[1.45rem] p-5">
+                  <p className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[var(--accent)]">Notas</p>
+                  <p className="mt-3 text-base font-semibold text-[var(--foreground)]">{stickyNotes.length} guardadas no workspace</p>
+                </div>
                 {isAdmin ? (
                   <AppLink href="/admin" className="panel-soft rounded-[1.45rem] p-5 transition duration-300 hover:border-[var(--cool-accent)] hover:bg-white">
                     <p className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[var(--accent)]">Admin</p>
@@ -165,7 +170,17 @@ export default function Home() {
             </div>
           </section>
 
-          <RoadmapBoard days={days} />
+          <details className="panel shell-frame rounded-[2rem] p-6 sm:p-8">
+            <summary className="cursor-pointer list-none">
+              <p className="kicker">Roteiro do curso</p>
+              <h2 className="mt-3 font-serif text-3xl tracking-[-0.03em] text-[var(--foreground)] sm:text-4xl">
+                Abre o mapa completo so quando precisares de replanear.
+              </h2>
+            </summary>
+            <div className="mt-6">
+              <RoadmapBoard days={days} />
+            </div>
+          </details>
         </div>
       </main>
     );

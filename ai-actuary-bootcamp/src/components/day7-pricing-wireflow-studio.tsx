@@ -534,7 +534,7 @@ export function Day7PricingWireflowStudio() {
                   Brief de build copiavel
                 </p>
                 <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">
-                  Bloco pronto para OpenCode, Z.ai, Speckit ou outra ferramenta local.
+                  Bloco pronto para OpenCode, Z.ai, GitHub Spec Kit ou outra ferramenta local.
                 </p>
               </div>
               <button

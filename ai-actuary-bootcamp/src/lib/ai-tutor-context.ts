@@ -11,7 +11,7 @@ export const COURSE_CONTEXT = {
       "Atuarios que querem tornar-se builders e fundadores AI-native, mesmo sem background de coding tradicional",
     objetivo:
       "Construir um Prophet Lite com AI Copilot: local primeiro, deploy depois, com narrativa de mercado e lancamento claro",
-    formador: "Peter (pedro@stratfordgeek.com)",
+    formador: "Peter (fixola1986@gmail.com)",
     metodologia:
       "Spec-Driven Development (SDD) -- escrever spec primeiro, gerar codigo com AI, auditar com checklist",
     filosofia:
@@ -41,6 +41,19 @@ export const COURSE_CONTEXT = {
         "question (perguntar ao utilizador)",
         "todowrite/todoread (gerir tarefas)",
       ],
+      github_spec_kit: {
+        descricao: "Uma metodologia open-source para criar software guiando agentes de IA de forma previsível. Transforma ideias vagas em especificações executáveis.",
+        instalacao: "npm install -g specify-cli",
+        comandos_chave: [
+          "/speckit.constitution (Define regras globais do projeto)",
+          "/speckit.specify (Descreve o comportamento de uma feature concreta e seus edge cases)",
+          "/speckit.clarify (Força o LLM a fazer perguntas para eliminar ambiguidades antes de codar)",
+          "/speckit.plan (Gera um plano arquitetural técnico)",
+          "/speckit.tasks (Quebra o plano em passos pequenos e independentes)",
+          "/speckit.implement (Executa as tarefas gerando o código)"
+        ],
+        filosofia: "Falar sobre o 'o que' e o 'porquê' (com specify/clarify) ANTES de falar sobre o 'como' (com plan/implement)."
+      },
       cli_comandos: {
         opencode: "Abre a TUI interativa",
         "opencode run 'prompt'": "Executa prompt sem TUI (modo headless)",
@@ -107,7 +120,7 @@ export const COURSE_CONTEXT = {
     dia_1:
       "Mudanca de identidade: de atuario a fundador AI-native. Vocabulario, memo do fundador, 3 frustracoes vendaveis.",
     dia_2:
-      "Specs com Speckit: spec.md, constitution.md, acceptance criteria, coding plans com GLM-5.",
+      "GitHub Spec Kit: constitution, spec.md, specify, clarify, acceptance criteria e planos de build com AI. Inclui exercicio pratico end-to-end (CSV para Vercel + PDF) usando a metodologia para ganhar fluencia.",
     dia_3:
       "Dados como interfaces: CSV, JSON, YAML, model points, assumptions, API calls.",
     dia_4:
@@ -132,7 +145,7 @@ export const COURSE_CONTEXT = {
     fim_dia_1:
       "Dominas o vocabulario novo, sabes a diferenca entre vender horas e vender produto, tens um memo do fundador.",
     fim_dia_2:
-      "Consegues escrever specs que um LLM consegue implementar sem ambiguidades centrais.",
+      "Consegues escrever specs executaveis seguindo o fluxo do GitHub Spec Kit e completaste um exercicio prático que transformou um CSV de dados numa página web funcional, validando o conceito de ir do texto ao software com AI.",
     fim_dia_3:
       "Percebes os dados, os schemas e as APIs necessarias para ligar inputs, runs e outputs do MVP.",
     fim_dia_4:
@@ -164,6 +177,7 @@ Corro sobre o DeepSeek, mas pensa em mim como o teu par tecnico — estou aqui p
 O QUE ESTE BOOTCAMP ESTA A CONSTRUIR:
 O aluno esta a construir o Prophet Lite — uma versao moderna, acessivel e com copiloto AI do FIS Prophet,
 o software de projecao atuarial que domina o mercado mas custa caro e e dificil de usar.
+No Dia 2, focamos muito no GitHub Spec Kit, ensinando-o a estruturar pedidos (specify, clarify) antes de codar (plan, implement), com um exercicio pratico end-to-end transformando CSV em App Web/PDF via CLI.
 O cliente alvo sao equipas atuariais pequenas (3-10 pessoas) em seguradoras e consultoras portuguesas
 que ainda usam Excel para fazer projecoes de vida. O produto resolve: lentidao, erros de copy-paste,
 falta de audit trail, e ausencia de explicacao automatica dos calculos.
@@ -230,6 +244,7 @@ COMO DEVES RESPONDER:
 
 5. SE O ALUNO PERGUNTAR "POR ONDE COMEÇO?", DAI UM PROXIMO PASSO CONCRETO.
    Nao uma lista de opcoes. Um passo. "Abre o terminal. Escreve este comando. Volta com o output."
+   Se for no Dia 2 (GitHub Spec Kit), diz para ele comecar pelo "specify", escrevendo o que a feature deve fazer em negocio, e depois usar o "clarify" para o LLM achar as zonas cinzentas.
 
 6. NAO RESOLVAS O EXERCICIO PELO ALUNO.
    Se pedirem codigo completo, da pseudo-codigo ou a estrutura do raciocinio.

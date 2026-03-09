@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Rnd } from "react-rnd";
 import { useAuth } from "@/lib/auth-context";
 import { useStudentState } from "@/lib/use-student-state";
+import { useIsMobile } from "@/lib/use-is-mobile";
 import { type StickyColor, type StickyNote } from "@/lib/student-state";
 
 // ---------------------------------------------------------------------------
@@ -60,49 +61,55 @@ export function StickyNotesWidget() {
 
   const [open, setOpen] = useState(false);
   const [activeColor, setActiveColor] = useState<StickyColor>("yellow");
+  const isMobile = useIsMobile();
 
-  function applyUpdate(next: StickyNote[]) {
+  function applyUpdate(next: StickyNote[] | ((current: StickyNote[]) => StickyNote[])) {
     updateStickyNotes(next);
   }
 
   // ---- CRUD ----
 
   function addNote() {
-    const pos = spawnPosition(stickyNotes.length);
-    const note: StickyNote = {
-      id: newId(),
-      content: "",
-      color: activeColor,
-      x: pos.x,
-      y: pos.y,
-      width: 220,
-      height: 180,
-      createdAt: Date.now(),
-    };
-    applyUpdate([...stickyNotes, note]);
+    applyUpdate((current) => {
+      const pos = spawnPosition(current.length);
+      const note: StickyNote = {
+        id: newId(),
+        content: "",
+        color: activeColor,
+        x: pos.x,
+        y: pos.y,
+        width: 220,
+        height: 180,
+        createdAt: Date.now(),
+      };
+
+      return [...current, note];
+    });
   }
 
   function updateContent(id: string, content: string) {
-    applyUpdate(stickyNotes.map((n) => (n.id === id ? { ...n, content } : n)));
+    applyUpdate((current) => current.map((n) => (n.id === id ? { ...n, content } : n)));
   }
 
   function updatePosition(id: string, x: number, y: number) {
-    applyUpdate(stickyNotes.map((n) => (n.id === id ? { ...n, x, y } : n)));
+    applyUpdate((current) => current.map((n) => (n.id === id ? { ...n, x, y } : n)));
   }
 
-  function updateSize(id: string, width: number, height: number) {
-    applyUpdate(stickyNotes.map((n) => (n.id === id ? { ...n, width, height } : n)));
+  function updateFrame(id: string, patch: Partial<Pick<StickyNote, "x" | "y" | "width" | "height">>) {
+    applyUpdate((current) => current.map((n) => (n.id === id ? { ...n, ...patch } : n)));
   }
 
   function updateColor(id: string, color: StickyColor) {
-    applyUpdate(stickyNotes.map((n) => (n.id === id ? { ...n, color } : n)));
+    applyUpdate((current) => current.map((n) => (n.id === id ? { ...n, color } : n)));
   }
 
   function deleteNote(id: string) {
-    applyUpdate(stickyNotes.filter((n) => n.id !== id));
+    applyUpdate((current) => current.filter((n) => n.id !== id));
   }
 
   if (!user) return null;
+
+  if (isMobile) return null;
 
   return (
     <>
@@ -128,10 +135,14 @@ export function StickyNotesWidget() {
               bounds="window"
               dragHandleClassName="sticky-drag-handle"
               onDragStop={(_e, d) => updatePosition(note.id, d.x, d.y)}
-              onResizeStop={(_e, _dir, ref, _delta, pos) => {
-                updateSize(note.id, ref.offsetWidth, ref.offsetHeight);
-                updatePosition(note.id, pos.x, pos.y);
-              }}
+              onResizeStop={(_e, _dir, ref, _delta, pos) =>
+                updateFrame(note.id, {
+                  width: ref.offsetWidth,
+                  height: ref.offsetHeight,
+                  x: pos.x,
+                  y: pos.y,
+                })
+              }
               style={{ zIndex: 9999 }}
             >
               <div

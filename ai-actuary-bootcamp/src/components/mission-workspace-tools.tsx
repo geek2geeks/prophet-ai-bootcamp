@@ -19,21 +19,17 @@ type Challenge = {
 
 type Props = {
   dayNumber: number;
-  daySlug: string;
   dayTitle: string;
   exercises: Exercise[];
   challenge: Challenge;
-  cliLabel: string;
   artifactList?: string[];
 };
 
 export function MissionWorkspaceTools({
   dayNumber,
-  daySlug,
   dayTitle,
   exercises,
   challenge,
-  cliLabel,
   artifactList,
 }: Props) {
   const { progress, toggleProgress, loading, day1Answers, day1Reviews } = useStudentState();
@@ -46,14 +42,11 @@ export function MissionWorkspaceTools({
   const totalPoints = items.reduce((sum, item) => sum + item.pontos, 0);
   const completionRatio = Math.round((completedCount / items.length) * 100) || 0;
 
-  // daySlug and dayNumber are used in section labels — kept for reference
-  void daySlug;
-
   return (
     <div className="space-y-4">
       <section className="panel-tech shell-frame rounded-[1.9rem] p-5">
         <p className="kicker">
-          Hoje em resumo
+          Progresso do fluxo
         </p>
         <h2 className="mt-3 text-lg font-semibold text-[var(--foreground)]">
           Dia {dayNumber.toString().padStart(2, "0")} · {dayTitle}
@@ -74,11 +67,14 @@ export function MissionWorkspaceTools({
             <span>{completedPoints}/{totalPoints} pts</span>
           </div>
         </div>
+        <p className="mt-4 text-sm leading-7 text-[var(--muted-foreground)]">
+          Este bloco acompanha o teu progresso, mas o trabalho deve acontecer de cima para baixo na pagina.
+        </p>
       </section>
 
       <section className="panel shell-frame rounded-[1.75rem] p-5">
         <p className="kicker">
-          Checklist de sucesso
+          O que falta fechar
         </p>
         <div className="mt-4 space-y-3">
           {exercises.map((exercise) => {
@@ -160,30 +156,10 @@ export function MissionWorkspaceTools({
         </div>
       </section>
 
-      <section className="panel shell-frame rounded-[1.75rem] p-5">
-        <p className="kicker">
-          Modo de trabalho
-        </p>
-        <div className="mt-4 space-y-3 text-sm leading-7 text-[var(--muted-foreground)]">
-          <div className="panel-soft rounded-2xl p-4">
-            <p className="font-semibold text-[var(--foreground)]">Na plataforma</p>
-            <p className="mt-1">Ler a aula, acompanhar o progresso, guardar notas e capturar a prova do que foi feito.</p>
-          </div>
-          <div className="panel-soft rounded-2xl p-4">
-            <p className="font-semibold text-[var(--foreground)]">Nas ferramentas locais</p>
-            <p className="mt-1">{cliLabel}</p>
-          </div>
-          <div className="panel-soft rounded-2xl p-4">
-            <p className="font-semibold text-[var(--foreground)]">Pronto para avancar quando</p>
-            <p className="mt-1">As notas da aula capturam o insight chave, o trabalho local produziu um artefacto util e o desafio ficou marcado como concluido.</p>
-          </div>
-        </div>
-      </section>
-
       {artifactList?.length ? (
         <section className="panel shell-frame rounded-[1.75rem] p-5">
           <p className="kicker">
-            Artefactos a guardar
+            Guardar no fim
           </p>
           <div className="mt-4 space-y-3 text-sm leading-7 text-[var(--muted-foreground)]">
             {artifactList.map((artifact) => (
@@ -197,17 +173,6 @@ export function MissionWorkspaceTools({
           </div>
         </section>
       ) : null}
-
-      {/* Sticky notes tip */}
-      <section className="panel shell-frame rounded-[1.75rem] p-5">
-        <p className="kicker">
-          Notas
-        </p>
-        <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">
-          Usa o widget <span className="font-semibold text-[var(--foreground)]">Notas</span> no canto inferior esquerdo para criar sticky notes livres —
-          arrasta, redimensiona e muda a cor. Ficam guardadas automaticamente no teu perfil.
-        </p>
-      </section>
     </div>
   );
 }

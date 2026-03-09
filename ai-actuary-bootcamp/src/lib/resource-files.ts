@@ -82,12 +82,20 @@ export const RESOURCE_GROUPS: ResourceGroup[] = [
   {
     id: "day-2",
     title: "Dia 2",
-    description: "Templates base para Specification-Driven Development. Como orientar a IA com specs rigorosas.",
+    description: "Recursos introdutorios para GitHub Spec Kit e Specification-Driven Development, pensados para estudantes sem background tecnico.",
     files: [
+      {
+        id: "docs/spec_kit_primer.md",
+        title: "spec_kit_primer.md",
+        description: "Explicacao simples do GitHub Spec Kit, da ordem constitution -> specify -> clarify -> plan -> tasks -> implement e comparacao com outras metodologias.",
+        relativePath: ["public", "course-assets", "docs", "spec_kit_primer.md"],
+        mimeType: "text/markdown; charset=utf-8",
+        kind: "markdown",
+      },
       {
         id: "docs/template_spec.md",
         title: "template_spec.md",
-        description: "Estrutura para definir fluxos, edge cases e critérios de aceite.",
+        description: "Template simples para transformar uma ideia de produto em spec funcional com objetivo, fluxos, fora de ambito, clarificacoes e criterios de aceite.",
         relativePath: ["public", "course-assets", "docs", "template_spec.md"],
         mimeType: "text/markdown; charset=utf-8",
         kind: "markdown",
@@ -95,7 +103,7 @@ export const RESOURCE_GROUPS: ResourceGroup[] = [
       {
         id: "docs/template_constitution.md",
         title: "template_constitution.md",
-        description: "Arquivo de regras e convenções (Design, Tech e Matemática) para garantir consistência no código gerado.",
+        description: "Template de principios permanentes do projeto: UX, linguagem de erro, convencoes de dados, limites do MVP e regras matematicas.",
         relativePath: ["public", "course-assets", "docs", "template_constitution.md"],
         mimeType: "text/markdown; charset=utf-8",
         kind: "markdown",

@@ -48,7 +48,7 @@ const TEMPLATES: Record<
         "O utilizador percebe em menos de 30 segundos se o ficheiro pode entrar no sistema e recebe mensagens acionaveis para corrigir o problema.",
     },
     prompt:
-      "Usa esta spec para gerar um spec.md final em formato Speckit. Confirma ambiguidades, edge cases e criterios de aceite antes de sugerir implementacao.",
+      "Usa esta spec para gerar um spec.md final em formato GitHub Spec Kit. Confirma ambiguidades, edge cases e criterios de aceite antes de sugerir implementacao.",
   },
   "document-drop": {
     label: "Document Drop",
@@ -186,8 +186,8 @@ export function Day2SpecStudio() {
             Escrever uma spec que o LLM consegue implementar.
           </h2>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--muted-foreground)]">
-            Em vez de uma folha em branco, o estudante monta a spec por blocos, valida o
-            scope do MVP e sai com um pacote pronto para Speckit, Z.ai ou OpenCode rever.
+             Em vez de uma folha em branco, o estudante monta a spec por blocos, valida o
+             scope do MVP e sai com um pacote pronto para GitHub Spec Kit, Z.ai ou OpenCode rever.
           </p>
         </div>
 
@@ -293,7 +293,7 @@ export function Day2SpecStudio() {
                   Prompt para ferramentas locais
                 </p>
                 <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">
-                  Usa este bloco como base para Speckit, GLM-5, Z.ai ou OpenCode.
+                  Usa este bloco como base para GitHub Spec Kit, GLM-5, Z.ai ou OpenCode.
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">

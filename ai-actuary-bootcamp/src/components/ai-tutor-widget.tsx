@@ -6,6 +6,7 @@ import { AppLink } from "@/components/app-link";
 import { useAuth } from "@/lib/auth-context";
 import { isAdminEmail } from "@/lib/admin";
 import { db } from "@/lib/firebase";
+import { useIsMobile } from "@/lib/use-is-mobile";
 import {
   buildMessages,
   type TutorMessage,
@@ -28,6 +29,7 @@ type Props = {
   dayTitle?: string;
   completedDays?: number[];
   currentProgress?: Record<string, boolean>;
+  mobileEmbedded?: boolean;
 };
 
 const EMPTY_COMPLETED_DAYS: number[] = [];
@@ -490,6 +492,7 @@ export function AiTutorWidget({
   dayTitle,
   completedDays = EMPTY_COMPLETED_DAYS,
   currentProgress = EMPTY_PROGRESS,
+  mobileEmbedded = false,
 }: Props) {
   const { user } = useAuth();
 
@@ -526,6 +529,7 @@ export function AiTutorWidget({
 
   const studentName = user?.displayName?.split(" ")[0] ?? null;
   const isAdmin = isAdminEmail(user?.email);
+  const isMobile = useIsMobile();
 
   // -------------------------------------------------------------------------
   // Load Firestore progress when widget opens
@@ -838,7 +842,7 @@ export function AiTutorWidget({
   // Render
   // -------------------------------------------------------------------------
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
+    <div className={`${mobileEmbedded ? "relative flex" : isMobile ? "hidden md:flex" : "fixed bottom-6 right-6 z-50 flex"} flex-col items-end gap-3`}>
       {/* ------------------------------------------------------------------ */}
       {/* Chat panel                                                          */}
       {/* ------------------------------------------------------------------ */}

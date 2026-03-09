@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 350">
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .box-main { fill: #f0fdf4; stroke: #10b981; stroke-width: 2; rx: 8; }
+      .box-sub { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; rx: 8; }
+      .text-title { font-family: system-ui, sans-serif; font-size: 16px; font-weight: bold; fill: #0f172a; text-anchor: middle; }
+      .text-desc { font-family: system-ui, sans-serif; font-size: 13px; fill: #475569; text-anchor: middle; }
+      .text-actuary { font-family: system-ui, sans-serif; font-size: 12px; font-weight: 600; fill: #3b82f6; text-anchor: middle; }
+      .line { stroke: #10b981; stroke-width: 2; stroke-dasharray: 4; fill: none; }
+      .arrow-head { fill: #10b981; }
+    </style>
+  </defs>
+
+  <rect width="100%" height="100%" class="bg" />
+
+  <!-- Constitution -->
+  <g transform="translate(250, 20)">
+    <rect width="300" height="110" class="box-main" />
+    <text x="150" y="30" class="text-title">constitution.md</text>
+    <text x="150" y="55" class="text-desc">Regras Globais do Projeto</text>
+    <text x="150" y="75" class="text-desc">(ex: Arredondar a 2 casas, UI em Português)</text>
+    <text x="150" y="95" class="text-actuary">Analogia: Normas da ASF / Diretrizes Atuariais</text>
+  </g>
+
+  <!-- Flow lines down -->
+  <path d="M 400 130 L 400 160" class="line" />
+  <path d="M 400 160 L 200 160 L 200 180" class="line" />
+  <path d="M 400 160 L 600 160 L 600 180" class="line" />
+
+  <polygon points="195,180 205,180 200,190" class="arrow-head" />
+  <polygon points="395,180 405,180 400,190" class="arrow-head" />
+  <polygon points="595,180 605,180 600,190" class="arrow-head" />
+
+  <!-- Specs -->
+  <g transform="translate(100, 190)">
+    <rect width="200" height="90" class="box-sub" />
+    <text x="100" y="30" class="text-title">Spec: Upload de Dados</text>
+    <text x="100" y="50" class="text-desc">Como ler ficheiros CSV</text>
+    <text x="100" y="75" class="text-actuary">Obedece à Constitution</text>
+  </g>
+
+  <g transform="translate(300, 190)">
+    <rect width="200" height="90" class="box-sub" />
+    <text x="100" y="30" class="text-title">Spec: Dashboard</text>
+    <text x="100" y="50" class="text-desc">Como mostrar resultados</text>
+    <text x="100" y="75" class="text-actuary">Obedece à Constitution</text>
+  </g>
+
+  <g transform="translate(500, 190)">
+    <rect width="200" height="90" class="box-sub" />
+    <text x="100" y="30" class="text-title">Spec: Motor Vida</text>
+    <text x="100" y="50" class="text-desc">Cálculo de prémios/reservas</text>
+    <text x="100" y="75" class="text-actuary">Obedece à Constitution</text>
+  </g>
+
+  <text x="400" y="320" font-family="system-ui, sans-serif" font-size="14" font-weight="500" fill="#334155" text-anchor="middle">
+    Escreves o Constitution apenas 1 vez. O LLM aplica essas regras a todas as Specs seguintes automaticamente.
+  </text>
+
+</svg>
