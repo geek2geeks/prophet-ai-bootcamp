@@ -46,7 +46,7 @@ export type Day6DocumentPipelineWorkbenchState = {
   nextStep: string;
 };
 
-const STORAGE_KEY = "aibootcamp-day6-document-pipeline-workbench-v1";
+const STORAGE_KEY = "aibootcamp-day6-document-pipeline-workbench-v2";
 
 const PIPELINE_STAGES: Array<{
   id: PipelineStageId;
@@ -137,6 +137,29 @@ const QUALITY_CHECKS: Array<{
     id: "readyForDeepSeek",
     label: "Pronto para DeepSeek",
     helper: "Ha material suficiente para pedir revisao sem enviar lixo para o modelo.",
+  },
+];
+
+const ASSETS = [
+  {
+    title: "ocr_local_guide.md",
+    description: "Guia de ferramentas OCR locais: Tesseract, pdfplumber, marker.",
+    href: "/course-assets/day6/ocr_local_guide.md",
+  },
+  {
+    title: "cleaning_checklist.md",
+    description: "Checklist de limpeza de texto: colunas, tabelas, rodapes, hifenizacao.",
+    href: "/course-assets/day6/cleaning_checklist.md",
+  },
+  {
+    title: "evidence_template.md",
+    description: "Template para capturar evidencia entre original, OCR bruto e texto limpo.",
+    href: "/course-assets/day6/evidence_template.md",
+  },
+  {
+    title: "deepseek_review_prompts.md",
+    description: "Prompts de revisao para DeepSeek: resumo, QA, comparacao e memo.",
+    href: "/course-assets/day6/deepseek_review_prompts.md",
   },
 ];
 
@@ -254,7 +277,7 @@ function stageStatus(state: Day6DocumentPipelineWorkbenchState, stageId: Pipelin
   }
 }
 
-function buildWorkflowSummary(state: Day6DocumentPipelineWorkbenchState) {
+function buildPipelineConfig(state: Day6DocumentPipelineWorkbenchState): string {
   const evidenceLines = state.evidence
     .filter(
       (item) =>
@@ -277,38 +300,67 @@ function buildWorkflowSummary(state: Day6DocumentPipelineWorkbenchState) {
   });
 
   return [
-    "# Workflow local-first de OCR e revisao",
+    "# Pipeline Config: Local-first OCR e Review",
     "",
+    "## Documento",
     `Ficheiro: ${state.fileName || "n/d"}`,
     `Tipo: ${state.documentType || "n/d"}`,
     `Owner: ${state.owner || "n/d"}`,
     `Contexto: ${state.sourceContext || "n/d"}`,
     "",
-    "Pipeline visivel:",
+    "## Pipeline Stages",
     "1. Ficheiro -> guardar original e contexto do documento.",
     `2. OCR/parser local -> ${state.localTool || "n/d"}`,
     `3. Texto limpo -> ${state.cleanedTextGoal || "n/d"}`,
     `4. DeepSeek/review -> ${state.reviewGoal || "n/d"}`,
     "",
-    "Porque local-first:",
+    "## Porque Local-First",
     "- O OCR inicial corre localmente para reduzir fuga de dados e apanhar ruido cedo.",
     "- O modelo remoto so recebe texto mais limpo, curto e com melhor contexto.",
     "- A equipa guarda evidencia entre original, OCR bruto e versao limpa.",
     "- Se precisares de metadata fiavel, pede JSON mode em vez de texto livre.",
     "- Se precisares de comparacao ou raciocinio mais fundo, usa o reasoner so depois da limpeza.",
     "",
-    "Checks de qualidade:",
+    "## Quality Checks",
     ...checkLines,
     "",
-    `Confianca OCR: ${clampScore(state.ocrConfidence)}% (${scoreLabel(clampScore(state.ocrConfidence))})`,
-    `Confianca parser: ${clampScore(state.parseConfidence)}% (${scoreLabel(clampScore(state.parseConfidence))})`,
-    `Confianca review: ${clampScore(state.reviewConfidence)}% (${scoreLabel(clampScore(state.reviewConfidence))})`,
+    "## Confidence Scores",
+    `OCR: ${clampScore(state.ocrConfidence)}% (${scoreLabel(clampScore(state.ocrConfidence))})`,
+    `Parser: ${clampScore(state.parseConfidence)}% (${scoreLabel(clampScore(state.parseConfidence))})`,
+    `Review: ${clampScore(state.reviewConfidence)}% (${scoreLabel(clampScore(state.reviewConfidence))})`,
     "",
-    "Evidencia capturada:",
+    "## Evidence Log",
     ...(evidenceLines.length ? evidenceLines : ["- Sem evidencia registada."]),
     "",
-    `Decisao: ${state.decision || "n/d"}`,
-    `Proximo passo: ${state.nextStep || "n/d"}`,
+    "## Decision",
+    state.decision || "n/d",
+    "",
+    "## Next Step",
+    state.nextStep || "n/d",
+    "",
+  ].join("\n");
+}
+
+function buildOpenCodePrompt(state: Day6DocumentPipelineWorkbenchState): string {
+  const missingChecks = QUALITY_CHECKS.filter((check) => !state.qualityChecks[check.id].done);
+  const avgConfidence = Math.round(
+    (clampScore(state.ocrConfidence) + clampScore(state.parseConfidence) + clampScore(state.reviewConfidence)) / 3,
+  );
+
+  return [
+    "Prompt local-first para CLI/OpenCode",
+    "",
+    `Objetivo: montar pipeline documental para ${state.fileName || "documento"}.`,
+    `Ferramenta local: ${state.localTool || "OCR/parser local"}.`,
+    `Modo de review: ${state.reviewMode}.`,
+    `Checks em falta: ${missingChecks.length > 0 ? missingChecks.map((c) => c.label).join(", ") : "nenhum"}.`,
+    `Confianca media: ${avgConfidence}%.`,
+    "",
+    "Pede ao agente para:",
+    "1. sugerir melhorias ao perfil de parser local;",
+    "2. identificar riscos de fuga de dados no fluxo atual;",
+    "3. propor prompts de revisao para DeepSeek baseados no objetivo;",
+    "4. manter a abordagem local-first e sem dependencias desnecessarias.",
   ].join("\n");
 }
 
@@ -325,7 +377,7 @@ export function Day6DocumentPipelineWorkbench() {
       return createInitialState();
     }
   });
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<string | null>(null);
 
   useEffect(() => {
     try {
@@ -347,7 +399,8 @@ export function Day6DocumentPipelineWorkbench() {
     return Math.round(confidenceAverage * 0.55 + checkWeight * 0.45);
   }, [completedChecks, state.ocrConfidence, state.parseConfidence, state.reviewConfidence]);
 
-  const workflowSummary = useMemo(() => buildWorkflowSummary(state), [state]);
+  const pipelineConfig = useMemo(() => buildPipelineConfig(state), [state]);
+  const openCodePrompt = useMemo(() => buildOpenCodePrompt(state), [state]);
 
   function setField<Key extends keyof Day6DocumentPipelineWorkbenchState>(
     key: Key,
@@ -393,35 +446,64 @@ export function Day6DocumentPipelineWorkbench() {
     }));
   }
 
-  async function copyWorkflowSummary() {
-    await navigator.clipboard.writeText(workflowSummary);
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 1800);
+  async function copyToClipboard(key: string, text: string) {
+    await navigator.clipboard.writeText(text);
+    setCopied(key);
+    setTimeout(() => setCopied(null), 1600);
+  }
+
+  function downloadPipelineConfig() {
+    const blob = new Blob([pipelineConfig], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "pipeline-config.md";
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   return (
-    <section className="rounded-[1.8rem] border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[0_18px_50px_rgba(22,27,45,0.06)]">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
-            Lab Dia 6
-          </p>
-          <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
-            Montar um pipeline documental com OCR local antes da revisao por modelo.
-          </h2>
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--muted-foreground)]">
-            Este workbench ensina a ordem certa: guardar o ficheiro, correr OCR ou parsing local,
-            limpar o texto, capturar evidencia e so depois pedir ao DeepSeek uma segunda leitura.
-          </p>
+    <section className="space-y-6">
+      <div className="rounded-[1.8rem] border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[0_18px_50px_rgba(22,27,45,0.06)]">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
+              Lab Dia 6 — Document Pipeline Workbench
+            </p>
+            <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
+              Montar um pipeline documental com OCR local antes da revisao por modelo.
+            </h2>
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--muted-foreground)]">
+              Este workbench ensina a ordem certa: guardar o ficheiro, correr OCR ou parsing local,
+              limpar o texto, capturar evidencia e so depois pedir ao DeepSeek uma segunda leitura.
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="rounded-xl border border-[var(--accent-soft)] bg-[linear-gradient(180deg,rgba(124,63,88,0.08),rgba(124,63,88,0.03))] px-4 py-2.5 text-sm font-semibold text-[var(--foreground)]">
+              {qualityHealth}% saude
+            </div>
+          </div>
         </div>
+      </div>
 
-        <button
-          type="button"
-          onClick={copyWorkflowSummary}
-          className="rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[var(--accent-strong)]"
-        >
-          {copied ? "Workflow copiado" : "Copiar workflow local"}
-        </button>
+      <div className="rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-5">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
+          Ficheiros de apoio — guias de OCR e prompts de revisao
+        </p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {ASSETS.map((asset) => (
+            <a
+              key={asset.href}
+              href={asset.href}
+              download
+              className="flex flex-col gap-2 rounded-xl border border-[var(--border)] bg-white p-4 transition hover:border-[var(--accent-soft)] hover:shadow-sm"
+            >
+              <p className="text-sm font-semibold text-[var(--foreground)]">{asset.title}</p>
+              <p className="text-xs leading-5 text-[var(--muted-foreground)]">{asset.description}</p>
+              <span className="mt-auto text-xs font-semibold text-[var(--accent)]">Descarregar</span>
+            </a>
+          ))}
+        </div>
       </div>
 
       <div className="mt-6 grid gap-4 xl:grid-cols-[1.15fr_0.85fr]">
@@ -437,7 +519,7 @@ export function Day6DocumentPipelineWorkbench() {
                 </p>
                 <p className="mt-2 text-base font-semibold text-[var(--foreground)]">{stage.label}</p>
                 <p className="mt-2 text-sm leading-6 text-[var(--muted-foreground)]">{stage.helper}</p>
-                <div className="mt-3 flex items-center justify-between gap-3 text-xs text-[var(--muted-foreground)]">
+                <div className="mt-3 flex flex-col gap-1 text-xs text-[var(--muted-foreground)] sm:flex-row sm:items-center sm:justify-between">
                   <span>{stageStatus(state, stage.id)}</span>
                   {index < PIPELINE_STAGES.length - 1 ? <span aria-hidden="true">-&gt;</span> : <span>fim</span>}
                 </div>
@@ -551,7 +633,7 @@ export function Day6DocumentPipelineWorkbench() {
               <div className="rounded-[1.2rem] border border-[var(--border)] bg-white p-4">
                 <p className="font-semibold text-[var(--foreground)]">1. Extrair localmente</p>
                 <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">
-                  O objetivo nao e magia de prompt. E reduzir risco cedo, ver o texto bruto e perceber se
+                  O objetivo nao e magica de prompt. E reduzir risco cedo, ver o texto bruto e perceber se
                   o documento merece limpeza antes de qualquer upload.
                 </p>
               </div>
@@ -660,7 +742,7 @@ export function Day6DocumentPipelineWorkbench() {
 
                 return (
                   <label key={item.key} className="block">
-                    <div className="flex items-center justify-between gap-3 text-sm font-medium text-[var(--foreground)]">
+                    <div className="flex flex-col gap-1 text-sm font-medium text-[var(--foreground)] sm:flex-row sm:items-center sm:justify-between">
                       <span>{item.label}</span>
                       <span>
                         {value}% - {scoreLabel(value)}
@@ -717,7 +799,7 @@ export function Day6DocumentPipelineWorkbench() {
         </div>
       </div>
 
-      <section className="mt-6 rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-5">
+      <section className="rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
@@ -839,15 +921,57 @@ export function Day6DocumentPipelineWorkbench() {
 
         <section className="rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-5">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
-            Resumo copiavel do workflow local
+            Preview do pipeline-config.md
           </p>
-          <textarea
-            readOnly
-            value={workflowSummary}
-            rows={18}
-            className="mt-4 w-full rounded-[1rem] border border-[var(--border)] bg-white px-4 py-3 font-mono text-xs leading-6 text-[var(--foreground)] outline-none"
-          />
+          <pre className="mt-4 max-h-80 overflow-auto whitespace-pre-wrap break-words rounded-xl border border-[var(--border)] bg-white p-4 text-xs leading-6 text-[var(--foreground)]">
+            {pipelineConfig}
+          </pre>
         </section>
+      </div>
+
+      <div className="rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface)] p-5">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
+              Artefacto final — pipeline-config.md
+            </p>
+            <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">
+              Descarrega o ficheiro ou copia para o clipboard. Usa o prompt para pedir ao OpenCode uma revisao.
+            </p>
+          </div>
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+            <button
+              type="button"
+              onClick={() => copyToClipboard("prompt", openCodePrompt)}
+              className="rounded-full border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--foreground)] transition hover:border-[var(--accent-soft)]"
+            >
+              {copied === "prompt" ? "Copiado" : "Copiar prompt"}
+            </button>
+            <button
+              type="button"
+              onClick={() => copyToClipboard("config", pipelineConfig)}
+              className="rounded-full border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--foreground)] transition hover:border-[var(--accent-soft)]"
+            >
+              {copied === "config" ? "Copiado" : "Copiar config"}
+            </button>
+            <button
+              type="button"
+              onClick={downloadPipelineConfig}
+              className="rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[var(--accent-strong)]"
+            >
+              Descarregar pipeline-config.md
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-4 rounded-xl border border-dashed border-[var(--border-strong)] bg-white/60 p-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
+            Prompt para OpenCode / GLM-5
+          </p>
+          <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">
+            {openCodePrompt}
+          </p>
+        </div>
       </div>
     </section>
   );

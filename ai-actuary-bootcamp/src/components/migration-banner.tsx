@@ -96,7 +96,7 @@ export function MigrationBanner() {
           <span className="text-2xl">🔑</span>
           <div className="flex-1">
             <p className="font-semibold text-amber-900">
-              A tua conta foi migrada para a nova plataforma
+              Atualiza a palavra-passe da tua conta
             </p>
             <p className="mt-1 text-sm text-amber-800">
               Para garantir a segurança da tua conta, define uma nova

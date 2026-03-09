@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { useStudentState } from "@/lib/use-student-state";
+import { isItemDone } from "@/lib/student-state";
 import { getDay1ReviewGateMessage } from "@/lib/day1-review";
 import { EXTENDED_REVIEW_DAYS } from "@/lib/review-presets";
 
@@ -19,47 +20,40 @@ type Challenge = {
 
 type Props = {
   dayNumber: number;
-  daySlug: string;
   dayTitle: string;
   exercises: Exercise[];
   challenge: Challenge;
-  cliLabel: string;
   artifactList?: string[];
 };
 
 export function MissionWorkspaceTools({
   dayNumber,
-  daySlug,
   dayTitle,
   exercises,
   challenge,
-  cliLabel,
   artifactList,
 }: Props) {
   const { progress, toggleProgress, loading, day1Answers, day1Reviews } = useStudentState();
 
   const items = useMemo(() => [...exercises, challenge], [challenge, exercises]);
-  const completedCount = items.filter((item) => progress[item.id]).length;
+  const completedCount = items.filter((item) => isItemDone(progress, item.id)).length;
   const completedPoints = items
-    .filter((item) => progress[item.id])
+    .filter((item) => isItemDone(progress, item.id))
     .reduce((sum, item) => sum + item.pontos, 0);
   const totalPoints = items.reduce((sum, item) => sum + item.pontos, 0);
   const completionRatio = Math.round((completedCount / items.length) * 100) || 0;
-
-  // daySlug and dayNumber are used in section labels — kept for reference
-  void daySlug;
 
   return (
     <div className="space-y-4">
       <section className="panel-tech shell-frame rounded-[1.9rem] p-5">
         <p className="kicker">
-          Hoje em resumo
+          Progresso do fluxo
         </p>
         <h2 className="mt-3 text-lg font-semibold text-[var(--foreground)]">
           Dia {dayNumber.toString().padStart(2, "0")} · {dayTitle}
         </h2>
         <div className="panel-soft mt-4 rounded-2xl p-4">
-          <div className="flex items-center justify-between text-sm">
+          <div className="flex flex-col gap-2 text-sm sm:flex-row sm:items-center sm:justify-between">
             <span className="font-medium text-[var(--foreground)]">Progresso da aula</span>
             <span className="text-[var(--muted-foreground)]">{completionRatio}%</span>
           </div>
@@ -69,16 +63,22 @@ export function MissionWorkspaceTools({
               style={{ width: `${completionRatio}%` }}
             />
           </div>
-          <div className="mt-4 flex items-center justify-between text-sm text-[var(--muted-foreground)]">
+          <div className="mt-4 flex flex-col gap-1 text-sm text-[var(--muted-foreground)] sm:flex-row sm:items-center sm:justify-between">
             <span>{completedCount}/{items.length} etapas</span>
             <span>{completedPoints}/{totalPoints} pts</span>
           </div>
         </div>
+        <p className="mt-4 text-sm leading-7 text-[var(--muted-foreground)]">
+          Usa este bloco apenas para te orientares. O foco continua a ser seguir a aula de cima para baixo e fechar uma coisa de cada vez.
+        </p>
       </section>
 
-      <section className="panel shell-frame rounded-[1.75rem] p-5">
-        <p className="kicker">
-          Checklist de sucesso
+      <details className="panel shell-frame rounded-[1.75rem] p-5">
+        <summary className="cursor-pointer list-none text-sm font-semibold text-[var(--foreground)]">
+          Abrir checklist da aula
+        </summary>
+        <p className="mt-3 text-sm leading-7 text-[var(--muted-foreground)]">
+          Marca apenas o que ja fechaste. Se ainda estas perdido, volta primeiro ao caminho principal da aula.
         </p>
         <div className="mt-4 space-y-3">
           {exercises.map((exercise) => {
@@ -90,7 +90,7 @@ export function MissionWorkspaceTools({
                     "exercise",
                   )
                 : null;
-            const isChecked = Boolean(progress[exercise.id]);
+            const isChecked = isItemDone(progress, exercise.id);
 
             return (
               <label
@@ -130,7 +130,7 @@ export function MissionWorkspaceTools({
                     "challenge",
                   )
                 : null;
-            const isChecked = Boolean(progress[challenge.id]);
+            const isChecked = isItemDone(progress, challenge.id);
 
             return (
               <label className="panel-accent flex cursor-pointer items-start gap-3 rounded-2xl px-4 py-3">
@@ -158,33 +158,13 @@ export function MissionWorkspaceTools({
             );
           })()}
         </div>
-      </section>
-
-      <section className="panel shell-frame rounded-[1.75rem] p-5">
-        <p className="kicker">
-          Modo de trabalho
-        </p>
-        <div className="mt-4 space-y-3 text-sm leading-7 text-[var(--muted-foreground)]">
-          <div className="panel-soft rounded-2xl p-4">
-            <p className="font-semibold text-[var(--foreground)]">Na plataforma</p>
-            <p className="mt-1">Ler a aula, acompanhar o progresso, guardar notas e capturar a prova do que foi feito.</p>
-          </div>
-          <div className="panel-soft rounded-2xl p-4">
-            <p className="font-semibold text-[var(--foreground)]">Nas ferramentas locais</p>
-            <p className="mt-1">{cliLabel}</p>
-          </div>
-          <div className="panel-soft rounded-2xl p-4">
-            <p className="font-semibold text-[var(--foreground)]">Pronto para avancar quando</p>
-            <p className="mt-1">As notas da aula capturam o insight chave, o trabalho local produziu um artefacto util e o desafio ficou marcado como concluido.</p>
-          </div>
-        </div>
-      </section>
+      </details>
 
       {artifactList?.length ? (
-        <section className="panel shell-frame rounded-[1.75rem] p-5">
-          <p className="kicker">
-            Artefactos a guardar
-          </p>
+        <details className="panel shell-frame rounded-[1.75rem] p-5">
+          <summary className="cursor-pointer list-none text-sm font-semibold text-[var(--foreground)]">
+            Ver o que guardar no fim
+          </summary>
           <div className="mt-4 space-y-3 text-sm leading-7 text-[var(--muted-foreground)]">
             {artifactList.map((artifact) => (
               <div
@@ -195,19 +175,8 @@ export function MissionWorkspaceTools({
               </div>
             ))}
           </div>
-        </section>
+        </details>
       ) : null}
-
-      {/* Sticky notes tip */}
-      <section className="panel shell-frame rounded-[1.75rem] p-5">
-        <p className="kicker">
-          Notas
-        </p>
-        <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">
-          Usa o widget <span className="font-semibold text-[var(--foreground)]">Notas</span> no canto inferior esquerdo para criar sticky notes livres —
-          arrasta, redimensiona e muda a cor. Ficam guardadas automaticamente no teu perfil.
-        </p>
-      </section>
     </div>
   );
 }

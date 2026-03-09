@@ -35,7 +35,7 @@ export type Day5ArchitectureScopeCanvasState = {
   matrix: MatrixItem[];
 };
 
-const STORAGE_KEY = "aibootcamp-day5-architecture-scope-canvas-v1";
+const STORAGE_KEY = "aibootcamp-day5-architecture-scope-canvas-v2";
 
 const OWNER_ORDER: OwnerId[] = ["produto", "atuarial", "engenharia", "qa"];
 
@@ -45,6 +45,19 @@ const OWNER_TITLES: Record<OwnerId, string> = {
   engenharia: "Dono tecnico",
   qa: "Review e go-live",
 };
+
+const ASSETS = [
+  {
+    title: "prophet_reference_vida.md",
+    description: "Referencia de arquitetura Prophet para produtos de vida.",
+    href: "/course-assets/docs/prophet_reference_vida.md",
+  },
+  {
+    title: "template_constitution.md",
+    description: "Template de principios permanentes: UX, erros, convencoes, limites do MVP.",
+    href: "/course-assets/docs/template_constitution.md",
+  },
+];
 
 function createInitialState(): Day5ArchitectureScopeCanvasState {
   return {
@@ -178,6 +191,31 @@ export function buildDay5ArchitectureBlueprint(state: Day5ArchitectureScopeCanva
   ].join("\n");
 }
 
+function buildOpenCodePrompt(state: Day5ArchitectureScopeCanvasState): string {
+  const risksCount = state.matrix.filter((m) => m.type === "risco").length;
+  const decisionsCount = state.matrix.filter((m) => m.type === "decisao").length;
+
+  return [
+    "Prompt para OpenCode propor arquitetura",
+    "",
+    "Objetivo: usar este canvas de arquitetura para gerar um blueprint tecnico do Prophet Lite MVP.",
+    "",
+    "Contexto:",
+    `- North star: ${state.northStar.slice(0, 80)}...`,
+    `- In scope: ${state.boundaries.inScope.length} itens`,
+    `- Out of scope: ${state.boundaries.outOfScope.length} itens`,
+    `- Riscos identificados: ${risksCount}`,
+    `- Decisoes pendentes: ${decisionsCount}`,
+    "",
+    "Pede ao agente para:",
+    "1. Propor uma arquitetura modular com fronteiras claras entre ingestao, validacao, execucao e reporting;",
+    "2. Definir contratos de dados entre modulos (inputs, outputs, schemas);",
+    "3. Mapear estados de sistema, erros esperados e mensagens de UX;",
+    "4. Sugerir um plano de build em milestones com testes minimos por fase;",
+    "5. Manter a proposta local-first, pequena e auditavel.",
+  ].join("\n");
+}
+
 export function Day5ArchitectureScopeCanvas() {
   const [state, setState] = useState<Day5ArchitectureScopeCanvasState>(() => {
     if (typeof window === "undefined") {
@@ -191,7 +229,7 @@ export function Day5ArchitectureScopeCanvas() {
       return createInitialState();
     }
   });
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<string | null>(null);
 
   useEffect(() => {
     try {
@@ -202,6 +240,7 @@ export function Day5ArchitectureScopeCanvas() {
   }, [state]);
 
   const blueprint = useMemo(() => buildDay5ArchitectureBlueprint(state), [state]);
+  const openCodePrompt = useMemo(() => buildOpenCodePrompt(state), [state]);
 
   const readiness = useMemo(() => {
     const signals = [
@@ -300,34 +339,66 @@ export function Day5ArchitectureScopeCanvas() {
     }));
   }
 
-  async function copyBlueprint() {
-    await navigator.clipboard.writeText(blueprint);
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 1800);
+  async function copyToClipboard(key: string, text: string) {
+    await navigator.clipboard.writeText(text);
+    setCopied(key);
+    setTimeout(() => setCopied(null), 1600);
+  }
+
+  function downloadBlueprint() {
+    const blob = new Blob([blueprint], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "blueprint-prophet-lite.md";
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   return (
-    <section className="rounded-[1.8rem] border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[0_18px_50px_rgba(22,27,45,0.06)]">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
-            Lab Dia 5
-          </p>
-          <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
-            Fechar arquitetura e scope antes do build do Prophet Lite.
-          </h2>
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--muted-foreground)]">
-            Este canvas ajuda o estudante a decidir o que entra no MVP, quem responde por cada
-            bloco e quais riscos ou decisoes precisam de dono antes de pedir um coding plan.
-          </p>
-        </div>
+    <section className="space-y-6">
+      <div className="rounded-[1.8rem] border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[0_18px_50px_rgba(22,27,45,0.06)]">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
+              Lab Dia 5 — Architecture & Scope Canvas
+            </p>
+            <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
+              Fechar arquitetura e scope antes do build do Prophet Lite.
+            </h2>
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--muted-foreground)]">
+              Este canvas ajuda a decidir o que entra no MVP, quem responde por cada bloco e quais
+              riscos ou decisoes precisam de dono antes de pedir um coding plan.
+            </p>
+          </div>
 
-        <div className="rounded-[1.2rem] border border-[var(--accent-soft)] bg-[linear-gradient(180deg,rgba(124,63,88,0.08),rgba(124,63,88,0.03))] px-4 py-3 text-sm text-[var(--foreground)]">
-          Readiness do blueprint: {readiness}%
+          <div className="rounded-xl border border-[var(--accent-soft)] bg-[linear-gradient(180deg,rgba(124,63,88,0.08),rgba(124,63,88,0.03))] px-4 py-2.5 text-sm font-semibold text-[var(--foreground)]">
+            {readiness}% readiness
+          </div>
         </div>
       </div>
 
-      <div className="mt-6 grid gap-4 xl:grid-cols-[0.95fr_1.05fr]">
+      <div className="rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-5">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
+          Ficheiros de apoio — descarrega antes de comecar
+        </p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          {ASSETS.map((asset) => (
+            <a
+              key={asset.href}
+              href={asset.href}
+              download
+              className="flex flex-col gap-2 rounded-xl border border-[var(--border)] bg-white p-4 transition hover:border-[var(--accent-soft)] hover:shadow-sm"
+            >
+              <p className="text-sm font-semibold text-[var(--foreground)]">{asset.title}</p>
+              <p className="text-xs leading-5 text-[var(--muted-foreground)]">{asset.description}</p>
+              <span className="mt-auto text-xs font-semibold text-[var(--accent)]">Descarregar</span>
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <div className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
         <div className="space-y-4">
           <div className="grid gap-4 md:grid-cols-3">
             <CanvasField
@@ -449,30 +520,53 @@ export function Day5ArchitectureScopeCanvas() {
               ))}
             </div>
           </div>
+        </div>
+      </div>
 
-          <div className="rounded-[1.3rem] border border-[var(--accent-soft)] bg-[linear-gradient(180deg,rgba(124,63,88,0.06),rgba(124,63,88,0.1))] p-4">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--accent)]">
-                  Blueprint exportavel
-                </p>
-                <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">
-                  Bloco pronto para OpenCode, Z.ai ou outra ferramenta local.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={copyBlueprint}
-                className="rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[var(--accent-strong)]"
-              >
-                {copied ? "Blueprint copiado" : "Copiar blueprint"}
-              </button>
-            </div>
-
-            <pre className="mt-4 overflow-x-auto rounded-[1rem] border border-[var(--border)] bg-white p-4 text-xs leading-6 text-[var(--foreground)]">
-              {blueprint}
-            </pre>
+      <div className="rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface)] p-5">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
+              Artefacto final — blueprint.md
+            </p>
+            <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">
+              Descarrega o blueprint ou copia para o clipboard. Usa o prompt para pedir ao OpenCode uma proposta de arquitetura.
+            </p>
           </div>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => copyToClipboard("prompt", openCodePrompt)}
+              className="rounded-full border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--foreground)] transition hover:border-[var(--accent-soft)]"
+            >
+              {copied === "prompt" ? "Copiado" : "Copiar prompt"}
+            </button>
+            <button
+              type="button"
+              onClick={() => copyToClipboard("blueprint", blueprint)}
+              className="rounded-full border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--foreground)] transition hover:border-[var(--accent-soft)]"
+            >
+              {copied === "blueprint" ? "Copiado" : "Copiar blueprint"}
+            </button>
+            <button
+              type="button"
+              onClick={downloadBlueprint}
+              className="rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[var(--accent-strong)]"
+            >
+              Descarregar blueprint.md
+            </button>
+          </div>
+        </div>
+
+        <pre className="mt-4 max-h-80 overflow-auto rounded-xl border border-[var(--border)] bg-[var(--surface-subtle)] p-4 text-xs leading-6 text-[var(--foreground)]">
+          {blueprint}
+        </pre>
+
+        <div className="mt-4 rounded-xl border border-dashed border-[var(--border-strong)] bg-white/60 p-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
+            Prompt para OpenCode / GLM-5
+          </p>
+          <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">{openCodePrompt}</p>
         </div>
       </div>
     </section>

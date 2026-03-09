@@ -1,26 +1,26 @@
 {
   "title": "AI Founder Bootcamp para Atuarios",
   "subtitle": "Do conhecimento atuarial ao Prophet Lite com copiloto AI",
-  "totalPoints": 675,
+  "totalPoints": 695,
   "badges": [
     [
       0,
       "Builder Ready"
     ],
     [
-      120,
+      115,
       "Tool Operator"
     ],
     [
-      240,
+      230,
       "Spec Strategist"
     ],
     [
-      360,
+      350,
       "Workflow Architect"
     ],
     [
-      480,
+      470,
       "Product Builder"
     ],
     [
@@ -44,36 +44,42 @@
           "id": "ex0.1",
           "titulo": "Abrir o Terminal e Navegar sem Medo",
           "pontos": 10,
+          "tipo": "pratica",
           "descricao": "⏱ ~15 min | Abrir o terminal (no Windows: procurar 'cmd' no menu Iniciar; no Mac: Aplicacoes > Utilitarios > Terminal). Executar 5 comandos: (1) ver a pasta atual -- escrever 'cd' no Windows ou 'pwd' no Mac, (2) listar ficheiros -- 'dir' no Windows ou 'ls' no Mac, (3) criar pasta do projeto -- 'mkdir projeto_prophet', (4) entrar nela -- 'cd projeto_prophet', (5) voltar atras -- 'cd ..'. Para guardar o output: abrir o Bloco de Notas (Windows) ou TextEdit (Mac), colar os resultados e guardar como comandos_dia0.txt."
         },
         {
           "id": "ex0.2",
           "titulo": "Obter API Key e Configurar DeepSeek",
           "pontos": 10,
-          "descricao": "⏱ ~20 min | Esta key vai dar-te acesso a um modelo de IA capaz de analisar tabuas de mortalidade, carteiras e regulacao em segundos. OPCAO A (recomendada): Ir a pagina Exercicios nesta app, selecionar Dia 0, e clicar em 'Chaves do Bootcamp' para copiar a key partilhada. OPCAO B (conta propria): Ir a platform.deepseek.com, criar conta, adicionar credito (~$2 por cartao, processado na Europa via Stripe), clicar 'API Keys' no menu lateral, criar nova key e copia-la IMEDIATAMENTE. Feito: quando tiveres a key copiada e guardada num local seguro, marca como concluido."
+          "tipo": "pratica",
+          "descricao": "⏱ ~20 min | Esta key vai dar-te acesso a um modelo de IA capaz de analisar tabuas de mortalidade, carteiras e regulacao em segundos. OPCAO A (recomendada): Ir a pagina Recursos nesta app e clicar em 'Chaves do Bootcamp' para copiar a key partilhada. OPCAO B (conta propria): Ir a platform.deepseek.com, criar conta, adicionar credito (~$2 por cartao, processado na Europa via Stripe), clicar 'API Keys' no menu lateral, criar nova key e copia-la IMEDIATAMENTE. Feito: quando tiveres a key copiada e guardada num local seguro, marca como concluido."
         },
         {
           "id": "ex0.3",
           "titulo": "Instalar OpenCode e Primeiro Teste",
           "pontos": 10,
-          "descricao": "⏱ ~25 min | PREREQUISITO: instalar o Node.js primeiro (vai a nodejs.org, descarrega a versao LTS, instala, e FECHA E REABRE o terminal). Depois, instalar o OpenCode: escrever 'npm install -g @opencode/cli' no terminal. Copiar a DeepSeek key da pagina Exercicios > Dia 0 > 'Chaves do Bootcamp'. Configurar de forma PERMANENTE (ver instrucoes detalhadas no Modulo 2 -- 'Configuracao Permanente'). Abrir o OpenCode (escrever 'opencode' no terminal -- aparece uma interface de texto onde escreves instrucoes). Testar com: 'Sou atuario vida com experiencia em pricing e reservas. Diz-me em 3 frases o que consegues fazer com uma tabua de mortalidade CSO 2017.' Para sair do OpenCode: escrever '/exit' ou premir Ctrl+C. Documentar o resultado: pedir ao OpenCode 'guarda esta conversa num ficheiro chamado setup_log.md'."
+          "tipo": "pratica",
+          "descricao": "⏱ ~25 min | PREREQUISITO: instalar o Node.js primeiro (vai a nodejs.org, descarrega a versao LTS, instala, e FECHA E REABRE o terminal). Depois, instalar o OpenCode: escrever 'npm install -g @opencode/cli' no terminal. Copiar a DeepSeek key da pagina Recursos > 'Chaves do Bootcamp'. Configurar de forma PERMANENTE (ver instrucoes detalhadas no Modulo 2 -- 'Configuracao Permanente'). Abrir o OpenCode (escrever 'opencode' no terminal -- aparece uma interface de texto onde escreves instrucoes). Testar com: 'Sou atuario vida com experiencia em pricing e reservas. Diz-me em 3 frases o que consegues fazer com uma tabua de mortalidade CSO 2017.' Para sair do OpenCode: escrever '/exit' ou premir Ctrl+C. Documentar o resultado: pedir ao OpenCode 'guarda esta conversa num ficheiro chamado setup_log.md'."
         },
         {
           "id": "ex0.4",
           "titulo": "Analisar Dados Reais com OpenCode",
           "pontos": 10,
+          "tipo": "pratica",
           "descricao": "⏱ ~25 min | Descarregar os ficheiros de dados do bootcamp (o instrutor fornece o link ou envia por email). Abrir o OpenCode na pasta onde guardaste os ficheiros (escrever 'cd caminho_da_pasta' no terminal antes de abrir o OpenCode). Pedir ao OpenCode: (1) 'Abre o ficheiro carteira_vida_sample.csv e diz-me quantas apolices tem, qual o capital total segurado em EUR e como se distribui por tipo de produto', (2) 'Qual e a idade media e a distribuicao por sexo e estado de fumador? Ha diferencas nos premios entre fumadores e nao-fumadores para a mesma faixa etaria?', (3) 'Resume esta carteira como se fosse para apresentar ao board da seguradora: incluir exposicao total, concentracao de risco, e eventuais apolices a vigiar'. Para guardar: pedir ao OpenCode 'guarda estas respostas num ficheiro chamado analise_carteira.md'."
         },
         {
           "id": "ex0.5",
           "titulo": "Prompt Preciso vs Prompt Explorador",
           "pontos": 10,
+          "tipo": "pratica",
           "descricao": "⏱ ~20 min | Usar o ficheiro tabua_mortalidade_CSO2017.csv (nota: tabua americana usada como exemplo educativo -- em Portugal usarias tabuas aprovadas pela ASF). PROMPT PRECISO: 'Abre tabua_mortalidade_CSO2017.csv. Qual e o valor exato de qx para homens e mulheres aos 65 anos? Calcula a diferenca relativa entre sexos e a esperanca de vida restante para ambos.' PROMPT EXPLORADOR: 'Olhando para a mortalidade aos 65 anos e a progressao da tabua, que implicacoes tem para o pricing de um seguro temporario 10 anos vs um seguro vida inteira? Que margens de seguranca recomendarias?' Comparar as respostas e anotar: o modelo acertou nos numeros? As recomendacoes fazem sentido atuarial? Guardar com: 'guarda ambas as respostas num ficheiro comparacao_prompts.md'."
         },
         {
           "id": "ex0.6",
           "titulo": "Mapa da Stack AI do Fundador",
           "pontos": 10,
+          "tipo": "pratica",
           "descricao": "⏱ ~15 min | Pedir ao OpenCode: 'Cria um diagrama em texto da stack do bootcamp: Terminal → OpenCode CLI → API DeepSeek → Modelo LLM → Resposta. Mostra onde ficam os ficheiros locais (CSVs no meu computador), o que viaja pela internet (apenas o texto dos prompts e respostas), e onde fica o modelo (servidor DeepSeek). Explica porque e que dados reais de clientes NUNCA devem ser enviados para o modelo, em contexto de RGPD e regulacao de seguros (ASF).' Guardar com: 'guarda este diagrama num ficheiro chamado mapa_stack.md'. O objetivo e perceber o fluxo de dados e as fronteiras de seguranca antes de construir."
         }
       ],
@@ -81,6 +87,7 @@
         "id": "des0",
         "titulo": "Kit do Fundador AI",
         "pontos": 25,
+        "tipo": "entrega",
         "descricao": "⏱ ~30 min | Entregar um founder-kit com: (1) setup_log.md documentando toda a instalacao, (2) 3 prompts reutilizaveis para trabalho atuarial -- escolher 3 destas tarefas e criar um prompt testado para cada: calcular premio de risco, comparar mortalidade observada vs esperada, analisar concentracao de risco por faixa etaria, resumir impacto regulatorio (Solvencia II ou IFRS 17), gerar relatorio de carteira para o board, explicar uma tabua de mortalidade a um nao-atuario, (3) mapa_stack.md com fronteiras de seguranca e RGPD, (4) checklist pessoal de 5 regras de operacao segura com LLMs para trabalho em seguros. PREVIEW DIA 1: amanha vais usar estas ferramentas para pensar como fundador -- escolher que problema atuarial resolver com IA e desenhar o teu primeiro produto. Para submeter: cola um link (Google Drive, pasta partilhada) OU descreve o que fizeste no campo abaixo."
       },
       "conteudo": {
@@ -164,42 +171,49 @@
           "id": "ex1.1",
           "titulo": "Glossario Pessoal do Fundador",
           "pontos": 10,
+          "tipo": "pratica",
           "descricao": "Vais construir software e não apenas operar folhas de cálculo. Usa o OpenCode para definir rapidamente, nas tuas palavras (1-2 frases), os termos do jogo: (1) SaaS, (2) MVP, (3) Wedge, (4) Workflow, (5) UX, (6) Feature, (7) Deploy, (8) Incumbent, (9) Posicionamento, (10) Stack. Acrescenta um exemplo atuarial para cada um (formato tabela). Guarda como glossario_fundador.md. É a linguagem que vais usar até ao fim do curso."
         },
         {
           "id": "ex1.2",
           "titulo": "Horas vs Produto -- Porque Construir Software",
           "pontos": 10,
+          "tipo": "pratica",
           "descricao": "Ontem analisaste uma carteira de apólices com IA em 25 minutos. Quanto tempo demoraria à mão no Excel? Esse contraste é a alavanca. Usa o OpenCode para resumir a diferença entre vender horas de consultoria (onde o tempo é o limite) e vender um produto de software (SaaS). Compara em 3 dimensões: Margem, Escala e Dependência de Tempo. Entrega um documento de 1 página com essa tabela e 3 conclusões tuas. Queremos que visualizes porque é que o software escala e o teu tempo não."
         },
         {
           "id": "ex1.3",
           "titulo": "Analisar o Prophet sem Construir Demais",
           "pontos": 10,
+          "tipo": "pratica",
           "descricao": "Lê o ficheiro prophet_reference_vida.md (nos Recursos). Este é o teu 'incumbent' - o dinossauro que domina o mercado. Cria uma tabela rápida: Modulo Prophet | Ponto Forte Deles | A Nossa Oportunidade (versão simples/MVP). Faz isto para 5 áreas (ex: assumptions, motor, reports). O objetivo não é copiar o gigante, mas descobrir onde ele é pesado demais para equipas pequenas."
         },
         {
           "id": "ex1.4",
           "titulo": "Escolher 3 Problemas que Alguem Pagaria para Resolver",
           "pontos": 10,
+          "tipo": "pratica",
           "descricao": "Abre os dados do Dia 0 no OpenCode e usa um prompt exploratório: 'Se fosses um atuário a receber estes dados todos os trimestres, o que te faria perder a cabeça sem um software dedicado?' Lista 3 frustrações reais que encontraste. Para cada uma, indica: Quem sofre com isto? Qual a frequência? Qual o impacto no negócio? Porque é que o Excel não chega? É aqui que descobres o que as pessoas estariam dispostas a pagar para resolver."
         },
         {
           "id": "ex1.5",
           "titulo": "Memo do Fundador -- O Teu Plano Numa Pagina",
           "pontos": 10,
+          "tipo": "pratica",
           "descricao": "Escreve um documento interno de 1 página a definir o teu produto. 1) Cliente Ideal (quem sofre com a dor que escolheste). 2) Problema Principal. 3) Wedge (o pequeno problema por onde vais entrar). 4) O que o Prophet Lite faz primeiro (3-5 coisas core). 5) O que NÃO faz (ser agressivo no corte de scope é essencial). 6) Argumento de Foco. Usa o OpenCode para criticar e afinar o teu documento. Guarda como memo_fundador.md."
         },
         {
           "id": "ex1.6",
           "titulo": "Mental Check do Dia 1",
           "pontos": 10,
+          "tipo": "pratica",
           "descricao": "Responde a estas perguntas por escrito em 2-3 frases sem usar IA. O objetivo é validares o teu próprio raciocínio. (1) O que separa vender horas de vender SaaS? (2) O que é um MVP? (3) Explica o que é uma 'wedge'. (4) Porque é que uma equipa pequena tem vantagem sobre o incumbent? (5) O que é posicionamento? (6) Porque é que dizer 'não' a funcionalidades é uma boa estratégia? Se souberes responder a isto, estás pronto para construir."
         },
         {
           "id": "ex1.7",
           "titulo": "Lab Interativo – Reporting e IA",
           "pontos": 10,
+          "tipo": "pratica",
           "descricao": "Usa o laboratório interativo na plataforma com os ficheiros de reporting. Explora os painéis de métricas e descobre onde a rentabilidade caiu. Depois, vai ao OpenCode e responde: (1) Que segmentos explicam a queda do lucro? (2) O aumento das reservas vem de onde? (3) Escreve uma nota de 5 linhas ao CFO a explicar a variação. (4) Propõe uma feature de IA para automatizar este trabalho repetitivo. Entrega o analise_variacao_trimestral.md."
         }
       ],
@@ -207,6 +221,7 @@
         "id": "des1",
         "titulo": "Tese de Produto -- Convencer o Primeiro Cliente",
         "pontos": 25,
+        "tipo": "entrega",
         "descricao": "Cria um documento de 2 páginas focado em convencer o teu primeiro utilizador real. Inclui: 1) Para Quem É (e estimativa de mercado). 2) O Problema Hoje (onde o workflow dói). 3) O Que Fazemos. 4) A Nossa Vantagem (UX moderno, IA embutida, sem atritos). 5) Prova de Conceito (mostra números reais da análise do Dia 0 para dar força aos teus argumentos). 6) Plano de Distribuição (3 passos para chegar a essa pessoa sem intermediários). 7) Riscos e Respostas (o que pode falhar e como reages). O memo descreve o produto; a tese argumenta porque é que o mercado o vai querer."
       },
       "conteudo": {
@@ -248,7 +263,9 @@
             },
             {
               "titulo": "Mentalidade de Quem Cria Produto",
-              "conteudo": "Pensar como criador de produto significa escolher resolver um problema pequeno muito bem, em vez de tentar resolver tudo razoavelmente. Significa pedir a pessoas reais que experimentem o que construiste e ouvir o que dizem. E significa aceitar que a primeira versao vai ser imperfeita -- e isso e normal e esperado. No Dia 0 usaste o OpenCode para analisar dados reais e geraste ideias de produto no ex0.5. Esse momento -- 'isto podia ser um produto' -- e o instinto que vais agora aprender a disciplinar."
+              "conteudo": "Eu nao quero andar por aqui por ver os outros andarem em algum sitio. Isso nao e viver; e copiar. Se eu vou estar aqui, entao quero construir. Quero pensar com clareza, otimizar o raciocinio, cortar ruido, testar ideias na realidade e fazer coisas que funcionem. Empreender interessa-me por isso: obriga-me a confrontar o real. Obriga-me a sair da teoria e a produzir.\n\nTambem nao tenho paciencia para conversa vazia. E feio falar a toa, projetar a toa e comprometer-me com coisas que nunca vou cumprir. Prefiro prometer pouco e entregar muito. O mundo nao precisa de mais pessoas a performar ambicao; precisa de pessoas a resolver problemas. Se uma ideia e boa, constroi-se. Se nao aguenta execucao, era vaidade, nao visao.\n\nE e aqui que entra a engenharia. Engenharia nao e apenas um titulo profissional; e uma maneira de pensar. Ha quem tenha curso e nunca aprenda a pensar com rigor, e ha quem nunca tenha tido esse curso e viva como engenheiro todos os dias: observa a realidade, reduz o problema aos seus principios, mede, testa, corrige, melhora. Foi esse mindset, aliado a matematica, precisao e exigencia excecional, que mudou o mundo - pontes, motores, computadores, satelites, redes, vacinas, sistemas. O mundo avanca quando alguem decide nao aceitar confusao como destino e impor ordem sobre a realidade. E isso, para mim, e o que vale a pena fazer.",
+              "spotifyEmbedUrl": "https://open.spotify.com/embed/track/20JfQbIIZbswwfxLfLf99W?utm_source=generator",
+              "customVisual": "effort-axis"
             }
           ]
         },
@@ -277,79 +294,121 @@
     },
     {
       "dia": 2,
-      "titulo": "Specs com Speckit -- Diz ao LLM o Que Construir",
+      "titulo": "GitHub Spec Kit -- Diz ao LLM o Que Construir",
       "semana": 1,
-      "objetivo": "Aprender a trabalhar por especificacao. Usar Speckit, spec.md e constitution.md para transformar ideias vagas em instrucoes claras que o LLM consegue implementar e que o fundador consegue validar.",
+      "objetivo": "No Dia 2 vais fechar um mini projeto completo: definir regras, escrever a spec, construir uma webapp simples, gerar um PDF executivo e publicar o site. O objetivo nao e aprender toda a teoria de software; e perceber como dar instrucoes claras a uma AI e transformar um CSV atuarial numa entrega visivel.",
       "modulos": [
-        "Spec-Driven Development com Speckit",
-        "Acceptance Criteria, Git & Iteracao"
+        "Da Ideia do Dia 1 a uma Spec Executavel",
+        "GitHub Spec Kit na Pratica",
+        "Acceptance Criteria, Git & Iteracao Leve"
       ],
       "exercicios": [
         {
           "id": "ex2.1",
-          "titulo": "Spec para Upload de Assumptions",
+          "titulo": "Passo 1 - Constitution do Mini Projeto",
           "pontos": 10,
-          "descricao": "Pedir a um LLM para \"fazer um upload de assumptions\" é a receita certa para ter problemas. Usa o template_spec.md para ser absolutamente explícito sobre o fluxo de upload e validação das tábuas de mortalidade, lapsos e taxas de desconto. Define os inputs, os erros esperados e o output final. A qualidade do que a máquina constrói escala em proporção direta à qualidade da tua spec."
+          "tipo": "pratica",
+            "descricao": "Comeca pelo essencial: cria uma constitution curta para a webapp do dia. Define 4 ou 5 regras permanentes, como linguagem simples, validacao do CSV antes de qualquer analise, narrativa AI baseada apenas em metricas agregadas e PDF legivel por decisores nao tecnicos."
         },
         {
           "id": "ex2.2",
-          "titulo": "Spec para Document Drop",
+          "titulo": "Passo 2 - Spec do Dashboard e PDF",
           "pontos": 10,
-          "descricao": "Arrastar PDFs para a app não chega; precisas de definir o que acontece depois. Escreve a spec para a feature de Document Drop: o utilizador faz upload de ficheiros, e a app deve classificar, extrair metadados e indexar a informação. Pensa nisto como desenhar um processo fabril. Se não especificares como a máquina deve tratar os dados, o valor da feature será zero."
+          "tipo": "pratica",
+            "descricao": "Escreve a spec da feature principal do dia: uma webapp que le o CSV, mostra metricas-chave e gera um PDF executivo. O foco e descrever claramente o que entra, o que sai, o que pode falhar e como uma pessoa nao tecnica confirma que ficou pronto."
         },
         {
           "id": "ex2.3",
-          "titulo": "Auditar uma Spec com GLM-5 e OpenCode",
+          "titulo": "Passo 3 - Clarify e Auditoria Antes do Build",
           "pontos": 10,
-          "descricao": "O verdadeiro teste a uma ideia é tentar encontrar os seus pontos de falha antes de escrever código. Pede ao modelo base para fazer um plano de execução da tua spec, e usa as tuas ferramentas locais para uma auditoria impiedosa. O objetivo é destapar ambiguidades, edge cases e critérios de aceite em falta. É um stress-test à tua lógica antes de investires tempo a construir."
+          "tipo": "pratica",
+            "descricao": "Antes de construir, usa o fluxo de clarify e revisao para apanhar perguntas em aberto. Confirma especialmente: que metricas entram no dashboard, como o PDF e gerado, que papel a DeepSeek tem e que prova final o tutor deve receber."
+        },
+        {
+          "id": "ex2.4",
+          "titulo": "Exercicio Pratico Rapido: Do CSV ao PDF Executivo Publicado",
+          "pontos": 20,
+          "tipo": "pratica",
+          "descricao": "Neste exercicio guiado, vais viver um ciclo completo e pequeno de especificacao, implementacao e deploy. Usa o ficheiro `carteira_vida_sample.csv` para criar uma webapp que mostre metricas-chave da carteira e gere um PDF executivo para decisores nao tecnicos. O fluxo esperado e: instalar o Spec Kit, Firebase CLI e Google Cloud CLI; autenticar com a conta `levelwelness@gmail.com`; correr `/speckit.constitution`, `/speckit.specify`, `/speckit.clarify`, `/speckit.plan`, `/speckit.tasks` e `/speckit.implement` no OpenCode; usar DeepSeek apenas para escrever a narrativa do relatorio a partir de metricas agregadas; e publicar o site final em Firebase Hosting para enviar o URL ao tutor."
         }
       ],
       "desafio": {
         "id": "des2",
-        "titulo": "Pacote de Especificacao MVP",
+        "titulo": "Mini App Publicada com Pacote de Especificacao",
         "pontos": 25,
-        "descricao": "Entrega o teu pacote de especificação: spec.md, constitution.md e a checklist de aceite para o MVP (Prophet Lite). Este conjunto tem de ser claro o suficiente para que o LLM execute o projeto com autonomia, sem te interromper constantemente com perguntas básicas. Boas fundações hoje poupam-te muita dívida técnica amanhã."
+        "tipo": "entrega",
+          "descricao": "Entrega duas coisas: (1) o pacote de especificacao do mini projeto - constitution.md, spec.md, clarificacoes e checklist de aceite - e (2) o URL da webapp publicada em Firebase Hosting. O tutor deve conseguir perceber o que a app faz, ver o dashboard e confirmar que o PDF executivo faz sentido para um contexto atuarial simples."
       },
       "conteudo": {
         "modulo_1": {
-          "titulo": "Spec-Driven Development com Speckit",
+          "titulo": "Da Ideia do Dia 1 a uma Spec Executavel",
           "topicos": [
             {
-              "titulo": "A Skill Central",
-              "conteudo": "A grande vantagem de um founder com LLMs nao e velocidade a programar. E a capacidade de descrever com clareza o comportamento que quer."
+              "titulo": "A Ponte Entre Dia 1 e Dia 2",
+              "conteudo": "No Dia 1 escolheste uma direcao de produto. Hoje vais transformar essa ideia num mini projeto concreto: um site simples que le um CSV, mostra metricas e gera um PDF executivo. A licao principal e esta: antes de pedir codigo, tens de dizer com clareza o que queres ver no produto final.",
+              "imagemUrl": "/course-assets/images/day1-to-day2-bridge.svg"
             },
             {
-              "titulo": "Speckit como Estrutura",
-              "conteudo": "Speckit ajuda a transformar requisitos dispersos em blocos claros: objetivo, fluxos, validacoes, edge cases, criterios de aceite e entregaveis."
+              "titulo": "O Que o GitHub Spec Kit E na Pratica",
+              "conteudo": "O GitHub Spec Kit e uma forma organizada de trabalhar com AI. Em vez de pedires tudo de uma vez, defines regras, escreves a spec, resolves duvidas, fazes um plano e so depois constrois. Para quem nao vem de software, isto ajuda a nao se perder no meio de prompts soltos."
             },
             {
-              "titulo": "Boa Spec, Mau Codigo Evitado",
-              "conteudo": "Muitos erros atribuimos ao modelo quando, na verdade, a instrucao estava vaga. Uma boa spec reduz retrabalho e melhora a qualidade do output."
+              "titulo": "Escrever o Que e Porque Antes do Como",
+              "conteudo": "Hoje interessa mais o que o site faz do que a tecnologia usada. Primeiro decides o que entra no dashboard, o que o PDF diz e como o tutor valida o resultado. So depois passas para ferramentas, ficheiros e deploy."
             },
             {
-              "titulo": "Escrever para Maquina e para Equipa",
-              "conteudo": "A spec serve o LLM hoje e uma equipa humana amanha. E documentacao operacional, nao papel burocratico."
+              "titulo": "Uma Boa Spec Parece uma Instrucao Operacional",
+              "conteudo": "Uma boa spec deve ser facil de seguir. Se outra pessoa nao conseguir perceber o que o site mostra, quando o PDF e gerado e o que conta como pronto, entao a spec ainda esta vaga."
             }
           ]
         },
         "modulo_2": {
-          "titulo": "Acceptance Criteria, Git & Iteracao",
+          "titulo": "GitHub Spec Kit na Pratica",
           "topicos": [
             {
-              "titulo": "Constitution.md",
-              "conteudo": "O constitution define regras globais: convencoes de arredondamento, assumptions de referencia, politicas de validacao e principios de interface. Evita inconsistencias entre modulos."
+              "titulo": "Constitution antes de Spec",
+              "conteudo": "No GitHub Spec Kit, o constitution.md vem primeiro. E onde fixas regras simples que nao queres renegociar: linguagem clara, validacao antes da AI, PDF legivel por decisores e proibicao de conclusoes inventadas.",
+              "imagemUrl": "/course-assets/images/day2-constitution-flow.svg"
             },
             {
-              "titulo": "Acceptance Criteria",
-              "conteudo": "Cada feature deve responder a uma pergunta simples: como sei que isto esta feito? Sem essa resposta, o LLM vai produzir algo plausivel mas dificil de aprovar."
+              "titulo": "Specify e Clarify",
+              "conteudo": "Depois da constitution, escreves a spec. A seguir, usas clarify para apanhar o que ainda esta mal definido. Por exemplo: que metricas entram, que papel tem a DeepSeek e o que o tutor deve ver no fim.",
+              "imagemUrl": "/course-assets/images/day2-specify-clarify.svg"
             },
             {
-              "titulo": "Git como Memoria de Decisao",
-              "conteudo": "Nao precisas de dominar Git em profundidade, mas precisas de o usar para guardar versoes de specs, prompts e iteracoes relevantes."
+              "titulo": "Plan, Tasks e Implement",
+              "conteudo": "So depois da spec estar clara e que passas ao plano e as tarefas. Aqui o mais importante nao e decorar comandos; e perceber que o build corre melhor quando ja sabes exatamente o que o site precisa mostrar e entregar.",
+              "mermaid": "flowchart LR\n    A[constitution.md] --> B[spec.md]\n    B --> C[clarify]\n    C --> D[plan]\n    D --> E[tasks]\n    E --> F[implement]\n    F --> G[app local]\n    G --> H[deploy em Firebase Hosting]\n    style A fill:#fdf2f8,stroke:#be185d\n    style F fill:#eff6ff,stroke:#3b82f6\n    style H fill:#f0fdf4,stroke:#10b981"
             },
             {
-              "titulo": "Iterar sem Perder o Norte",
-              "conteudo": "O ciclo ideal e curto: escrever spec, gerar, rever, corrigir, documentar. A velocidade vem da clareza, nao da pressa."
+              "titulo": "Comparacao com Prompting Solto",
+              "conteudo": "Pedir tudo num prompt unico parece rapido, mas costuma gerar confusao. O Spec Kit desacelera no inicio para poupar retrabalho depois. Para este dia, isso ajuda-te a chegar ao deploy com menos caos."
+            }
+          ]
+        },
+        "modulo_3": {
+          "titulo": "Acceptance Criteria, Git & Iteracao Leve",
+          "topicos": [
+            {
+              "titulo": "Criterios de Aceite Sao o Teu Teste de Realidade",
+              "conteudo": "Antes de fechares o dia, tens de saber responder a isto: como confirmo que o trabalho ficou pronto? Neste caso, a resposta deve ser simples: o site abre, mostra metricas, gera PDF e tem um URL publico para enviar ao tutor."
+            },
+            {
+              "titulo": "Git como Memoria, Nao como Obstaculo",
+              "conteudo": "Nao precisas de dominar Git hoje. Basta usares Git como memoria: guardar a evolucao da spec e do mini projeto para nao perder o que ja decidiste."
+            },
+            {
+              "titulo": "Iterar sem Voltar a Folha em Branco",
+              "conteudo": "O ciclo ideal do dia e curto: escrever, clarificar, construir, rever e publicar. Em vez de depender da memoria do chat, passas a depender de ficheiros e decisoes claras."
+            },
+            {
+              "titulo": "Comparacao com Outras Metodologias",
+              "conteudo": "Nao precisas de decorar outras metodologias. Para este bootcamp basta reter uma ideia: primeiro decides bem o que queres, depois pedes ajuda a AI para construir isso com menos ambiguidade."
+            },
+            {
+              "titulo": "Arquitetura do Mini Exercicio do Dia 2",
+              "conteudo": "O mini exercicio recomendado do dia segue uma arquitetura simples: o CSV entra, a app resume os numeros, a DeepSeek escreve a narrativa executiva, o PDF e gerado e o site e publicado. O importante e perceberes onde entram os dados, onde entra a AI e onde acontece o deploy.",
+              "mermaid": "flowchart LR\n    A[CSV atuarial] --> B[Parser e agregacao]\n    B --> C[Dashboard com metricas]\n    B --> D[Contexto resumido]\n    D --> E[DeepSeek]\n    C --> F[Gerador PDF]\n    E --> F\n    F --> G[Relatorio executivo]\n    C --> H[Firebase Hosting]\n    style B fill:#f0fdf4,stroke:#10b981\n    style E fill:#eff6ff,stroke:#3b82f6\n    style F fill:#fff7ed,stroke:#f97316"
             }
           ]
         }
@@ -359,7 +418,7 @@
       "dia": 3,
       "titulo": "Dados, JSON & APIs -- A Linguagem do Produto",
       "semana": 1,
-      "objetivo": "Dar ao atuario literacy suficiente para operar software moderno: perceber CSV, JSON e YAML, fazer uma API call, ler uma resposta, e mapear o fluxo de dados do produto sem precisar de ser programador tradicional.",
+      "objetivo": "No Dia 3 vais aprender a ler os dados e os pedidos que alimentam o produto. O objetivo nao e programar uma integracao complexa; e saber reconhecer formatos, perceber o que entra e sai de uma API e descrever contratos de dados com clareza suficiente para trabalhar com agentes no terminal.",
       "modulos": [
         "Dados Estruturados sem Drama",
         "APIs, Docs & Contratos de Integracao"
@@ -369,26 +428,30 @@
           "id": "ex3.1",
           "titulo": "Inspecionar Inputs Reais do Produto",
           "pontos": 10,
-          "descricao": "Abrir carteira_apolices_vida.csv, tabua_mortalidade_CSO2017.csv, taxas_resgate.csv e yield_curve_ECB.csv. Identificar o papel de cada ficheiro no MVP e registar 5 regras de validacao para cada um."
+          "tipo": "pratica",
+          "descricao": "Abrir os quatro ficheiros do dia e identificar o papel de cada um no MVP. O foco e simples: que dados tem cada ficheiro, para que servem e que erros basicos devem ser apanhados cedo."
         },
         {
           "id": "ex3.2",
           "titulo": "Primeira API Call com Proposito",
           "pontos": 10,
-          "descricao": "Executar uma chamada de API a um modelo LLM ou a um servico simples, documentando endpoint, payload JSON, resposta e erros mais comuns."
+          "tipo": "pratica",
+          "descricao": "Executar uma chamada de API simples e documentar quatro coisas: endpoint, payload, resposta e erro basico. Nao precisas de aprender backend; precisas de perceber a conversa entre sistemas."
         },
         {
           "id": "ex3.3",
           "titulo": "Definir o Contrato de Dados",
           "pontos": 10,
-          "descricao": "Criar um schema simples para model points, assumptions e run results. O objetivo e saber que dados entram, que dados saem e como isso liga ao frontend."
+          "tipo": "pratica",
+          "descricao": "Criar um contract pack simples para model points, assumptions e run results. O objetivo e saber que dados entram, que dados saem e como isso se explica a um agente no terminal."
         }
       ],
       "desafio": {
         "id": "des3",
         "titulo": "Mapa de Integracao do MVP",
         "pontos": 25,
-        "descricao": "Entregar um integration-pack com 3 contratos: model_points.json, assumptions_schema.json e run_result.json, mais uma nota a explicar como um utilizador nao-tecnico os alimenta via interface."
+        "tipo": "entrega",
+        "descricao": "Entregar um integration-pack com 3 contratos: model_points.json, assumptions_schema.json e run_result.json, mais uma nota curta a explicar como um utilizador nao-tecnico fornece estes dados sem tocar em codigo."
       },
       "conteudo": {
         "modulo_1": {
@@ -396,7 +459,7 @@
           "topicos": [
             {
               "titulo": "CSV, JSON e YAML",
-              "conteudo": "Estas estruturas sao a lingua do produto. Um fundador AI-native nao precisa de saber programar tudo, mas precisa de reconhecer formatos, campos obrigatorios e erros tipicos."
+              "conteudo": "Estas estruturas sao a lingua do produto. Nao precisas de programar tudo, mas precisas de reconhecer formatos, campos obrigatorios e erros tipicos para falares bem com um agente no terminal."
             },
             {
               "titulo": "Model Points como Produto",
@@ -404,11 +467,11 @@
             },
             {
               "titulo": "Assumptions como Ativo",
-              "conteudo": "Mortality, lapse e discount tables sao inputs criticos do negocio. Devem ser versionados, validados e apresentados com cuidado na app."
+              "conteudo": "Mortality, lapse e discount tables sao inputs criticos do negocio. O importante hoje e perceber que estes ficheiros precisam de nomes claros, colunas consistentes e validacao simples."
             },
             {
               "titulo": "Schemas como Guardrails",
-              "conteudo": "O schema e uma das melhores formas de tornar um produto com LLMs mais robusto: limita ambiguidades e facilita automacao."
+              "conteudo": "O schema ajuda-te a dizer com clareza o que e aceite e o que deve falhar. Isso torna o trabalho com agentes mais robusto e reduz adivinhacao."
             }
           ]
         },
@@ -417,19 +480,19 @@
           "topicos": [
             {
               "titulo": "Como Ler Docs sem Perder Tempo",
-              "conteudo": "Nao e preciso ler tudo. Procurar auth, endpoint, exemplo de request, exemplo de response, erros, limites e preco costuma bastar para comecar."
+              "conteudo": "Nao e preciso ler tudo. Para comecar, basta procurar auth, endpoint, exemplo de request, exemplo de response e erros mais comuns."
             },
             {
               "titulo": "HTTP em Linguagem Clara",
-              "conteudo": "Uma API call e um pedido com estrutura. Saber ler um request e uma response e o suficiente para conversar com ferramentas e integrar servicos."
+              "conteudo": "Uma API call e um pedido com estrutura. Se souberes ler request e response, ja consegues trabalhar com servicos sem teres de virar programador backend."
             },
             {
               "titulo": "Registar o Que Funcionou",
-              "conteudo": "Cada chamada que funciona deve virar nota reutilizavel. Isto reduz friccao e cria uma biblioteca interna de operacao para o fundador."
+              "conteudo": "Cada chamada que funciona deve virar nota reutilizavel. Isto poupa tempo e ajuda-te a repetir o processo sem voltar a aprender tudo do zero."
             },
             {
               "titulo": "A Ponte para a App",
-              "conteudo": "Os dados nao existem em abstrato. Eles ligam uploads, calculos, dashboards, copiloto e integrações futuras. Pensar por contratos ajuda a escalar melhor."
+              "conteudo": "Os dados ligam uploads, calculos, dashboards e copiloto. Pensar por contratos ajuda-te a explicar melhor ao agente o que entra, o que sai e onde pode falhar."
             }
           ]
         }
@@ -449,18 +512,21 @@
           "id": "ex4.1",
           "titulo": "Mesma Tarefa, Modelos Diferentes",
           "pontos": 10,
+          "tipo": "pratica",
           "descricao": "Dar o mesmo prompt a GLM-5 e DeepSeek: rever uma spec de assumptions upload, sugerir validacoes e simplificar o texto para um utilizador nao tecnico. Comparar outputs com uma rubrica."
         },
         {
           "id": "ex4.2",
           "titulo": "Ler Docs com Intencao",
           "pontos": 10,
+          "tipo": "pratica",
           "descricao": "Ler uma pagina de docs de um modelo ou API e extrair: janela de contexto, custos, structured output, tool use, limites, latencia e exemplos."
         },
         {
           "id": "ex4.3",
           "titulo": "Mini Scorecard LLM",
           "pontos": 10,
+          "tipo": "pratica",
           "descricao": "Criar uma tabela de comparacao para 3 tarefas do bootcamp: planear uma feature, resumir um memo atuarial e sugerir uma API call. Avaliar acao, clareza, fiabilidade e custo."
         }
       ],
@@ -468,6 +534,7 @@
         "id": "des4",
         "titulo": "Playbook de Model Selection",
         "pontos": 25,
+        "tipo": "entrega",
         "descricao": "Entregar um playbook com: qual modelo usas para planear, qual usas para construir, qual usas para segunda opiniao e qual usas para explicacao ao cliente ou equipa."
       },
       "conteudo": {
@@ -529,18 +596,21 @@
           "id": "ex5.1",
           "titulo": "Mapa de Modulos Prophet -> MVP",
           "pontos": 10,
+          "tipo": "pratica",
           "descricao": "Com base em prophet_reference_vida.md, mapear modulos core do Prophet para uma versao simplificada: inputs, assumptions, projection, results, governance, docs."
         },
         {
           "id": "ex5.2",
           "titulo": "Definir User Roles e Audit Trail",
           "pontos": 10,
+          "tipo": "pratica",
           "descricao": "Escolher os utilizadores do MVP (ex: admin, actuary, reviewer, viewer) e listar o que deve ficar auditado: uploads, versoes, runs, erros e overrides."
         },
         {
           "id": "ex5.3",
           "titulo": "Escolher o Escopo Certo",
           "pontos": 10,
+          "tipo": "pratica",
           "descricao": "Escrever uma lista explicita do que fica fora do MVP: estocastico, multiplas geografias, health completo, accounting, ML profundo ou outra tentacao de scope creep."
         }
       ],
@@ -548,6 +618,7 @@
         "id": "des5",
         "titulo": "Blueprint do Prophet Lite",
         "pontos": 25,
+        "tipo": "entrega",
         "descricao": "Entregar um blueprint com: modulos MVP, user roles, fluxos principais, itens fora de scope, e explicacao de porque esta versao pequena pode ser vendida ou demonstrada com credibilidade."
       },
       "conteudo": {
@@ -568,7 +639,8 @@
             },
             {
               "titulo": "Prophet Lite",
-              "conteudo": "A proposta deste bootcamp e um workspace pequeno para Vida: assumptions, model points, run deterministic, resultados, copiloto AI e memos/documentos ligados ao trabalho."
+              "conteudo": "A proposta deste bootcamp e um workspace pequeno para Vida: assumptions, model points, run deterministic, resultados, copiloto AI e memos/documentos ligados ao trabalho.",
+              "mermaid": "graph TD\n    A[Model Points CSV] --> C{Motor de Projeção}\n    B[Assumptions / Tábuas] --> C\n    C --> D[Resultados (Dashboard)]\n    E[Document Drop / Memos] --> F[AI Copilot]\n    D --> F\n    F --> G[Insights & Audit Trail]\n    style C fill:#f0fdf4,stroke:#10b981\n    style F fill:#eff6ff,stroke:#3b82f6"
             }
           ]
         },
@@ -609,18 +681,21 @@
           "id": "ex6.1",
           "titulo": "Classificar Documentos do Bootcamp",
           "pontos": 10,
+          "tipo": "pratica",
           "descricao": "Pegar em 5 documentos do conjunto existente (PDFs, imagens, memos ou clausulados) e definir para cada um: tipo, entidade de negocio, campos chave e risco de erro."
         },
         {
           "id": "ex6.2",
           "titulo": "Schema de Extracao",
           "pontos": 10,
+          "tipo": "pratica",
           "descricao": "Desenhar um schema JSON para o document drop com metadata minima: doc_type, product, policy_id opcional, effective_date, extracted_fields, confidence e reviewer_status."
         },
         {
           "id": "ex6.3",
           "titulo": "Primeiro RAG Util",
           "pontos": 10,
+          "tipo": "pratica",
           "descricao": "Criar um mini fluxo com ChromaDB ou equivalente para guardar texto de documentos e permitir perguntas como: 'qual a versao mais recente do memo?' ou 'o que mudou nesta assumption?'"
         }
       ],
@@ -628,6 +703,7 @@
         "id": "des6",
         "titulo": "Knowledge Workspace",
         "pontos": 25,
+        "tipo": "entrega",
         "descricao": "Entregar o desenho do modulo de document drop com pipeline, schema, regras de review humana, e 5 queries de negocio que o utilizador deve conseguir fazer depois do upload."
       },
       "conteudo": {
@@ -657,7 +733,8 @@
           "topicos": [
             {
               "titulo": "RAG como Memoria",
-              "conteudo": "RAG ajuda a recuperar contexto de documentos sem fingir que o modelo sabe tudo. E especialmente util para clausulados, memos e docs internos."
+              "conteudo": "RAG ajuda a recuperar contexto de documentos sem fingir que o modelo sabe tudo. E especialmente util para clausulados, memos e docs internos.",
+              "mermaid": "sequenceDiagram\n    participant U as Utilizador\n    participant A as Aplicação\n    participant DB as Vector DB (Chroma)\n    participant AI as Modelo (DeepSeek)\n    U->>A: Faz pergunta sobre as assumptions\n    A->>DB: Procura documentos similares\n    DB-->>A: Retorna Memos Relevantes\n    A->>AI: Pede resposta usando Memos + Pergunta\n    AI-->>U: Responde com base nos factos (com fonte)"
             },
             {
               "titulo": "Review Humano e Obrigatorio",
@@ -689,18 +766,21 @@
           "id": "ex7.1",
           "titulo": "Desenhar 3 Fluxos Core",
           "pontos": 10,
+          "tipo": "pratica",
           "descricao": "Desenhar os fluxos mobile-first para: upload de assumptions, correr projection e fazer document drop. Cada fluxo deve caber em poucos passos e ter mensagens de erro claras."
         },
         {
           "id": "ex7.2",
           "titulo": "Landing Copy e Posicionamento",
           "pontos": 10,
+          "tipo": "pratica",
           "descricao": "Escrever hero, proposta de valor, 3 bullets de resultados e 1 CTA para a tua landing page. Usar LLM para gerar variantes e escolher a mais clara."
         },
         {
           "id": "ex7.3",
           "titulo": "Pricing Hipotetico",
           "pontos": 10,
+          "tipo": "pratica",
           "descricao": "Definir 3 tiers simples para o teu SaaS e explicar o que muda entre eles: volume de runs, numero de utilizadores, document storage, copiloto AI ou exportacoes."
         }
       ],
@@ -708,6 +788,7 @@
         "id": "des7",
         "titulo": "Founder Launch Pack",
         "pontos": 25,
+        "tipo": "entrega",
         "descricao": "Entregar o build pack final com: spec consolidada, mapa de ecras mobile-first, landing copy, pricing, checklist de validacao e plano de build dos Dias 8-10."
       },
       "conteudo": {
@@ -769,18 +850,21 @@
           "id": "ex8.1",
           "titulo": "Carregar Inputs do Motor",
           "pontos": 10,
+          "tipo": "pratica",
           "descricao": "Implementar com ajuda do LLM o carregamento de tabua_mortalidade_CSO2017.csv, taxas_resgate.csv, yield_curve_ECB.csv e model points. Validar colunas obrigatorias e erros de formato."
         },
         {
           "id": "ex8.2",
           "titulo": "Projecao Base de Vida",
           "pontos": 10,
+          "tipo": "pratica",
           "descricao": "Gerar a projecao deterministica de um temporario simples com premio, beneficio e desconto. Comparar um caso com o excel_validacao_cashflow.md e documentar diferencas."
         },
         {
           "id": "ex8.3",
           "titulo": "Testes e Output Legivel",
           "pontos": 10,
+          "tipo": "pratica",
           "descricao": "Criar testes minimos para o motor e garantir que o output e legivel por humano e por app: cash flows, reserve proxy, profit metricas simples e mensagens de erro claras."
         }
       ],
@@ -788,6 +872,7 @@
         "id": "des8",
         "titulo": "Motor Local v0.1",
         "pontos": 25,
+        "tipo": "entrega",
         "descricao": "Entregar um motor local funcional que aceita inputs simples, corre a projecao base, devolve resultados estruturados e passa num conjunto minimo de testes de confianca."
       },
       "conteudo": {
@@ -804,7 +889,8 @@
             },
             {
               "titulo": "Cash Flows Primeiro",
-              "conteudo": "Antes de pensar em features sofisticadas, o motor tem de conseguir produzir cash flows coerentes e consistentes com a spec."
+              "conteudo": "Antes de pensar em features sofisticadas, o motor tem de conseguir produzir cash flows coerentes e consistentes com a spec.",
+              "mermaid": "stateDiagram-v2\n    direction LR\n    [*] --> Input_Data\n    Input_Data --> Projection\n    state Projection {\n      [*] --> Calc_Decrements\n      Calc_Decrements --> Calc_Cashflows\n      Calc_Cashflows --> Calc_Reserves\n      Calc_Reserves --> Profit_Signature\n    }\n    Projection --> Output_Results\n    Output_Results --> [*]"
             },
             {
               "titulo": "Assumptions como Camada Separada",
@@ -849,18 +935,21 @@
           "id": "ex9.1",
           "titulo": "Construir a Shell da App",
           "pontos": 10,
+          "tipo": "pratica",
           "descricao": "Ligar num app local os 3 fluxos core: upload assumptions, upload model points e correr projection. Mostrar estados de carregamento, validacao e resultados."
         },
         {
           "id": "ex9.2",
           "titulo": "Adicionar Copiloto AI",
           "pontos": 10,
+          "tipo": "pratica",
           "descricao": "Criar um copiloto simples que explica outputs, indica assumptions em falta e responde a perguntas sobre o run. O copiloto deve apoiar o utilizador, nao esconder a logica."
         },
         {
           "id": "ex9.3",
           "titulo": "Ligar Document Drop",
           "pontos": 10,
+          "tipo": "pratica",
           "descricao": "Adicionar o fluxo de document drop com OCR/extracao basica, armazenamento de metadata e pesquisa ou recuperacao minima no contexto da app local."
         }
       ],
@@ -868,6 +957,7 @@
         "id": "des9",
         "titulo": "Prophet Lite Local",
         "pontos": 25,
+        "tipo": "entrega",
         "descricao": "Entregar uma app local navegavel onde um utilizador sobe inputs, corre um run, consulta resultados, faz upload de um documento e usa o copiloto AI para entender o que aconteceu."
       },
       "conteudo": {
@@ -929,18 +1019,21 @@
           "id": "ex10.1",
           "titulo": "Deploy Seguro do MVP",
           "pontos": 10,
+          "tipo": "pratica",
           "descricao": "Preparar requirements, secrets, README e fazer deploy da app. Confirmar que o fluxo principal funciona fora da maquina local."
         },
         {
           "id": "ex10.2",
           "titulo": "Polir a Narrativa do Produto",
           "pontos": 10,
+          "tipo": "pratica",
           "descricao": "Escrever a descricao do produto, 3 screenshots ou gifs, e um resumo curto sobre o problema, a wedge e o valor do teu Prophet Lite com AI Copilot."
         },
         {
           "id": "ex10.3",
           "titulo": "Documentar o Lançamento",
           "pontos": 10,
+          "tipo": "pratica",
           "descricao": "Criar um resumo de lançamento com imagem, URL, problema resolvido, stack usada e aprendizagem. O objetivo é documentar e preparar a partilha de conhecimento com a tua equipa, colegas ou rede de contactos."
         }
       ],
@@ -948,6 +1041,7 @@
         "id": "des10",
         "titulo": "Lancamento Publico do Produto",
         "pontos": 25,
+        "tipo": "entrega",
         "descricao": "Entregar a app deployada, README final, demo curta e a nota de lançamento. O projeto deixa de ser exercicio interno e passa a ativo publico de carreira e mercado."
       },
       "conteudo": {
@@ -956,7 +1050,8 @@
           "topicos": [
             {
               "titulo": "Local Primeiro, Cloud Depois",
-              "conteudo": "Esta ordem reduz stress e acelera aprendizagem. So faz sentido deployar depois de o fluxo principal funcionar localmente."
+              "conteudo": "Esta ordem reduz stress e acelera aprendizagem. So faz sentido deployar depois de o fluxo principal funcionar localmente.",
+              "mermaid": "flowchart LR\n    subgraph Local [A Tua Máquina]\n        C[Código e Motor] \n        K[.env / API Keys]\n    end\n    C -- git push --> G[GitHub]\n    subgraph Cloud [Servidor Web / Streamlit]\n        A[A Tua App Online]\n        S[Secrets / Variáveis de Ambiente]\n    end\n    G -->|Faz Build automático| A\n    K -. Copias à mão .-> S\n    A --> U((O teu Cliente))\n    style Local fill:#f8fafc,stroke:#cbd5e1\n    style Cloud fill:#f0fdf4,stroke:#10b981\n    style K fill:#fee2e2,stroke:#ef4444"
             },
             {
               "titulo": "Secrets e Higiene",

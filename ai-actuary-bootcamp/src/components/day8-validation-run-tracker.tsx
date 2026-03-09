@@ -39,7 +39,7 @@ type TrackerState = {
   evidence: EvidenceItem[];
 };
 
-const STORAGE_KEY = "aibootcamp-day8-validation-run-tracker-v1";
+const STORAGE_KEY = "aibootcamp-day8-validation-run-tracker-v2";
 
 const STATUS_META: Record<
   StatusId,
@@ -114,6 +114,29 @@ const STARTER_EVIDENCE: EvidenceItem[] = [
   },
 ];
 
+const ASSETS = [
+  {
+    title: "tabua_mortalidade_CSO2017.csv",
+    description: "Tabua de mortalidade CSO2017 com taxas qx por idade e genero.",
+    href: "/course-assets/day8/tabua_mortalidade_CSO2017.csv",
+  },
+  {
+    title: "taxas_resgate.csv",
+    description: "Taxas de resgate (lapse) por ano de apolice e produto.",
+    href: "/course-assets/day8/taxas_resgate.csv",
+  },
+  {
+    title: "yield_curve_ECB.csv",
+    description: "Curva de rendimentos ECB com taxas spot e forward.",
+    href: "/course-assets/day8/yield_curve_ECB.csv",
+  },
+  {
+    title: "excel_validacao_cashflow.md",
+    description: "Template de validacao de cashflows para comparar com o motor.",
+    href: "/course-assets/day8/excel_validacao_cashflow.md",
+  },
+];
+
 function createInitialState(): TrackerState {
   return {
     engineName: "Motor deterministico local",
@@ -150,6 +173,88 @@ function createEvidenceItem(): EvidenceItem {
   };
 }
 
+function buildValidationReport(state: TrackerState, statusMeta: typeof STATUS_META[StatusId]): string {
+  const completedMilestones = MILESTONES.filter((item) => state.milestones[item.id].done).map(
+    (item) => `- ${item.label}: ${state.milestones[item.id].note || "ok"}`,
+  );
+  const pendingMilestones = MILESTONES.filter((item) => !state.milestones[item.id].done).map(
+    (item) => `- ${item.label}: ${state.milestones[item.id].note || "por fechar"}`,
+  );
+  const evidenceLines = state.evidence
+    .filter((item) => item.title.trim() || item.command.trim() || item.outcome.trim())
+    .map((item, index) => {
+      const title = item.title.trim() || `Evidencia ${index + 1}`;
+      const command = item.command.trim() || "sem comando";
+      const outcome = item.outcome.trim() || "sem resultado registado";
+      return `- ${title}: ${command} -> ${outcome}`;
+    });
+
+  return [
+    "# Relatorio de Validacao do Motor Deterministico",
+    "",
+    "## Estado Atual",
+    "",
+    `Estado: ${statusMeta.label}`,
+    `Motor: ${state.engineName || "n/d"}`,
+    `Branch: ${state.branchName || "n/d"}`,
+    `Dataset: ${state.dataset || "n/d"}`,
+    `Owner: ${state.owner || "n/d"}`,
+    `Ultima run: ${state.lastRunAt || "n/d"}`,
+    `Runtime esperado: ${state.expectedRuntime || "n/d"}`,
+    `Confianca atual: ${state.confidence}%`,
+    "",
+    "## Milestones Fechados",
+    ...(completedMilestones.length ? completedMilestones : ["- Nenhum milestone fechado."]),
+    "",
+    "## Milestones Pendentes",
+    ...(pendingMilestones.length ? pendingMilestones : ["- Nenhum milestone pendente."]),
+    "",
+    "## Premissas",
+    state.assumptionsNote || "Nenhuma premissa registada.",
+    "",
+    "## Notas de Variancia",
+    state.varianceNote || "Nenhuma variancia registada.",
+    "",
+    "## Bloqueios",
+    state.blockerNote || "Sem bloqueios ativos.",
+    "",
+    "## Proximo Passo",
+    state.nextStep || "n/d",
+    "",
+    "## Evidencia da Run",
+    ...(evidenceLines.length ? evidenceLines : ["- Sem evidencia registada."]),
+    "",
+    "## Comandos CLI",
+    `git switch ${state.branchName || "<branch>"}`,
+    "pnpm install && pnpm test:engine --scenario baseline",
+    "pnpm engine:compare --expected fixtures/baseline.json --actual tmp/latest.json",
+    "",
+  ].join("\n");
+}
+
+function buildOpenCodePrompt(state: TrackerState): string {
+  return [
+    "Prompt para validar o motor deterministico no OpenCode",
+    "",
+    `Objetivo: validar o motor ${state.engineName} com fixtures locais.`,
+    `Branch: ${state.branchName}`,
+    `Dataset: ${state.dataset}`,
+    "",
+    "Pede ao agente para:",
+    "1. carregar os fixtures de mortality, lapse e yield curve;",
+    "2. correr o motor com o cenario baseline;",
+    "3. comparar o output com o ficheiro esperado;",
+    "4. reportar desvios com coluna, valor esperado e valor atual;",
+    "5. sugerir acoes se a variancia exceder tolerancias definidas.",
+    "",
+    "Assets disponiveis:",
+    "- tabua_mortalidade_CSO2017.csv",
+    "- taxas_resgate.csv",
+    "- yield_curve_ECB.csv",
+    "- excel_validacao_cashflow.md",
+  ].join("\n");
+}
+
 export function Day8ValidationRunTracker() {
   const [state, setState] = useState<TrackerState>(() => {
     if (typeof window === "undefined") {
@@ -163,7 +268,7 @@ export function Day8ValidationRunTracker() {
       return createInitialState();
     }
   });
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<string | null>(null);
 
   useEffect(() => {
     try {
@@ -180,54 +285,15 @@ export function Day8ValidationRunTracker() {
 
   const statusMeta = STATUS_META[state.overallStatus];
 
-  const handoffSummary = useMemo(() => {
-    const completedMilestones = MILESTONES.filter((item) => state.milestones[item.id].done).map(
-      (item) => `- ${item.label}: ${state.milestones[item.id].note || "ok"}`,
-    );
-    const pendingMilestones = MILESTONES.filter((item) => !state.milestones[item.id].done).map(
-      (item) => `- ${item.label}: ${state.milestones[item.id].note || "por fechar"}`,
-    );
-    const evidenceLines = state.evidence
-      .filter((item) => item.title.trim() || item.command.trim() || item.outcome.trim())
-      .map((item, index) => {
-        const title = item.title.trim() || `Evidencia ${index + 1}`;
-        const command = item.command.trim() || "sem comando";
-        const outcome = item.outcome.trim() || "sem resultado registado";
-        return `- ${title}: ${command} -> ${outcome}`;
-      });
+  const validationReport = useMemo(
+    () => buildValidationReport(state, statusMeta),
+    [state, statusMeta],
+  );
 
-    return [
-      "# Handoff de validacao local",
-      "",
-      `Estado: ${statusMeta.label}`,
-      `Motor: ${state.engineName || "n/d"}`,
-      `Branch: ${state.branchName || "n/d"}`,
-      `Dataset: ${state.dataset || "n/d"}`,
-      `Owner: ${state.owner || "n/d"}`,
-      `Ultima run: ${state.lastRunAt || "n/d"}`,
-      `Runtime esperado: ${state.expectedRuntime || "n/d"}`,
-      `Confianca atual: ${state.confidence}%`,
-      "",
-      "Milestones fechados:",
-      ...(completedMilestones.length ? completedMilestones : ["- Nenhum milestone fechado."]),
-      "",
-      "Milestones pendentes:",
-      ...(pendingMilestones.length ? pendingMilestones : ["- Nenhum milestone pendente."]),
-      "",
-      `Premissas: ${state.assumptionsNote || "n/d"}`,
-      `Variancia: ${state.varianceNote || "n/d"}`,
-      `Bloqueios: ${state.blockerNote || "Sem bloqueios ativos."}`,
-      `Proximo passo: ${state.nextStep || "n/d"}`,
-      "",
-      "Evidencia da run:",
-      ...(evidenceLines.length ? evidenceLines : ["- Sem evidencia registada."]),
-      "",
-      "CLI sugerido:",
-      `git switch ${state.branchName || "<branch>"}`,
-      `pnpm install && pnpm test:engine --scenario baseline`,
-      "pnpm engine:compare --expected fixtures/baseline.json --actual tmp/latest.json",
-    ].join("\n");
-  }, [state, statusMeta.label]);
+  const openCodePrompt = useMemo(
+    () => buildOpenCodePrompt(state),
+    [state],
+  );
 
   function setField<Key extends keyof TrackerState>(key: Key, value: TrackerState[Key]) {
     setState((current) => ({ ...current, [key]: value }));
@@ -267,38 +333,68 @@ export function Day8ValidationRunTracker() {
     }));
   }
 
-  async function copySummary() {
-    await navigator.clipboard.writeText(handoffSummary);
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 1800);
+  async function copyToClipboard(key: string, text: string) {
+    await navigator.clipboard.writeText(text);
+    setCopied(key);
+    window.setTimeout(() => setCopied(null), 1600);
+  }
+
+  function downloadReport() {
+    const blob = new Blob([validationReport], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "validation-report.md";
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   return (
-    <section className="rounded-[1.8rem] border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[0_18px_50px_rgba(22,27,45,0.06)]">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
-            Lab Dia 8
-          </p>
-          <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
-            Fechar a validacao do motor local com evidencia e handoff.
-          </h2>
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--muted-foreground)]">
-            Este tracker ajuda o estudante a provar que a run deterministica e repetivel, explicar a
-            variancia observada e passar o trabalho no repo sem notas soltas no terminal.
-          </p>
-        </div>
+    <section className="space-y-6">
+      <div className="rounded-[1.8rem] border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[0_18px_50px_rgba(22,27,45,0.06)]">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
+              Lab Dia 8
+            </p>
+            <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
+              Fechar a validacao do motor local com evidencia e handoff.
+            </h2>
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--muted-foreground)]">
+              Este tracker ajuda o estudante a provar que a run deterministica e repetivel, explicar a
+              variancia observada e passar o trabalho no repo sem notas soltas no terminal.
+            </p>
+          </div>
 
-        <button
-          type="button"
-          onClick={copySummary}
-          className="rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[var(--accent-strong)]"
-        >
-          {copied ? "Handoff copiado" : "Copiar handoff"}
-        </button>
+          <div className="flex items-center gap-3">
+            <div className="rounded-xl border border-[var(--accent-soft)] bg-[linear-gradient(180deg,rgba(124,63,88,0.08),rgba(124,63,88,0.03))] px-4 py-2.5 text-sm font-semibold text-[var(--foreground)]">
+              {completedCount}/{MILESTONES.length} checkpoints
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="mt-6 grid gap-4 xl:grid-cols-[0.88fr_1.12fr]">
+      <div className="rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-5">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
+          Assets de validacao do motor — descarrega antes de correr
+        </p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {ASSETS.map((asset) => (
+            <a
+              key={asset.href}
+              href={asset.href}
+              download
+              className="flex flex-col gap-2 rounded-xl border border-[var(--border)] bg-white p-4 transition hover:border-[var(--accent-soft)] hover:shadow-sm"
+            >
+              <p className="text-sm font-semibold text-[var(--foreground)]">{asset.title}</p>
+              <p className="text-xs leading-5 text-[var(--muted-foreground)]">{asset.description}</p>
+              <span className="mt-auto text-xs font-semibold text-[var(--accent)]">Descarregar</span>
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <div className="grid gap-6 xl:grid-cols-[0.88fr_1.12fr]">
         <div className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <MetricCard label="Checkpoints fechados" value={`${completedCount}/${MILESTONES.length}`} />
@@ -391,18 +487,18 @@ export function Day8ValidationRunTracker() {
           <div className="rounded-[1.3rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-4">
             <div className="flex items-center justify-between gap-3">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
-                Handoff para repo e CLI
+                Preview do relatorio
               </p>
               <button
                 type="button"
-                onClick={copySummary}
+                onClick={() => copyToClipboard("preview", validationReport)}
                 className="rounded-full border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--foreground)] transition hover:border-[var(--accent-soft)]"
               >
-                {copied ? "Texto copiado" : "Copiar resumo"}
+                {copied === "preview" ? "Texto copiado" : "Copiar resumo"}
               </button>
             </div>
-            <pre className="mt-4 overflow-x-auto rounded-[1rem] border border-[var(--border)] bg-white p-4 text-xs leading-6 text-[var(--foreground)]">
-              {handoffSummary}
+            <pre className="mt-4 max-h-64 overflow-auto rounded-[1rem] border border-[var(--border)] bg-white p-4 text-xs leading-6 text-[var(--foreground)]">
+              {validationReport}
             </pre>
           </div>
         </div>
@@ -558,6 +654,55 @@ export function Day8ValidationRunTracker() {
               ))}
             </div>
           </div>
+        </div>
+      </div>
+
+      <div className="rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface)] p-5">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
+              Artefacto final — validation-report.md
+            </p>
+            <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">
+              Descarrega o relatorio completo ou copia o prompt para o OpenCode correr a validacao.
+            </p>
+          </div>
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+            <button
+              type="button"
+              onClick={() => copyToClipboard("prompt", openCodePrompt)}
+              className="rounded-full border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--foreground)] transition hover:border-[var(--accent-soft)]"
+            >
+              {copied === "prompt" ? "Copiado" : "Copiar prompt"}
+            </button>
+            <button
+              type="button"
+              onClick={() => copyToClipboard("report", validationReport)}
+              className="rounded-full border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--foreground)] transition hover:border-[var(--accent-soft)]"
+            >
+              {copied === "report" ? "Copiado" : "Copiar relatorio"}
+            </button>
+            <button
+              type="button"
+              onClick={downloadReport}
+              className="rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[var(--accent-strong)]"
+            >
+              Descarregar validation-report.md
+            </button>
+          </div>
+        </div>
+
+        <pre className="mt-4 max-h-80 overflow-auto whitespace-pre-wrap break-words rounded-xl border border-[var(--border)] bg-[var(--surface-subtle)] p-4 text-xs leading-6 text-[var(--foreground)]">
+          {validationReport}
+        </pre>
+
+        <div className="mt-4 rounded-xl border border-dashed border-[var(--border-strong)] bg-white/60 p-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
+            Prompt para OpenCode / GLM-5
+          </p>
+          <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">
+            {openCodePrompt}
+          </p>
         </div>
       </div>
     </section>

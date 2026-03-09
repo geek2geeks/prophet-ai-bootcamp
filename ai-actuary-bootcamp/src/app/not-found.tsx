@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { AppLink } from "@/components/app-link";
 
 export default function NotFound() {
   return (
@@ -9,15 +9,15 @@ export default function NotFound() {
         </p>
         <h1 className="mt-4 font-serif text-5xl text-[#351f29]">The page slipped off the study desk.</h1>
         <p className="mt-4 text-sm leading-7 text-[#6c5560]">
-          Head back to the mission grid and continue from a valid day workspace.
+          Volta ao percurso e abre uma aula valida para continuar o bootcamp.
         </p>
-        <Link
+        <AppLink
           href="/"
           className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#351f29] px-5 py-3 text-sm font-semibold text-[#fff5f6]"
         >
           Back home
           <span aria-hidden="true">{"->"}</span>
-        </Link>
+        </AppLink>
       </div>
     </main>
   );

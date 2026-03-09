@@ -1,18 +1,23 @@
 "use client";
 
 import { useAuth } from "@/lib/auth-context";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect } from "react";
 
-export function RouteGuard({ children }: { children: React.ReactNode }) {
+function RouteGuardInner({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push("/login");
+      const query = searchParams.toString();
+      const returnTo = `${pathname}${query ? `?${query}` : ""}`;
+      const target = returnTo && returnTo !== "/login" ? `/login?returnTo=${encodeURIComponent(returnTo)}` : "/login";
+      router.replace(target);
     }
-  }, [user, loading, router]);
+  }, [loading, pathname, router, searchParams, user]);
 
   if (loading || !user) {
     return (
@@ -23,4 +28,20 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
   }
 
   return <>{children}</>;
+}
+
+export function RouteGuard({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-[50vh] items-center justify-center">
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--muted-foreground)]">
+            A verificar acesso...
+          </p>
+        </div>
+      }
+    >
+      <RouteGuardInner>{children}</RouteGuardInner>
+    </Suspense>
+  );
 }

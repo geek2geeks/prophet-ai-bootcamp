@@ -8,6 +8,7 @@ import { useAuth } from "@/lib/auth-context";
 import { course, days, missionItems } from "@/lib/course";
 import { db } from "@/lib/firebase";
 import { useStudentState } from "@/lib/use-student-state";
+import { isItemDone, type ProgressMap } from "@/lib/student-state";
 import type { ReviewMap } from "@/lib/day1-review";
 
 type SubmissionEntry = {
@@ -23,8 +24,9 @@ type SubmissionEntry = {
 type ReviewEntry = {
   itemId: string;
   title: string;
-  score: string;
+  readiness: string;
   feedback: string;
+  nextStep: string;
   updatedAtLabel: string | null;
   confidence: string;
 };
@@ -242,8 +244,8 @@ function extractRecentSubmissions(data: unknown) {
     .slice(0, 6);
 }
 
-function getDayCompletion(dayProgressIds: string[], progress: Record<string, boolean>) {
-  const completed = dayProgressIds.filter((id) => progress[id]).length;
+function getDayCompletion(dayProgressIds: string[], progress: ProgressMap) {
+  const completed = dayProgressIds.filter((id) => isItemDone(progress, id)).length;
   const total = dayProgressIds.length;
   const percent = Math.round((completed / total) * 100) || 0;
 
@@ -255,6 +257,9 @@ export function PortfolioProgressPage() {
   const { progress, stickyNotes, loading, day1Reviews } = useStudentState();
   const [recentSubmissions, setRecentSubmissions] = useState<SubmissionEntry[]>([]);
   const [submissionsLoading, setSubmissionsLoading] = useState(true);
+  const [showArchiveDays, setShowArchiveDays] = useState(false);
+  const [showStickyNotes, setShowStickyNotes] = useState(false);
+  const [showTutorReviews, setShowTutorReviews] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -322,28 +327,34 @@ export function PortfolioProgressPage() {
   }, [user]);
 
   const summary = useMemo(() => {
-    const completedItems = missionItems.filter((item) => progress[item.id]);
+    const completedItems = missionItems.filter((item) => isItemDone(progress, item.id));
     const completedPoints = completedItems.reduce((sum, item) => sum + item.points, 0);
     const completedDays = days.filter((day) => {
       const ids = [...day.exercicios.map((item) => item.id), day.desafio.id];
-      return ids.every((id) => progress[id]);
+      return ids.every((id) => isItemDone(progress, id));
     });
     const startedDays = days.filter((day) => {
       const ids = [...day.exercicios.map((item) => item.id), day.desafio.id];
-      return ids.some((id) => progress[id]);
+      return ids.some((id) => isItemDone(progress, id));
     });
     const nextDay =
       days.find((day) => {
         const ids = [...day.exercicios.map((item) => item.id), day.desafio.id];
-        return ids.some((id) => !progress[id]);
+        return ids.some((id) => !isItemDone(progress, id));
       }) ?? days.at(-1);
-    const highlightedDays = days.slice(0, 5).map((day) => {
+    const highlightedDays = days
+      .filter((day) => {
+        const ids = [...day.exercicios.map((item) => item.id), day.desafio.id];
+        return ids.some((id) => isItemDone(progress, id)) || day.slug === nextDay?.slug;
+      })
+      .slice(0, 5)
+      .map((day) => {
       const ids = [...day.exercicios.map((item) => item.id), day.desafio.id];
       return {
         day,
         ...getDayCompletion(ids, progress),
       };
-    });
+      });
     // Recent sticky notes for the portfolio summary (up to 3, newest first).
     const recentSticky = [...stickyNotes]
       .sort((a, b) => b.createdAt - a.createdAt)
@@ -367,14 +378,11 @@ export function PortfolioProgressPage() {
     const entries = Object.values(day1Reviews || {}) as Array<ReviewMap[string]>;
     const completed = entries.filter((entry) => !entry?.error && entry?.reviewedAnswer?.trim()).length;
     const fresh = entries.filter((entry) => !entry?.error && entry?.reviewedAnswer?.trim()).slice();
-    const averageScore =
-      completed > 0
-        ? Math.round(
-            entries
-              .filter((entry) => !entry?.error && entry?.reviewedAnswer?.trim())
-              .reduce((sum, entry) => sum + entry.scoreRecommended, 0) / completed,
-          )
-        : 0;
+    const readyCount = fresh.filter((entry) => entry.readyToSubmit).length;
+    const blockedCount = fresh.filter(
+      (entry) => entry.readinessStatus === "blocked" || entry.blockingIssues.length > 0,
+    ).length;
+    const reviseCount = Math.max(0, completed - readyCount - blockedCount);
 
     const recent = fresh
       .sort((left, right) => right.reviewedAtMs - left.reviewedAtMs)
@@ -382,15 +390,23 @@ export function PortfolioProgressPage() {
       .map((entry) => ({
         itemId: entry.itemId,
         title: entry.itemId,
-        score: `${entry.scoreRecommended}/${entry.maxScore}`,
-        feedback: entry.shortFeedback || "Sem comentario curto.",
+        readiness:
+          entry.readinessStatus === "ready"
+            ? "Pronto para submeter"
+            : entry.readinessStatus === "blocked"
+              ? "Precisa de mudancas chave"
+              : "Pede mais um draft",
+        feedback: entry.coachSummary || entry.encouragement || "Sem comentario curto.",
+        nextStep: entry.nextStep || entry.priorityActions[0] || "Sem proximo passo registado.",
         updatedAtLabel: formatDateLabel(entry.reviewedAtMs),
         confidence: entry.confidence,
       })) as ReviewEntry[];
 
     return {
       completed,
-      averageScore,
+      readyCount,
+      reviseCount,
+      blockedCount,
       recent,
     };
   }, [day1Reviews]);
@@ -436,25 +452,26 @@ export function PortfolioProgressPage() {
               Portfolio do estudante
             </p>
             <span className="ink-rule mt-3" aria-hidden="true" />
-            <h1 className="mt-4 max-w-4xl font-serif text-5xl leading-[0.94] tracking-[-0.04em] text-[var(--foreground)] sm:text-6xl">
+            <h1 className="mt-4 max-w-4xl font-serif text-[2.6rem] leading-[0.96] tracking-[-0.04em] text-[var(--foreground)] sm:text-6xl">
               O teu progresso, as tuas entregas e o proximo passo num so lugar.
             </h1>
             <p className="mt-4 max-w-3xl text-base leading-8 text-[var(--muted-foreground)] sm:text-lg">
-              Esta pagina junta o que ja foi concluido, o que ainda esta em curso e os sinais de trabalho guardados pelo estudante ao longo do bootcamp.
+              Consulta o que ja fechaste, o que ainda esta em curso e as entregas recentes que ja
+              servem como prova do teu trabalho.
             </p>
 
-            <div className="mt-6 flex flex-wrap gap-3">
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               {summary.nextDay ? (
                 <AppLink
                   href={`/missions/${summary.nextDay.slug}`}
-                  className="button-primary px-5 py-3 text-sm"
+                  className="button-primary w-full px-5 py-3 text-center text-sm sm:w-auto"
                 >
                   Continuar no Dia {summary.nextDay.slug}
                 </AppLink>
               ) : null}
               <AppLink
                 href="/"
-                className="button-secondary px-5 py-3 text-sm font-semibold"
+                className="button-secondary w-full px-5 py-3 text-center text-sm font-semibold sm:w-auto"
               >
                 Voltar ao inicio
               </AppLink>
@@ -498,7 +515,7 @@ export function PortfolioProgressPage() {
           </div>
         </section>
 
-        <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
           <article className="metric-card rounded-[1.6rem] p-5">
             <p className="text-xs uppercase tracking-[0.18em] text-[var(--muted-foreground)]">Dias concluidos</p>
             <p className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
@@ -539,14 +556,26 @@ export function PortfolioProgressPage() {
                     Dias em destaque
                   </p>
                   <h2 className="mt-2 font-serif text-3xl text-[var(--foreground)] sm:text-4xl">
-                    O percurso fica visivel sem perder o contexto da aula.
+                    Dias com progresso recente.
                   </h2>
                 </div>
                 <p className="max-w-xl text-sm leading-7 text-[var(--muted-foreground)]">
-                  Os primeiros dias mostram o arranque do teu portfolio e ajudam a perceber onde vale a pena voltar agora.
+                  Revê as aulas que ja tocaste e identifica rapidamente qual merece a tua atencao a
+                  seguir.
                 </p>
               </div>
 
+              <div className="mt-6 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setShowArchiveDays((prev) => !prev)}
+                  className="button-secondary px-4 py-2 text-sm font-semibold"
+                >
+                  {showArchiveDays ? "Esconder dias" : "Ver dias em curso"}
+                </button>
+              </div>
+
+              {showArchiveDays ? (
               <div className="mt-8 grid gap-3">
                 {summary.highlightedDays.map(({ day, completed, total, percent }) => (
                   <AppLink
@@ -568,12 +597,29 @@ export function PortfolioProgressPage() {
                   </AppLink>
                 ))}
               </div>
+              ) : (
+                <div className="mt-6 rounded-[1.4rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-4 text-sm leading-7 text-[var(--muted-foreground)]">
+                  Abre esta secao para rever aulas iniciadas, comparar progresso e decidir onde
+                  retomar.
+                </div>
+              )}
             </section>
 
             <section className="panel shell-frame rounded-[2rem] p-6 sm:p-8">
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--muted-foreground)]">
                 Notas adesivas
               </p>
+              <div className="mt-6 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setShowStickyNotes((prev) => !prev)}
+                  className="button-secondary px-4 py-2 text-sm font-semibold"
+                >
+                  {showStickyNotes ? "Esconder notas" : "Ver notas recentes"}
+                </button>
+              </div>
+
+              {showStickyNotes ? (
               <div className="mt-6 grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
                 <div className="rounded-[1.4rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-4">
                   <p className="text-sm font-semibold text-[var(--foreground)]">Resumo</p>
@@ -610,6 +656,12 @@ export function PortfolioProgressPage() {
                   )}
                 </div>
               </div>
+              ) : (
+                <div className="mt-6 rounded-[1.4rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-4 text-sm leading-7 text-[var(--muted-foreground)]">
+                  Abre esta secao quando quiseres rever prompts, comandos e decisoes guardadas nas
+                  tuas notas.
+                </div>
+              )}
             </section>
 
             <section className="panel shell-frame rounded-[2rem] p-6 sm:p-8">
@@ -619,26 +671,39 @@ export function PortfolioProgressPage() {
                     Reviews do tutor
                   </p>
                   <h2 className="mt-2 font-serif text-3xl text-[var(--foreground)] sm:text-4xl">
-                    Feedback AI guardado ao longo do percurso.
+                    Feedback AI sobre as tuas respostas.
                   </h2>
                 </div>
                 <p className="max-w-xl text-sm leading-7 text-[var(--muted-foreground)]">
-                  Cada review mostra evidencias, lacunas e o nivel de confianca da avaliacao. Isto torna o progresso mais auditavel e mais facil de rever.
+                  Cada review destaca pontos fortes, lacunas e o proximo passo antes de submeteres a
+                  versao final.
                 </p>
               </div>
 
+              <div className="mt-6 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setShowTutorReviews((prev) => !prev)}
+                  className="button-secondary px-4 py-2 text-sm font-semibold"
+                >
+                  {showTutorReviews ? "Esconder reviews" : "Ver reviews do tutor"}
+                </button>
+              </div>
+
+              {showTutorReviews ? (
+              <>
               <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 <article className="rounded-[1.4rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-4">
                   <p className="text-xs uppercase tracking-[0.16em] text-[var(--muted-foreground)]">Reviews concluidas</p>
                   <p className="mt-2 text-2xl font-semibold text-[var(--foreground)]">{reviewSummary.completed}</p>
                 </article>
                 <article className="rounded-[1.4rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-4">
-                  <p className="text-xs uppercase tracking-[0.16em] text-[var(--muted-foreground)]">Score medio</p>
-                  <p className="mt-2 text-2xl font-semibold text-[var(--foreground)]">{reviewSummary.averageScore}</p>
+                  <p className="text-xs uppercase tracking-[0.16em] text-[var(--muted-foreground)]">Prontas a submeter</p>
+                  <p className="mt-2 text-2xl font-semibold text-[var(--foreground)]">{reviewSummary.readyCount}</p>
                 </article>
                 <article className="rounded-[1.4rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-4">
-                  <p className="text-xs uppercase tracking-[0.16em] text-[var(--muted-foreground)]">Ultimas reviews</p>
-                  <p className="mt-2 text-2xl font-semibold text-[var(--foreground)]">{reviewSummary.recent.length}</p>
+                  <p className="text-xs uppercase tracking-[0.16em] text-[var(--muted-foreground)]">Pedem revisao</p>
+                  <p className="mt-2 text-2xl font-semibold text-[var(--foreground)]">{reviewSummary.reviseCount + reviewSummary.blockedCount}</p>
                 </article>
               </div>
 
@@ -659,13 +724,16 @@ export function PortfolioProgressPage() {
                           </h3>
                         </div>
                         <div className="text-right">
-                          <p className="text-sm font-semibold text-[var(--foreground)]">{entry.score}</p>
+                          <p className="text-sm font-semibold text-[var(--foreground)]">{entry.readiness}</p>
                           <p className="mt-1 text-xs uppercase tracking-[0.14em] text-[var(--muted-foreground)]">
                             {entry.confidence} · {entry.updatedAtLabel ?? "sem data"}
                           </p>
                         </div>
                       </div>
                       <p className="mt-3 text-sm leading-7 text-[var(--muted-foreground)]">{entry.feedback}</p>
+                      <p className="mt-3 text-xs leading-6 text-[var(--muted-foreground)]">
+                        Proximo passo: {entry.nextStep}
+                      </p>
                     </article>
                   ))
                 ) : (
@@ -674,10 +742,17 @@ export function PortfolioProgressPage() {
                   </div>
                 )}
               </div>
+              </>
+              ) : (
+                <div className="mt-6 rounded-[1.4rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-4 text-sm leading-7 text-[var(--muted-foreground)]">
+                  Abre esta secao para rever comentarios do tutor e decidir que respostas merecem uma
+                  nova iteracao.
+                </div>
+              )}
             </section>
           </div>
 
-          <aside className="space-y-6 xl:sticky xl:top-24 xl:self-start">
+          <aside className="space-y-6 xl:sticky xl:top-28 xl:self-start">
             <section className="panel shell-frame rounded-[2rem] p-6 sm:p-8">
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--muted-foreground)]">
                 Entregas recentes

@@ -6,13 +6,15 @@ export type ReviewResult = {
   reviewedAnswer: string;
   reviewedAtMs: number;
   model: string;
-  scoreRecommended: number;
-  maxScore: number;
-  passRecommended: boolean;
-  shortFeedback: string;
+  readinessStatus: "ready" | "revise" | "blocked";
+  readyToSubmit: boolean;
+  encouragement: string;
+  coachSummary: string;
   strengths: string[];
-  gaps: string[];
-  requiredFixes: string[];
+  coverageGaps: string[];
+  priorityActions: string[];
+  blockingIssues: string[];
+  nextStep: string;
   evidenceUsed: string[];
   confidence: "low" | "medium" | "high";
   error?: string;
@@ -27,31 +29,36 @@ type ReviewSpec = {
   mustInclude: string[];
 };
 
-const REVIEW_SYSTEM_PROMPT = `Es o Peter, a camada de review do bootcamp para respostas dos exercicios e desafios.
+const REVIEW_SYSTEM_PROMPT = `Es o Peter, o tutor AI do bootcamp para respostas dos exercicios e desafios.
 
 OBJETIVO:
- - Avaliar a resposta do aluno contra a rubrica do exercicio ou desafio.
-- Dar feedback curto, especifico e acionavel.
-- Funcionar como coach: recomendacao, nao julgamento final.
+ - Ler com cuidado o que o aluno tentou explicar.
+ - Dar feedback encorajador, especifico e acionavel.
+ - Funcionar como coach: ajudar a melhorar o proximo draft, nao dar nota final.
 
 REGRAS:
 - Responde em portugues de Portugal.
-- Sê exigente com elementos em falta, foco fraco e respostas vagas.
+- Comeca por reconhecer o que ja esta a funcionar bem.
+- Comenta os pontos que o aluno tentou explicar antes de sugerires mudancas.
+- Se faltar algo importante da rubrica, explica isso com cuidado e diz como melhorar.
+- Se houver algo extra que o aluno deva saber para fortalecer a resposta, acrescenta-o com clareza.
 - Valoriza especificidade, clareza, ligacao ao contexto do bootcamp e uso de evidencia.
-- Penaliza mais a falta de requisitos do que estilo cosmetico.
 - Se houver contexto factual extra, usa-o para verificar a resposta.
 - Nao inventes factos nem assumes trabalho que o aluno nao mostrou.
+- Limita-te as 1 a 3 prioridades mais importantes para o proximo draft.
 - Devolve APENAS JSON valido, sem markdown, sem texto extra.
 
 JSON OBRIGATORIO:
 {
-  "score_recommended": 0,
-  "max_score": 10,
-  "pass_recommended": false,
-  "short_feedback": "2-4 frases objetivas.",
+  "readiness_status": "ready|revise|blocked",
+  "ready_to_submit": false,
+  "encouragement": "1-2 frases curtas e honestas.",
+  "coach_summary": "2-4 frases objetivas e encorajadoras.",
   "strengths": ["..."],
-  "gaps": ["..."],
-  "required_fixes": ["..."],
+  "coverage_gaps": ["..."],
+  "priority_actions": ["..."],
+  "blocking_issues": ["..."],
+  "next_step": "Sugestao clara para o proximo draft.",
   "evidence_used": ["..."],
   "confidence": "low|medium|high"
 }`;
@@ -357,23 +364,32 @@ export function normalizeReviewResult(
   fallbackError?: string,
   model = "deepseek-chat",
 ): ReviewResult {
-  const spec = getReviewSpec(itemId);
-  const maxScore = spec?.maxScore ?? 10;
-  const scoreRaw = Number(payload?.score_recommended ?? 0);
-  const scoreRecommended = Number.isFinite(scoreRaw)
-    ? Math.max(0, Math.min(maxScore, Math.round(scoreRaw)))
-    : 0;
   const confidenceRaw = String(payload?.confidence ?? "medium").toLowerCase();
   const confidence =
     confidenceRaw === "low" || confidenceRaw === "high" || confidenceRaw === "medium"
       ? confidenceRaw
       : "medium";
-  const requiredFixes = normalizeList(payload?.required_fixes);
-  const passThreshold = Math.max(6, Math.ceil(maxScore * 0.7));
-  const passRecommended =
-    typeof payload?.pass_recommended === "boolean"
-      ? payload.pass_recommended
-      : scoreRecommended >= passThreshold && requiredFixes.length === 0;
+  const legacyRequiredFixes = normalizeList(payload?.required_fixes);
+  const coverageGaps = normalizeList(payload?.coverage_gaps ?? payload?.gaps);
+  const priorityActions = normalizeList(payload?.priority_actions ?? payload?.required_fixes);
+  const blockingIssues = normalizeList(payload?.blocking_issues ?? payload?.required_fixes);
+  const readinessRaw = String(payload?.readiness_status ?? "").toLowerCase();
+  const legacyPassRecommended =
+    typeof payload?.pass_recommended === "boolean" ? payload.pass_recommended : undefined;
+  const readinessStatus =
+    readinessRaw === "ready" || readinessRaw === "revise" || readinessRaw === "blocked"
+      ? readinessRaw
+      : blockingIssues.length > 0 || legacyRequiredFixes.length > 0
+        ? "blocked"
+        : legacyPassRecommended === true
+          ? "ready"
+          : "revise";
+  const readyToSubmit =
+    typeof payload?.ready_to_submit === "boolean"
+      ? payload.ready_to_submit
+      : readinessStatus === "ready";
+
+  const error = typeof fallbackError === "string" ? fallbackError.trim() : "";
 
   return {
     itemId,
@@ -381,17 +397,25 @@ export function normalizeReviewResult(
     reviewedAnswer,
     reviewedAtMs: Date.now(),
     model,
-    scoreRecommended,
-    maxScore,
-    passRecommended,
-    shortFeedback:
-      typeof payload?.short_feedback === "string" ? payload.short_feedback.trim() : "",
+    readinessStatus,
+    readyToSubmit,
+    encouragement:
+      typeof payload?.encouragement === "string" ? payload.encouragement.trim() : "",
+    coachSummary:
+      typeof payload?.coach_summary === "string"
+        ? payload.coach_summary.trim()
+        : typeof payload?.short_feedback === "string"
+          ? payload.short_feedback.trim()
+          : "",
     strengths: normalizeList(payload?.strengths),
-    gaps: normalizeList(payload?.gaps),
-    requiredFixes,
+    coverageGaps,
+    priorityActions,
+    blockingIssues,
+    nextStep:
+      typeof payload?.next_step === "string" ? payload.next_step.trim() : "",
     evidenceUsed: normalizeList(payload?.evidence_used),
     confidence,
-    error: fallbackError,
+    ...(error ? { error } : {}),
   };
 }
 
@@ -418,7 +442,7 @@ ${input.extraContext?.trim() || "Sem contexto extra."}
 RESPOSTA DO ALUNO:
 ${input.studentAnswer.trim()}
 
-Avalia a resposta e devolve apenas o JSON pedido.`;
+Primeiro reconhece o que ja esta a funcionar, depois comenta os pontos que o aluno tentou explicar, depois identifica apenas as melhorias mais importantes para o proximo draft. Devolve apenas o JSON pedido.`;
 
   return [
     { role: "system", content: REVIEW_SYSTEM_PROMPT },
@@ -445,11 +469,11 @@ export function getDay1ChallengeSubmissionGateMessage(
   const trimmed = currentAnswer.trim();
 
   if (!trimmed || !review || review.error) {
-    return "Para o Dia 1, cola a tua tese na review AI acima e corre a avaliacao antes de enviar a evidencia final.";
+    return "Para o Dia 1, cola a tua tese na revisao do tutor AI acima antes de enviar a evidencia final.";
   }
 
   if (review.reviewedAnswer.trim() !== trimmed) {
-    return "Alteraste a tese depois da review. Atualiza a avaliacao AI antes de enviar a evidencia final do Dia 1.";
+    return "Alteraste a tese depois da revisao. Atualiza a revisao do tutor AI antes de enviar a evidencia final do Dia 1.";
   }
 
   return null;
@@ -464,14 +488,14 @@ export function getDay1ReviewGateMessage(
 
   if (!trimmed || !review || review.error) {
     return itemType === "challenge"
-      ? "Corre uma review com AI sobre a tua tese antes de submeter ou marcar o desafio como concluido."
-      : "Escreve a tua resposta e corre uma review com AI antes de marcar este exercicio como concluido.";
+      ? "Pede uma revisao do tutor AI sobre a tua tese antes de submeter ou marcar o desafio como concluido."
+      : "Escreve a tua resposta e pede uma revisao do tutor AI antes de marcar este exercicio como concluido.";
   }
 
   if (review.reviewedAnswer.trim() !== trimmed) {
     return itemType === "challenge"
-      ? "Alteraste a tese depois da review. Atualiza a avaliacao AI antes de submeter ou fechar o desafio."
-      : "Alteraste a resposta depois da review. Atualiza a avaliacao AI antes de fechar este exercicio.";
+      ? "Alteraste a tese depois da revisao. Atualiza a revisao do tutor AI antes de submeter ou fechar o desafio."
+      : "Alteraste a resposta depois da review. Atualiza a revisao do tutor AI antes de fechar este exercicio.";
   }
 
   return null;

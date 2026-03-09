@@ -17,7 +17,7 @@ type BoardState = {
   tasks: Record<TaskId, Record<ProviderId, ProviderState>>;
 };
 
-const STORAGE_KEY = "aibootcamp-day4-model-board-v1";
+const STORAGE_KEY = "aibootcamp-day4-model-board-v2";
 
 const AXES: Array<{ id: AxisId; label: string; hint: string }> = [
   { id: "acao", label: "Acao", hint: "Sai com proximo passo executavel?" },
@@ -118,6 +118,115 @@ function createInitialState(): BoardState {
   };
 }
 
+const GUIDANCE_ASSETS = [
+  {
+    title: "DeepSeek Docs",
+    description: "Documentação oficial do DeepSeek para modos, pricing e capabilities.",
+    href: "https://api-docs.deepseek.com/",
+  },
+  {
+    title: "Z.ai Platform",
+    description: "Plataforma Z.ai para gestão de providers e configuração de projetos.",
+    href: "https://z.ai",
+  },
+  {
+    title: "OpenCode CLI",
+    description: "Repositório e docs do OpenCode para workflows locais com múltiplos providers.",
+    href: "https://github.com/opencode-ai/opencode",
+  },
+];
+
+function buildPlaybookMarkdown(
+  tasks: typeof TASKS,
+  providers: typeof PROVIDERS,
+  taskWinners: Record<TaskId, { providerId: ProviderId; total: number }>,
+  allTasks: BoardState["tasks"]
+): string {
+  const lines: string[] = [
+    "# Playbook de Model Selection",
+    "",
+    "## Sumario Executivo",
+    "",
+    "Este playbook resume qual provider usar para cada tipo de tarefa dentro do bootcamp.",
+    "Os resultados baseiam-se em testes praticos com rubricas consistentes.",
+    "",
+    "## Resultados por Tarefa",
+    "",
+  ];
+
+  (Object.keys(tasks) as TaskId[]).forEach((taskId) => {
+    const winner = taskWinners[taskId];
+    const provider = providers[winner.providerId];
+    const note = allTasks[taskId][winner.providerId].note;
+    const task = tasks[taskId];
+
+    lines.push(`### ${task.label}`);
+    lines.push("");
+    lines.push(`**Vencedor:** ${provider.label} (${winner.total}/20 pontos)`);
+    lines.push(`- Papel: ${provider.role}`);
+    lines.push(`- Porque ganha: ${note || provider.summary}`);
+    lines.push("");
+    lines.push(`**Prompt usado:**`);
+    lines.push(`> ${task.prompt}`);
+    lines.push("");
+    lines.push("**Criterios de avaliacao:**");
+    lines.push("- Acao: Sai com proximo passo executavel?");
+    lines.push("- Clareza: Explica-se bem e sem ruido?");
+    lines.push("- Fiabilidade: Inventa pouco e mantem coerencia?");
+    lines.push("- Custo: Entrega valor sem desperdicar credito?");
+    lines.push("");
+  });
+
+  lines.push("## Recomendacao Final");
+  lines.push("");
+  lines.push(`- **Planear features:** ${providers[taskWinners.planning.providerId].label}`);
+  lines.push(`- **Resumir memos atuariais:** ${providers[taskWinners.memo.providerId].label}`);
+  lines.push(`- **Sugerir API calls:** ${providers[taskWinners.api.providerId].label}`);
+  lines.push("");
+  lines.push("## Notas Metodologicas");
+  lines.push("");
+  lines.push("- Compara sempre a mesma tarefa e o mesmo prompt antes de mudar de modelo.");
+  lines.push("- Guarda o provider vencedor e a razao. O objetivo e criar um playbook, nao uma opiniao vaga.");
+  lines.push("- OpenCode pode ganhar como cockpit local mesmo quando o raciocinio vem de outro provider.");
+  lines.push("- DeepSeek ganha mais valor quando separas modos: deepseek-chat para velocidade e streaming, deepseek-reasoner para review exigente.");
+  lines.push("- Quando a resposta precisa de formato fiavel, usa JSON mode; quando precisa de acao dentro do produto, pensa em tool calling.");
+  lines.push("- Mantem prompts base estaveis para aproveitar context caching e baixar custo em tarefas repetidas.");
+  lines.push("");
+  lines.push("---");
+  lines.push("");
+  lines.push("*Gerado pelo AI Actuary Bootcamp - Dia 4*");
+  lines.push("");
+
+  return lines.join("\n");
+}
+
+function buildOpenCodePrompt(
+  tasks: typeof TASKS,
+  providers: typeof PROVIDERS,
+  taskWinners: Record<TaskId, { providerId: ProviderId; total: number }>
+): string {
+  const planningWinner = providers[taskWinners.planning.providerId].label;
+  const memoWinner = providers[taskWinners.memo.providerId].label;
+  const apiWinner = providers[taskWinners.api.providerId].label;
+
+  return [
+    "Prompt local-first para CLI/OpenCode",
+    "",
+    "Objetivo: rever o playbook de model selection com base nos resultados do lab.",
+    "",
+    "Resultados atuais:",
+    `- Planning: ${planningWinner}`,
+    `- Memo atuarial: ${memoWinner}`,
+    `- API calls: ${apiWinner}`,
+    "",
+    "Pede ao agente para:",
+    "1. analisar se os vencedores fazem sentido dado o tipo de tarefa;",
+    "2. identificar padroes — ex: o mesmo provider ganha em tarefas que precisam de estrutura;",
+    "3. sugerir otimizacoes de custo ou velocidade para cada caso;",
+    "4. manter a recomendacao local-first e pratica para o bootcamp.",
+  ].join("\n");
+}
+
 export function Day4ModelComparisonBoard() {
   const [state, setState] = useState<BoardState>(() => {
     if (typeof window === "undefined") {
@@ -131,7 +240,7 @@ export function Day4ModelComparisonBoard() {
       return createInitialState();
     }
   });
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<string | null>(null);
 
   useEffect(() => {
     try {
@@ -173,26 +282,29 @@ export function Day4ModelComparisonBoard() {
     );
   }, [state.tasks]);
 
-  const playbook = [
-    "# Playbook de Model Selection",
-    "",
-    ...(Object.keys(TASKS) as TaskId[]).map((taskId) => {
-      const winner = taskWinners[taskId];
-      const provider = PROVIDERS[winner.providerId];
-      const note = state.tasks[taskId][winner.providerId].note;
+  const completion = useMemo(() => {
+    let filled = 0;
+    let total = 0;
+    (Object.keys(state.tasks) as TaskId[]).forEach((taskId) => {
+      (Object.keys(PROVIDERS) as ProviderId[]).forEach((providerId) => {
+        total += 1;
+        if (state.tasks[taskId][providerId].note.trim().length > 10) {
+          filled += 1;
+        }
+      });
+    });
+    return total === 0 ? 0 : Math.round((filled / total) * 100);
+  }, [state.tasks]);
 
-      return [
-        `${TASKS[taskId].label}: ${provider.label} (${winner.total}/20)`,
-        `- Papel: ${provider.role}`,
-        `- Porque ganha: ${note || provider.summary}`,
-      ].join("\n");
-    }),
-    "",
-    "Recomendacao final:",
-    `- Planear: ${PROVIDERS[taskWinners.planning.providerId].label}`,
-    `- Explicar memo: ${PROVIDERS[taskWinners.memo.providerId].label}`,
-    `- Sugerir API call: ${PROVIDERS[taskWinners.api.providerId].label}`,
-  ].join("\n");
+  const playbookMarkdown = useMemo(
+    () => buildPlaybookMarkdown(TASKS, PROVIDERS, taskWinners, state.tasks),
+    [taskWinners, state.tasks]
+  );
+
+  const openCodePrompt = useMemo(
+    () => buildOpenCodePrompt(TASKS, PROVIDERS, taskWinners),
+    [taskWinners]
+  );
 
   function setScore(providerId: ProviderId, axisId: AxisId, value: number) {
     setState((current) => ({
@@ -229,40 +341,71 @@ export function Day4ModelComparisonBoard() {
     }));
   }
 
-  async function copyPlaybook() {
-    await navigator.clipboard.writeText(playbook);
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 1800);
+  async function copyToClipboard(key: string, text: string) {
+    await navigator.clipboard.writeText(text);
+    setCopied(key);
+    setTimeout(() => setCopied(null), 1600);
+  }
+
+  function downloadPlaybook() {
+    const blob = new Blob([playbookMarkdown], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "model-playbook.md";
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   return (
-    <section className="rounded-[1.8rem] border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[0_18px_50px_rgba(22,27,45,0.06)]">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
-            Lab Dia 4
-          </p>
-          <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
-            Comparar modelos pela tarefa, nao por hype.
-          </h2>
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--muted-foreground)]">
-            O estudante usa a mesma rubrica em varios providers e sai com um veredito reutilizavel:
-            quem planeia melhor, quem explica melhor e quem ajuda mais no fluxo tecnico.
-          </p>
+    <section className="space-y-6">
+      <div className="rounded-[1.8rem] border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[0_18px_50px_rgba(22,27,45,0.06)]">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
+              Lab Dia 4 — Model Comparison Board
+            </p>
+            <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
+              Comparar modelos pela tarefa, nao por hype.
+            </h2>
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--muted-foreground)]">
+              O estudante usa a mesma rubrica em varios providers e sai com um veredito reutilizavel:
+              quem planeia melhor, quem explica melhor e quem ajuda mais no fluxo tecnico.
+              Exporta o <code>model-playbook.md</code> para usar no bootcamp.
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="rounded-xl border border-[var(--accent-soft)] bg-[linear-gradient(180deg,rgba(124,63,88,0.08),rgba(124,63,88,0.03))] px-4 py-2.5 text-sm font-semibold text-[var(--foreground)]">
+              {completion}% notas
+            </div>
+          </div>
         </div>
-
-        <button
-          type="button"
-          onClick={copyPlaybook}
-          className="rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[var(--accent-strong)]"
-        >
-          {copied ? "Playbook copiado" : "Copiar playbook"}
-        </button>
       </div>
 
-      <div className="mt-6 grid gap-4 xl:grid-cols-[0.82fr_1.18fr]">
+      <div className="rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-5">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
+          Documentacao de referencia — consulta antes de avaliar
+        </p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-3">
+          {GUIDANCE_ASSETS.map((asset) => (
+            <a
+              key={asset.href}
+              href={asset.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex flex-col gap-2 rounded-xl border border-[var(--border)] bg-white p-4 transition hover:border-[var(--accent-soft)] hover:shadow-sm"
+            >
+              <p className="text-sm font-semibold text-[var(--foreground)]">{asset.title}</p>
+              <p className="text-xs leading-5 text-[var(--muted-foreground)]">{asset.description}</p>
+              <span className="mt-auto text-xs font-semibold text-[var(--accent)]">Abrir docs</span>
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <div className="grid gap-6 xl:grid-cols-[0.85fr_1.15fr]">
         <div className="space-y-4">
-          <div className="rounded-[1.3rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-4">
+          <div className="rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-5">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
               Escolher a tarefa
             </p>
@@ -277,11 +420,11 @@ export function Day4ModelComparisonBoard() {
                     key={taskId}
                     type="button"
                     onClick={() => setState((current) => ({ ...current, activeTask: taskId }))}
-                    className="block w-full rounded-[1.1rem] border px-4 py-4 text-left transition"
-                    style={{
-                      borderColor: active ? "var(--accent-soft)" : "var(--border)",
-                      backgroundColor: active ? "rgba(124,63,88,0.06)" : "white",
-                    }}
+                    className={`block w-full rounded-xl border px-4 py-4 text-left transition ${
+                      active
+                        ? "border-[var(--accent-soft)] bg-[rgba(124,63,88,0.06)]"
+                        : "border-[var(--border)] bg-white hover:border-[var(--accent-soft)]"
+                    }`}
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div>
@@ -300,14 +443,14 @@ export function Day4ModelComparisonBoard() {
             </div>
           </div>
 
-          <div className="rounded-[1.3rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-4">
+          <div className="rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-5">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
               Prompt comum
             </p>
             <p className="mt-3 text-sm leading-7 text-[var(--foreground)]">{activeTask.prompt}</p>
           </div>
 
-          <div className="rounded-[1.3rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-4">
+          <div className="rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-5">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
               Leitura rapida
             </p>
@@ -344,7 +487,7 @@ export function Day4ModelComparisonBoard() {
                       </h3>
                     </div>
                     <p className="mt-1 text-sm text-[var(--muted-foreground)]">
-                      {provider.role} · {provider.summary}
+                      {provider.role} - {provider.summary}
                     </p>
                   </div>
                   <div className="rounded-full bg-[var(--surface-subtle)] px-3 py-1 text-sm font-semibold text-[var(--foreground)]">
@@ -413,6 +556,55 @@ export function Day4ModelComparisonBoard() {
               cada tipo de trabalho dentro do bootcamp.
             </p>
           </div>
+        </div>
+      </div>
+
+      <div className="rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface)] p-5">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
+              Artefacto final — model-playbook.md
+            </p>
+            <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">
+              Descarrega o playbook ou copia para o clipboard. Usa o prompt para pedir ao OpenCode uma revisao.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => copyToClipboard("prompt", openCodePrompt)}
+              className="rounded-full border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--foreground)] transition hover:border-[var(--accent-soft)]"
+            >
+              {copied === "prompt" ? "Copiado" : "Copiar prompt"}
+            </button>
+            <button
+              type="button"
+              onClick={() => copyToClipboard("playbook", playbookMarkdown)}
+              className="rounded-full border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--foreground)] transition hover:border-[var(--accent-soft)]"
+            >
+              {copied === "playbook" ? "Copiado" : "Copiar playbook"}
+            </button>
+            <button
+              type="button"
+              onClick={downloadPlaybook}
+              className="rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[var(--accent-strong)]"
+            >
+              Descarregar playbook.md
+            </button>
+          </div>
+        </div>
+
+        <pre className="mt-4 max-h-80 overflow-auto rounded-xl border border-[var(--border)] bg-[var(--surface-subtle)] p-4 text-xs leading-6 text-[var(--foreground)]">
+          {playbookMarkdown}
+        </pre>
+
+        <div className="mt-4 rounded-xl border border-dashed border-[var(--border-strong)] bg-white/60 p-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
+            Prompt para OpenCode / GLM-5
+          </p>
+          <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">
+            {openCodePrompt}
+          </p>
         </div>
       </div>
     </section>

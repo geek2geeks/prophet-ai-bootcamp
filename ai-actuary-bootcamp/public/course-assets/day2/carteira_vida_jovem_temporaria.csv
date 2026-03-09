@@ -1,0 +1,13 @@
+apolice_id,idade,sexo,tipo_produto,capital_segurado,premio_anual,estado,fumador
+JV001,24,F,Temporario,80000,72,Ativa,Nao
+JV002,27,M,Temporario,120000,145,Ativa,Nao
+JV003,29,F,Temporario,95000,98,Ativa,Nao
+JV004,31,M,Temporario,150000,225,Ativa,Sim
+JV005,33,F,Temporario,110000,131,Ativa,Nao
+JV006,35,M,Temporario,200000,340,Ativa,Nao
+JV007,26,F,Misto,100000,980,Ativa,Nao
+JV008,32,M,Temporario,175000,298,Ativa,Nao
+JV009,38,F,Vida Inteira,125000,2100,Ativa,Nao
+JV010,30,M,Temporario,130000,169,Resgatada,Nao
+JV011,28,F,Temporario,90000,84,Ativa,Nao
+JV012,36,M,Misto,160000,1850,Ativa,Sim

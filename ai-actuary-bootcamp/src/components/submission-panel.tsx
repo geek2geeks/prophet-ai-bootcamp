@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
 import {
   addDoc,
   collection,
@@ -12,6 +12,12 @@ import {
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 import { useAuth } from "@/lib/auth-context";
+import {
+  DEEPSEEK_READABLE_FILE_EXTENSIONS,
+  DEEPSEEK_READABLE_FILE_SUMMARY,
+  getDeepSeekReadableFileError,
+  isDeepSeekReadableTextFile,
+} from "@/lib/deepseek-readable-files";
 import { db } from "@/lib/firebase";
 import { storage } from "@/lib/submission-storage";
 import { getDay1ChallengeSubmissionGateMessage } from "@/lib/day1-review";
@@ -186,11 +192,31 @@ export function SubmissionPanel({
     };
   }, [authLoading, missionId, user]);
 
+  function handleFileSelection(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0] ?? null;
+
+    if (!file) {
+      setSelectedFile(null);
+      return;
+    }
+
+    if (!isDeepSeekReadableTextFile(file)) {
+      setSelectedFile(null);
+      setSuccessMessage(null);
+      setErrorMessage(getDeepSeekReadableFileError("Esta entrega"));
+      event.target.value = "";
+      return;
+    }
+
+    setErrorMessage(null);
+    setSelectedFile(file);
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (!user) {
-      setErrorMessage("Inicia sessao para enviar evidencia desta missao.");
+      setErrorMessage("A tua sessao parece ter expirado. Faz login outra vez para enviar evidencia desta missao.");
       return;
     }
 
@@ -209,6 +235,11 @@ export function SubmissionPanel({
 
     if (selectedFile && selectedFile.size > MAX_FILE_SIZE) {
       setErrorMessage("O ficheiro excede o limite de 20 MB.");
+      return;
+    }
+
+    if (selectedFile && !isDeepSeekReadableTextFile(selectedFile)) {
+      setErrorMessage(getDeepSeekReadableFileError("Esta entrega"));
       return;
     }
 
@@ -303,7 +334,7 @@ export function SubmissionPanel({
             Entrega de artefactos
           </p>
           <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
-            Guarda a evidencia desta missao sem sair da plataforma.
+            Guarda a evidencia desta missao.
           </h2>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--muted-foreground)]">
             Resume o que foi construido, adiciona um titulo se fizer sentido e anexa um ficheiro quando tiveres prova pronta para guardar.
@@ -318,12 +349,12 @@ export function SubmissionPanel({
       <div className="mt-5 grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
         <div className="panel-accent rounded-[1.4rem] p-5">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--accent)]">
-            O que convem entregar
+            Passo final
           </p>
           <div className="mt-3 space-y-2 text-sm leading-7 text-[var(--muted-foreground)]">
             <p>- Resultado final em linguagem simples.</p>
             <p>- Nome do artefacto, se existir um ficheiro ou entrega formal.</p>
-            <p>- Ficheiro de apoio opcional: screenshot, pdf, notebook, zip ou documento.</p>
+            <p>- Ficheiro de apoio opcional: texto, markdown, csv, json, xml, yaml, html, sql ou codigo.</p>
           </div>
         </div>
 
@@ -373,12 +404,13 @@ export function SubmissionPanel({
             </span>
             <input
               type="file"
-              onChange={(event) => setSelectedFile(event.target.files?.[0] ?? null)}
+              accept={DEEPSEEK_READABLE_FILE_EXTENSIONS}
+              onChange={handleFileSelection}
               disabled={submitting || authLoading || !user}
               className="mt-3 block w-full text-sm text-[var(--muted-foreground)] file:mr-4 file:rounded-full file:border-0 file:bg-[var(--surface-subtle)] file:px-4 file:py-2 file:text-xs file:font-semibold file:uppercase file:tracking-[0.14em] file:text-[var(--accent)]"
             />
             <p className="mt-2 text-xs leading-6 text-[var(--muted-foreground)]">
-              Limite recomendado: 20 MB. Se a cloud falhar, o resumo fica guardado localmente, mas o ficheiro tem de ser reenviado.
+              Limite recomendado: 20 MB. So aceitamos formatos que o DeepSeek 3.2 leia diretamente: {DEEPSEEK_READABLE_FILE_SUMMARY}. Se a cloud falhar, o resumo fica guardado localmente, mas o ficheiro tem de ser reenviado.
             </p>
           </label>
         </div>
@@ -394,7 +426,7 @@ export function SubmissionPanel({
               authLoading
                 ? "A verificar a sessao..."
                 : !user
-                  ? "Inicia sessao para descrever o que queres entregar."
+                  ? "Sessao em falta ou expirada. Faz login para descrever o que queres entregar."
                   : "Explica em 2 a 5 linhas o que fizeste, o que ficou funcional e o que o artefacto prova."
             }
             disabled={submitting || authLoading || !user}
@@ -426,7 +458,7 @@ export function SubmissionPanel({
               ? "A confirmar autenticacao..."
               : user
                 ? "A entrega fica associada a esta conta e aparece na lista recente desta missao."
-                : "Autenticacao obrigatoria para submeter evidencia."}
+                : "Sessao em falta ou expirada. Faz login para submeter evidencia."}
           </div>
 
           <button
@@ -464,7 +496,7 @@ export function SubmissionPanel({
 
           {!loadingList && !user ? (
             <div className="rounded-[1.2rem] border border-[var(--border)] bg-white px-4 py-4 text-sm text-[var(--muted-foreground)]">
-              Inicia sessao para veres as tuas entregas recentes.
+              A tua sessao expirou ou ainda nao entrou. Faz login para veres as tuas entregas recentes.
             </div>
           ) : null}
 

@@ -2,6 +2,10 @@
 
 import { useEffect, useMemo, useState } from "react";
 
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
 type LaunchStatus = "a-preparar" | "pronto" | "lancado" | "bloqueado";
 type ChecklistGroupId = "deploy" | "assets" | "demo" | "proof";
 
@@ -32,7 +36,11 @@ type LaunchState = {
   checklists: Record<ChecklistGroupId, ChecklistItem[]>;
 };
 
-const STORAGE_KEY = "aibootcamp-day10-launch-console-v1";
+const STORAGE_KEY = "aibootcamp-day10-launch-console-v2";
+
+// ---------------------------------------------------------------------------
+// Status definitions
+// ---------------------------------------------------------------------------
 
 const STATUS_META: Record<
   LaunchStatus,
@@ -63,6 +71,10 @@ const STATUS_META: Record<
     helper: "Existe um risco material. A decisao certa pode ser esperar e corrigir antes de publicar.",
   },
 };
+
+// ---------------------------------------------------------------------------
+// Checklist definitions
+// ---------------------------------------------------------------------------
 
 const CHECKLIST_META: Array<{
   id: ChecklistGroupId;
@@ -95,6 +107,32 @@ const CHECKLIST_META: Array<{
     accent: "rgba(77,107,60,0.14)",
   },
 ];
+
+// ---------------------------------------------------------------------------
+// Assets
+// ---------------------------------------------------------------------------
+
+const ASSETS = [
+  {
+    title: "deploy_checklist.md",
+    description: "Checklist de deploy com criterios de observabilidade e rollback.",
+    href: "/course-assets/day10/deploy_checklist.md",
+  },
+  {
+    title: "demo_script_template.md",
+    description: "Template de guiiao de demo com opening, valor e CTA.",
+    href: "/course-assets/day10/demo_script_template.md",
+  },
+  {
+    title: "launch_summary_template.md",
+    description: "Template para resumir o lancamento e partilhar com a equipa.",
+    href: "/course-assets/day10/launch_summary_template.md",
+  },
+];
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
 
 function makeItem(id: string, label: string, done = false, note = ""): ChecklistItem {
   return { id, label, done, note };
@@ -163,7 +201,7 @@ function createEmptyChecklistItem(groupId: ChecklistGroupId): ChecklistItem {
   };
 }
 
-function buildLaunchSummary(state: LaunchState) {
+function buildLaunchSummary(state: LaunchState): string {
   const completedByGroup = CHECKLIST_META.map((group) => {
     const items = state.checklists[group.id];
     const done = items.filter((item) => item.done).length;
@@ -181,7 +219,9 @@ function buildLaunchSummary(state: LaunchState) {
     .map((item) => `- ${item.label}: ${item.note.trim() || "ok"}`);
 
   return [
-    "# Launch summary",
+    "# Launch Checklist",
+    "",
+    "## Contexto",
     "",
     `Produto: ${state.productName || "n/d"}`,
     `Owner: ${state.owner || "n/d"}`,
@@ -190,8 +230,13 @@ function buildLaunchSummary(state: LaunchState) {
     `Data alvo: ${state.targetDate || "n/d"}`,
     `URL principal: ${state.primaryUrl || "n/d"}`,
     "",
+    "## Mensagem",
+    "",
     `Headline: ${state.summaryHeadline || "n/d"}`,
     `Mensagem: ${state.summaryBody || "n/d"}`,
+    "",
+    "## Criterios de Lancamento",
+    "",
     `Regra de shipping: ${state.shippingRule || "n/d"}`,
     `Audiencia: ${state.audienceNote || "n/d"}`,
     `Sinal de sucesso: ${state.successSignal || "n/d"}`,
@@ -199,25 +244,52 @@ function buildLaunchSummary(state: LaunchState) {
     `Rollback: ${state.rollbackPlan || "n/d"}`,
     `Proximo passo pos-launch: ${state.postLaunchNextStep || "n/d"}`,
     "",
-    "Progresso por checklist:",
+    "## Progresso",
+    "",
+    "### Por checklist:",
     ...completedByGroup,
     "",
-    "Pendencias ativas:",
+    "### Pendencias ativas:",
     ...(openItems.length ? openItems : ["- Sem pendencias ativas."]),
     "",
-    "Provas registadas:",
+    "### Provas registadas:",
     ...(proofItems.length ? proofItems : ["- Ainda sem provas fechadas."]),
     `- Links de prova: ${state.proofLinks || "n/d"}`,
     `- Notas de prova: ${state.proofNotes || "n/d"}`,
+    "",
   ].join("\n");
 }
 
+function buildOpenCodePrompt(state: LaunchState): string {
+  const totals = CHECKLIST_META.flatMap((g) => state.checklists[g.id]);
+  const done = totals.filter((i) => i.done).length;
+  const openItems = totals.filter((i) => !i.done && i.label.trim()).map((i) => i.label);
+
+  return [
+    "Prompt para preparar o deployment com OpenCode / GLM-5",
+    "",
+    `Produto: ${state.productName}`,
+    `Estado atual: ${STATUS_META[state.status].label}`,
+    `Progresso: ${done}/${totals.length} itens fechados`,
+    "",
+    "Pendencias principais:",
+    ...(openItems.length > 0 ? openItems.slice(0, 5).map((i) => `- ${i}`) : ["- Todas as checklistas estao fechadas."]),
+    "",
+    "Pede ao agente para:",
+    "1. rever o plano de lancamento e identificar riscos em falta;",
+    "2. sugerir melhorias ao script de demo ou mensagem de lancamento;",
+    "3. preparar comandos de deploy para o ambiente escolhido;",
+    "4. criar um plano de rollback explicito com passos verificaveis.",
+  ].join("\n");
+}
+
+// ---------------------------------------------------------------------------
+// Component
+// ---------------------------------------------------------------------------
+
 export function Day10LaunchConsole() {
   const [state, setState] = useState<LaunchState>(() => {
-    if (typeof window === "undefined") {
-      return createInitialState();
-    }
-
+    if (typeof window === "undefined") return createInitialState();
     try {
       const raw = window.localStorage.getItem(STORAGE_KEY);
       return raw ? (JSON.parse(raw) as LaunchState) : createInitialState();
@@ -225,13 +297,13 @@ export function Day10LaunchConsole() {
       return createInitialState();
     }
   });
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<string | null>(null);
 
   useEffect(() => {
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     } catch {
-      return;
+      /* noop */
     }
   }, [state]);
 
@@ -248,6 +320,7 @@ export function Day10LaunchConsole() {
   }, [state.checklists]);
 
   const summary = useMemo(() => buildLaunchSummary(state), [state]);
+  const openCodePrompt = useMemo(() => buildOpenCodePrompt(state), [state]);
 
   function setField<Key extends keyof LaunchState>(key: Key, value: LaunchState[Key]) {
     setState((current) => ({ ...current, [key]: value }));
@@ -293,40 +366,73 @@ export function Day10LaunchConsole() {
     }));
   }
 
-  async function copySummary() {
-    await navigator.clipboard.writeText(summary);
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 1800);
+  async function copyToClipboard(key: string, text: string) {
+    await navigator.clipboard.writeText(text);
+    setCopied(key);
+    setTimeout(() => setCopied(null), 1600);
+  }
+
+  function downloadChecklist() {
+    const blob = new Blob([summary], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "launch-checklist.md";
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   return (
-    <section className="rounded-[1.8rem] border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[0_18px_50px_rgba(22,27,45,0.06)]">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
-            Lab Dia 10
-          </p>
-          <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
-            Preparar, lancar e provar o ship com menos ruido e mais intencao.
-          </h2>
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--muted-foreground)]">
-            Esta console junta readiness de deploy, ativos de lancamento, guiao de demo, prova da
-            publicacao e um resumo copiavel para partilhar o que saiu e o que vem a seguir.
-          </p>
+    <section className="space-y-6">
+      {/* ── Header ── */}
+      <div className="rounded-[1.8rem] border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[0_18px_50px_rgba(22,27,45,0.06)]">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
+              Lab Dia 10 — Launch Console
+            </p>
+            <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
+              Preparar, lancar e provar a release com clareza.
+            </h2>
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--muted-foreground)]">
+              Reune readiness de deploy, ativos de lancamento, guiao de demo, prova da publicacao e
+              um resumo pronto para partilhar resultados e proximos passos.
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="rounded-xl border border-[var(--accent-soft)] bg-[linear-gradient(180deg,rgba(124,63,88,0.08),rgba(124,63,88,0.03))] px-4 py-2.5 text-sm font-semibold text-[var(--foreground)]">
+              {totals.percent}% readiness
+            </div>
+          </div>
         </div>
-
-        <button
-          type="button"
-          onClick={copySummary}
-          className="rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[var(--accent-strong)]"
-        >
-          {copied ? "Resumo copiado" : "Copiar launch summary"}
-        </button>
       </div>
 
-      <div className="mt-6 grid gap-4 xl:grid-cols-[0.92fr_1.08fr]">
+      {/* ── Inline Assets ── */}
+      <div className="rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-5">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
+          Ficheiros de apoio — descarrega antes de lancar
+        </p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-3">
+          {ASSETS.map((asset) => (
+            <a
+              key={asset.href}
+              href={asset.href}
+              download
+              className="flex flex-col gap-2 rounded-xl border border-[var(--border)] bg-white p-4 transition hover:border-[var(--accent-soft)] hover:shadow-sm"
+            >
+              <p className="text-sm font-semibold text-[var(--foreground)]">{asset.title}</p>
+              <p className="text-xs leading-5 text-[var(--muted-foreground)]">{asset.description}</p>
+              <span className="mt-auto text-xs font-semibold text-[var(--accent)]">Descarregar</span>
+            </a>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Main Workspace ── */}
+      <div className="grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
+        {/* Left column */}
         <div className="space-y-4">
-          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-3">
             <MetricCard label="Readiness" value={`${totals.percent}%`} />
             <MetricCard label="Itens fechados" value={`${totals.done}/${totals.total}`} />
             <MetricCard label="Estado atual" value={statusMeta.label} />
@@ -336,8 +442,8 @@ export function Day10LaunchConsole() {
             className="rounded-[1.3rem] border p-4"
             style={{ borderColor: statusMeta.tone, backgroundColor: statusMeta.panel }}
           >
-            <div className="flex items-center justify-between gap-3">
-              <div>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: statusMeta.tone }}>
                   Shipping intencional
                 </p>
@@ -445,31 +551,9 @@ export function Day10LaunchConsole() {
               placeholder="Risco principal...\n\nRollback: plano de recuo..."
             />
           </div>
-
-          <div className="rounded-[1.3rem] border border-[var(--border)] bg-white p-4">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
-                  Launch summary copiavel
-                </p>
-                <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">
-                  Pronto para partilhar no chat da equipa, no repo ou na nota de release.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={copySummary}
-                className="rounded-full border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--foreground)] transition hover:border-[var(--accent-soft)]"
-              >
-                {copied ? "Texto copiado" : "Copiar resumo"}
-              </button>
-            </div>
-            <pre className="mt-4 overflow-x-auto rounded-[1rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-4 text-xs leading-6 text-[var(--foreground)]">
-              {summary}
-            </pre>
-          </div>
         </div>
 
+        {/* Right column */}
         <div className="space-y-4">
           {CHECKLIST_META.map((group) => {
             const items = state.checklists[group.id];
@@ -559,9 +643,61 @@ export function Day10LaunchConsole() {
           />
         </div>
       </div>
+
+      {/* ── Export / Artifact ── */}
+      <div className="rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface)] p-5">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
+              Artefacto final — launch-checklist.md
+            </p>
+            <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">
+              Descarrega o checklist completo ou copia o resumo. Usa o prompt para preparar o deployment.
+            </p>
+          </div>
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+            <button
+              type="button"
+              onClick={() => copyToClipboard("prompt", openCodePrompt)}
+              className="rounded-full border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--foreground)] transition hover:border-[var(--accent-soft)]"
+            >
+              {copied === "prompt" ? "Copiado" : "Copiar prompt"}
+            </button>
+            <button
+              type="button"
+              onClick={() => copyToClipboard("summary", summary)}
+              className="rounded-full border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--foreground)] transition hover:border-[var(--accent-soft)]"
+            >
+              {copied === "summary" ? "Copiado" : "Copiar resumo"}
+            </button>
+            <button
+              type="button"
+              onClick={downloadChecklist}
+              className="rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[var(--accent-strong)]"
+            >
+              Descarregar launch-checklist.md
+            </button>
+          </div>
+        </div>
+
+        <pre className="mt-4 max-h-72 overflow-auto whitespace-pre-wrap break-words rounded-xl border border-[var(--border)] bg-[var(--surface-subtle)] p-4 text-xs leading-6 text-[var(--foreground)]">
+          {summary}
+        </pre>
+
+        <div className="mt-4 rounded-xl border border-dashed border-[var(--border-strong)] bg-white/60 p-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
+            Prompt para OpenCode / GLM-5
+          </p>
+          <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">{openCodePrompt}</p>
+        </div>
+      </div>
     </section>
   );
 }
+
+// ---------------------------------------------------------------------------
+// Sub-components
+// ---------------------------------------------------------------------------
 
 function MetricCard({ label, value }: { label: string; value: string }) {
   return (

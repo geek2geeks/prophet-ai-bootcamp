@@ -16,7 +16,7 @@ import { isAdminEmail } from "@/lib/admin";
 import { RouteGuard } from "@/components/route-guard";
 
 type Keys = {
-  deepseek: string;
+  gemini: string;
   zai: string;
 };
 
@@ -26,7 +26,8 @@ type StudentRecord = {
   displayName?: string;
   completedCount: number;
   reviewCount: number;
-  avgReviewScore: number;
+  readyReviewCount: number;
+  blockedReviewCount: number;
   lastSeen?: string;
 };
 
@@ -42,7 +43,7 @@ type SubmissionRecord = {
 type ReviewRecord = {
   studentId: string;
   itemId: string;
-  score: string;
+  readiness: string;
   confidence: string;
   updatedAt?: string;
   feedback?: string;
@@ -61,7 +62,7 @@ export default function AdminPage() {
   const { user } = useAuth();
   const isAdmin = isAdminEmail(user?.email);
 
-  const [keys, setKeys] = useState<Keys>({ deepseek: "", zai: "" });
+  const [keys, setKeys] = useState<Keys>({ gemini: "", zai: "" });
   const [keysLoading, setKeysLoading] = useState(true);
   const [keysSaving, setKeysSaving] = useState(false);
   const [keysSaved, setKeysSaved] = useState(false);
@@ -84,7 +85,7 @@ export default function AdminPage() {
       .then((snap) => {
         if (snap.exists()) {
           const data = snap.data() as Keys;
-          setKeys({ deepseek: data.deepseek ?? "", zai: data.zai ?? "" });
+          setKeys({ gemini: data.gemini ?? "", zai: data.zai ?? "" });
         }
       })
       .catch(() => setKeysError("Erro ao carregar chaves."))
@@ -101,16 +102,16 @@ export default function AdminPage() {
           const progress = (data.progress as Record<string, boolean>) ?? {};
           const day1Reviews = (data.day1Reviews as Record<string, Record<string, unknown>>) ?? {};
           const reviewEntries = Object.values(day1Reviews).filter(
-            (entry) => entry && !entry.error && typeof entry.scoreRecommended === "number",
+            (entry) => entry && !entry.error && typeof entry.reviewedAnswer === "string",
           );
-          const avgReviewScore = reviewEntries.length
-            ? Math.round(
-                reviewEntries.reduce(
-                  (sum, entry) => sum + Number(entry.scoreRecommended ?? 0),
-                  0,
-                ) / reviewEntries.length,
-              )
-            : 0;
+          const readyReviewCount = reviewEntries.filter(
+            (entry) => entry.readyToSubmit === true || entry.readinessStatus === "ready",
+          ).length;
+          const blockedReviewCount = reviewEntries.filter(
+            (entry) =>
+              entry.readinessStatus === "blocked" ||
+              (Array.isArray(entry.blockingIssues) && entry.blockingIssues.length > 0),
+          ).length;
 
           return {
             id: d.id,
@@ -118,7 +119,8 @@ export default function AdminPage() {
             displayName: data.displayName as string | undefined,
             completedCount: Object.values(progress).filter(Boolean).length,
             reviewCount: reviewEntries.length,
-            avgReviewScore,
+            readyReviewCount,
+            blockedReviewCount,
             lastSeen: data.lastSeen as string | undefined,
           };
         });
@@ -129,14 +131,23 @@ export default function AdminPage() {
           return Object.entries(day1Reviews).map(([itemId, review]) => ({
             studentId: d.id,
             itemId,
-            score: `${Number(review.scoreRecommended ?? 0)}/${Number(review.maxScore ?? 10)}`,
+            readiness:
+              review.readinessStatus === "ready"
+                ? "Pronto"
+                : review.readinessStatus === "blocked"
+                  ? "Bloqueado"
+                  : "Em revisao",
             confidence: String(review.confidence ?? "medium"),
             updatedAt:
               typeof review.reviewedAtMs === "number"
                 ? new Date(review.reviewedAtMs).toLocaleDateString("pt-PT")
                 : undefined,
             feedback:
-              typeof review.shortFeedback === "string" ? review.shortFeedback : undefined,
+              typeof review.coachSummary === "string"
+                ? review.coachSummary
+                : typeof review.encouragement === "string"
+                  ? review.encouragement
+                  : undefined,
           }));
         });
         const tutorSessionRecords: TutorSessionRecord[] = snap.docs.flatMap((d) => {
@@ -310,20 +321,23 @@ export default function AdminPage() {
                     <div className="mt-6 space-y-4">
                       <div>
                         <label className="block text-xs font-semibold uppercase tracking-[0.16em] text-[var(--foreground)]">
-                          DeepSeek API Key
+                          Gemini API Key
                         </label>
                         <input
                           type="text"
-                          value={keys.deepseek}
+                          value={keys.gemini}
                           onChange={(e) =>
                             setKeys((k) => ({
                               ...k,
-                              deepseek: e.target.value,
+                              gemini: e.target.value,
                             }))
                           }
                           className="mt-2 w-full rounded-[1rem] border border-[var(--border)] bg-[var(--surface-subtle)] px-4 py-3 font-mono text-sm text-[var(--foreground)] outline-none focus:border-[var(--accent-soft)]"
-                          placeholder="sk-..."
+                          placeholder="AIza..."
                         />
+                        <p className="mt-2 text-xs leading-6 text-[var(--muted-foreground)]">
+                          Nota: a chave Gemini ja foi criada via CLI, mas o projeto Google continua sem billing/quota ativa para gerar respostas.
+                        </p>
                       </div>
                       <div>
                         <label className="block text-xs font-semibold uppercase tracking-[0.16em] text-[var(--foreground)]">
@@ -417,7 +431,7 @@ export default function AdminPage() {
                               </td>
                               <td className="py-3 pr-4">
                                 <span className="rounded-full bg-[var(--surface-subtle)] px-2.5 py-1 text-xs font-semibold text-[var(--accent)]">
-                                  {s.reviewCount} review{s.reviewCount !== 1 ? "s" : ""} · media {s.avgReviewScore}
+                                  {s.reviewCount} review{s.reviewCount !== 1 ? "s" : ""} · prontas {s.readyReviewCount} · bloqueadas {s.blockedReviewCount}
                                 </span>
                               </td>
                               <td className="py-3 text-xs text-[var(--muted-foreground)]">
@@ -536,7 +550,7 @@ export default function AdminPage() {
                           <tr className="border-b border-[var(--border)] text-left">
                             <th className="pb-3 pr-4 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted-foreground)]">Aluno</th>
                             <th className="pb-3 pr-4 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted-foreground)]">Item</th>
-                            <th className="pb-3 pr-4 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted-foreground)]">Score</th>
+                            <th className="pb-3 pr-4 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted-foreground)]">Estado</th>
                             <th className="pb-3 pr-4 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted-foreground)]">Confianca</th>
                             <th className="pb-3 pr-4 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted-foreground)]">Data</th>
                             <th className="pb-3 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted-foreground)]">Feedback</th>
@@ -547,7 +561,7 @@ export default function AdminPage() {
                             <tr key={`${review.studentId}-${review.itemId}-${index}`}>
                               <td className="py-3 pr-4 font-mono text-xs text-[var(--muted-foreground)]">{review.studentId.substring(0, 10)}…</td>
                               <td className="py-3 pr-4 font-semibold text-[var(--foreground)]">{review.itemId}</td>
-                              <td className="py-3 pr-4 text-[var(--foreground)]">{review.score}</td>
+                              <td className="py-3 pr-4 text-[var(--foreground)]">{review.readiness}</td>
                               <td className="py-3 pr-4 text-xs uppercase tracking-[0.14em] text-[var(--muted-foreground)]">{review.confidence}</td>
                               <td className="py-3 pr-4 text-xs text-[var(--muted-foreground)]">{review.updatedAt ?? "—"}</td>
                               <td className="py-3 text-xs text-[var(--muted-foreground)]">{review.feedback ?? "—"}</td>

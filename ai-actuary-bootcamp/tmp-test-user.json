@@ -1,0 +1,1 @@
+[{"localId": "test-student-01", "email": "teste@bootcamp.ai", "emailVerified": true, "passwordHash": "123456", "hashAlgorithm": "HMAC_SHA256", "salt": "", "displayName": "Aluno Teste"}]

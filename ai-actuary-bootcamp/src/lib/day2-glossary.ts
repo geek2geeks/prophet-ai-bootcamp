@@ -1,0 +1,16 @@
+export const DAY2_GLOSSARY: Record<string, string> = {
+  "GitHub Spec Kit": "Workflow que organiza o trabalho com AI em etapas: principios, spec, clarificacao, plano, tarefas e implementacao.",
+  "constitution.md": "Ficheiro com regras permanentes do produto, como linguagem, erros, limites e principios de UX.",
+  "Google Cloud CLI": "Ferramenta de linha de comandos da Google Cloud. O comando principal chama-se gcloud.",
+  "Firebase CLI": "Ferramenta de linha de comandos do Firebase para login, configuracao de projetos e deploy.",
+  "Firebase Hosting": "Servico do Firebase para publicar sites web com um URL publico.",
+  DeepSeek: "Modelo de AI que pode escrever narrativa e resumo a partir de contexto bem preparado.",
+  "context engineering": "Preparar bem o contexto antes de pedir ajuda a uma AI: objetivo, audiencia, dados, limites e formato de saida.",
+  LLM: "Modelo de linguagem: uma AI que escreve, resume e propoe codigo a partir das tuas instrucoes.",
+  clarify: "Etapa em que transformas duvidas vagas em perguntas concretas antes de implementar.",
+  plan: "Plano tecnico de implementacao: ordem de trabalho, componentes e etapas.",
+  Git: "Ferramenta para guardar versoes do trabalho e recuperar decisoes anteriores.",
+  "criterios de aceite": "Condicoes observaveis que dizem se a feature esta realmente pronta.",
+  "acceptance criteria": "Condicoes observaveis que dizem se a feature esta realmente pronta.",
+  "edge cases": "Situacoes menos normais que podem falhar e precisam de uma resposta clara do sistema.",
+};
