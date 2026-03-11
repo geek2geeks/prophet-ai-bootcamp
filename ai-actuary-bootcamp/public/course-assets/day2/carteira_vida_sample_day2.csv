@@ -1,0 +1,13 @@
+apolice_id,idade,sexo,tipo_produto,capital_segurado,premio_anual,estado,fumador
+POL001,30,F,Temporario,150000,158,Ativa,Nao
+POL002,55,M,Vida Inteira,300000,6000,Ativa,Sim
+POL003,28,F,Temporario,100000,91,Ativa,Nao
+POL004,63,M,Temporario,200000,2400,Sinistrada,Nao
+POL005,45,F,Misto,200000,2600,Ativa,Nao
+POL006,50,M,Temporario,500000,5250,Ativa,Sim
+POL007,37,F,Vida Inteira,175000,3063,Ativa,Nao
+POL008,42,M,Temporario,250000,1125,Ativa,Nao
+POL009,41,F,Temporario,250000,770,Ativa,Nao
+POL010,58,M,Vida Inteira,400000,10000,Ativa,Sim
+POL011,25,F,Temporario,75000,59,Ativa,Nao
+POL012,47,M,Misto,300000,4200,Ativa,Nao

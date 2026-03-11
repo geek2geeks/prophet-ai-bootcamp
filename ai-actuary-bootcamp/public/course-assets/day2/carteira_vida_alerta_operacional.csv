@@ -1,0 +1,13 @@
+apolice_id,idade,sexo,tipo_produto,capital_segurado,premio_anual,estado,fumador
+AO001,46,M,Temporario,220000,1460,Ativa,Sim
+AO002,52,F,Vida Inteira,180000,3900,Resgatada,Nao
+AO003,49,M,Temporario,300000,2850,Sinistrada,Sim
+AO004,57,F,Misto,250000,4700,Ativa,Nao
+AO005,61,M,Vida Inteira,275000,6400,Sinistrada,Nao
+AO006,43,F,Temporario,140000,960,Ativa,Nao
+AO007,55,M,Temporario,350000,3300,Resgatada,Sim
+AO008,47,F,Vida Inteira,210000,4300,Ativa,Nao
+AO009,59,M,Misto,260000,5200,Ativa,Sim
+AO010,62,F,Vida Inteira,190000,4100,Sinistrada,Nao
+AO011,51,M,Temporario,175000,1320,Ativa,Nao
+AO012,45,F,Temporario,160000,1180,Ativa,Nao

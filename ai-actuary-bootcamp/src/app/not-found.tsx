@@ -9,7 +9,7 @@ export default function NotFound() {
         </p>
         <h1 className="mt-4 font-serif text-5xl text-[#351f29]">The page slipped off the study desk.</h1>
         <p className="mt-4 text-sm leading-7 text-[#6c5560]">
-          Head back to the mission grid and continue from a valid day workspace.
+          Volta ao percurso e abre uma aula valida para continuar o bootcamp.
         </p>
         <AppLink
           href="/"

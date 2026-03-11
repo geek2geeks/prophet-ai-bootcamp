@@ -45,7 +45,7 @@ type IntegrationState = {
   checkpoints: Record<CheckpointId, Checkpoint>;
 };
 
-const STORAGE_KEY = "aibootcamp-day9-integration-workspace-v1";
+const STORAGE_KEY = "aibootcamp-day9-integration-workspace-v2";
 
 const STAGES: Array<{
   id: StageId;
@@ -117,6 +117,29 @@ const CHECKPOINTS: Array<{ id: CheckpointId; label: string; helper: string }> = 
   },
 ];
 
+const ASSETS = [
+  {
+    title: "integration_checklist.md",
+    description: "Checklist completo para validar cada etapa da integracao local-first.",
+    href: "/course-assets/day9/integration_checklist.md",
+  },
+  {
+    title: "motor_api_contract.md",
+    description: "Contrato da API do motor deterministic com inputs, outputs e erros.",
+    href: "/course-assets/day9/motor_api_contract.md",
+  },
+  {
+    title: "copilot_prompt_template.md",
+    description: "Template de prompt para o copilot explicar resultados em linguagem simples.",
+    href: "/course-assets/day9/copilot_prompt_template.md",
+  },
+  {
+    title: "sample_policy_document.md",
+    description: "Documento de exemplo para testar o fluxo completo de document drop.",
+    href: "/course-assets/day9/sample_policy_document.md",
+  },
+];
+
 function createInitialState(): IntegrationState {
   return {
     projectName: "Minha app local",
@@ -155,6 +178,105 @@ function createInitialState(): IntegrationState {
       handoff: { done: false, note: "Copiar plano final para docs ou issue local." },
     },
   };
+}
+
+function buildIntegrationSpec(state: IntegrationState): string {
+  const activeChecks = CHECKPOINTS.map((item) => {
+    const checkpoint = state.checkpoints[item.id];
+    return `- [${checkpoint.done ? "x" : " "}] ${item.label} — ${checkpoint.note || "sem nota"}`;
+  });
+
+  return [
+    "# Spec de Integracao: Motor + UI + Copilot + Document Drop",
+    "",
+    "## Projeto",
+    `- Nome: ${state.projectName || "n/d"}`,
+    `- Path local: ${state.localPath || "n/d"}`,
+    `- Branch: ${state.branchName || "n/d"}`,
+    "",
+    "## Objetivo da Integracao",
+    state.integrationGoal || "Nao definido.",
+    "",
+    "## Componentes",
+    "",
+    "### 1. Document Drop (Upload)",
+    `- Ficheiro de teste: ${state.uploadedFileName || "n/d"}`,
+    `- Tamanho: ${state.uploadedFileSize || "n/d"}`,
+    `- Nota de extracao: ${state.uploadedNote || "n/d"}`,
+    "",
+    "### 2. Motor Deterministic",
+    `- Comando de run: ${state.runCommand || "n/d"}`,
+    `- Output esperado: ${state.runOutput || "n/d"}`,
+    `- Risco principal: ${state.runRisk || "n/d"}`,
+    "",
+    "### 3. Copilot (Explain)",
+    `- Prompt: ${state.explainPrompt || "n/d"}`,
+    `- Resposta desejada: ${state.explainOutcome || "n/d"}`,
+    "",
+    "### 4. Persistencia (Guardar)",
+    `- Localizacao: ${state.guardarLocation || "n/d"}`,
+    `- Checklist: ${state.guardarChecklist || "n/d"}`,
+    "",
+    "## Checkpoints de Integracao",
+    ...activeChecks,
+    "",
+    "## Notas de Handoff",
+    state.handoffNotes || "n/d",
+    "",
+    "## Plano de Implementacao",
+    state.appPlanNotes || "n/d",
+    "",
+    "## Regras Local-First",
+    "- Upload e preview funcionam offline.",
+    "- Motor corre localmente sem cloud.",
+    "- Copilot tem fallback manual se AI falhar.",
+    "- Logs guardam evidencia de cada run.",
+    "",
+  ].join("\n");
+}
+
+function buildOpenCodePrompt(state: IntegrationState): string {
+  const completedChecks = CHECKPOINTS.filter((item) => state.checkpoints[item.id].done).length;
+  const totalChecks = CHECKPOINTS.length;
+
+  return [
+    "Prompt para construir a app integrada Dia 9",
+    "",
+    `Projeto: ${state.projectName}`,
+    `Path: ${state.localPath}`,
+    `Branch: ${state.branchName}`,
+    "",
+    "Objetivo:",
+    state.integrationGoal,
+    "",
+    `Estado atual: ${completedChecks}/${totalChecks} checkpoints fechados.`,
+    "",
+    "Componentes a implementar:",
+    "",
+    "1. Document Drop",
+    `   - Upload local com preview: ${state.uploadedNote}`,
+    "",
+    "2. Motor Deterministic",
+    `   - Comando: ${state.runCommand}`,
+    `   - Output: ${state.runOutput}`,
+    "",
+    "3. Copilot",
+    `   - Prompt: ${state.explainPrompt}`,
+    "",
+    "4. Guardar",
+    `   - Local: ${state.guardarLocation}`,
+    "",
+    "Pede ao agente para:",
+    "1. criar a estrutura de pastas e componentes;",
+    "2. implementar upload local com validacao de formato;",
+    "3. ligar o motor com logs observaveis;",
+    "4. adicionar o copilot com fallback manual;",
+    "5. guardar evidencia de cada run;",
+    "6. manter tudo local-first e testavel.",
+    "",
+    "Notas livres:",
+    state.appPlanNotes,
+  ].join("\n");
 }
 
 export function Day9IntegrationWorkspace() {
@@ -211,79 +333,8 @@ export function Day9IntegrationWorkspace() {
 
   const currentStage = STAGES.find((item) => item.id === state.activeStage) ?? STAGES[0];
 
-  const handoffBlock = useMemo(() => {
-    const checkpointLines = CHECKPOINTS.map((item) => {
-      const checkpoint = state.checkpoints[item.id];
-      return `- ${item.label}: ${checkpoint.done ? "ok" : "pendente"} | ${checkpoint.note || "sem nota"}`;
-    });
-
-    return [
-      "# Handoff de integracao local-first",
-      "",
-      `Projeto: ${state.projectName || "n/d"}`,
-      `Path local: ${state.localPath || "n/d"}`,
-      `Branch: ${state.branchName || "n/d"}`,
-      `Objetivo: ${state.integrationGoal || "n/d"}`,
-      `Ficheiro de teste: ${state.uploadedFileName || "n/d"}`,
-      `Comando de run: ${state.runCommand || "n/d"}`,
-      `Guardar em: ${state.guardarLocation || "n/d"}`,
-      "",
-      "Estado por etapa:",
-      `- Upload: ${state.uploadedNote || "n/d"}`,
-      `- Run: ${state.runOutput || "n/d"}`,
-      `- Explain: ${state.explainOutcome || "n/d"}`,
-      `- Guardar: ${state.guardarChecklist || "n/d"}`,
-      "",
-      "Checkpoints de app:",
-      ...checkpointLines,
-      "",
-      "Notas de handoff documento -> AI:",
-      state.handoffNotes || "n/d",
-    ].join("\n");
-  }, [state]);
-
-  const integrationPlan = useMemo(() => {
-    const activeChecks = CHECKPOINTS.map((item) => {
-      const checkpoint = state.checkpoints[item.id];
-      return `- ${item.label}: ${checkpoint.done ? "feito" : "por fechar"}`;
-    });
-
-    return [
-      "# Plano de integracao para a app local",
-      "",
-      `Projeto alvo: ${state.projectName || "Minha app local"}`,
-      `Path: ${state.localPath || "C:/dev/minha-app"}`,
-      `Branch sugerida: ${state.branchName || "feature/day9-integracao-local"}`,
-      "",
-      "## Fluxo minimo",
-      "1. Criar uma zona de upload local com preview do ficheiro e validacao de tamanho/formato.",
-      "2. Extrair um excerto pequeno do documento e mostrar o que vai para o prompt antes da chamada AI.",
-      "3. Chamar um endpoint local da app com payload minimo: fileName, snippet, objetivo e contexto.",
-      "4. Mostrar resposta em portugues com streaming e tres blocos: resumo, riscos, confirmacao humana necessaria.",
-      "5. Guardar localmente o ultimo run, o prompt usado e a resposta em localStorage ou ficheiro de suporte no repo.",
-      "",
-      "## Contrato sugerido",
-      "POST /api/integration/explain",
-      "body: { fileName, snippet, integrationGoal, notes }",
-      "response: { summary, extractedFacts, aiInference, humanChecks, nextStep }",
-      "",
-      "## Regras local-first",
-      "- Nunca mandar o documento inteiro se um excerto controlado chega para a tarefa.",
-      "- Se a AI falhar, manter preview local e permitir nota manual sem bloquear a app.",
-      "- Guardar exemplos de request e response no repo para debugging e onboarding.",
-      "- Logar input resumido, duracao, erro e decisao final da chamada.",
-      "- Quando o output precisar de shape fiavel, pedir JSON mode; quando o UX importar, usar streaming para reduzir espera sentida.",
-      "",
-      "## Checkpoints atuais",
-      ...activeChecks,
-      "",
-      "## Nota para o agente AI",
-      state.explainPrompt || "Explica o output, separa facto de inferencia e aponta confirmacoes humanas.",
-      "",
-      "## Nota livre do estudante",
-      state.appPlanNotes || "Comecar pequeno e so depois expandir o fluxo.",
-    ].join("\n");
-  }, [state]);
+  const integrationSpec = useMemo(() => buildIntegrationSpec(state), [state]);
+  const openCodePrompt = useMemo(() => buildOpenCodePrompt(state), [state]);
 
   function setField<Key extends keyof IntegrationState>(key: Key, value: IntegrationState[Key]) {
     setState((current) => ({ ...current, [key]: value }));
@@ -306,6 +357,16 @@ export function Day9IntegrationWorkspace() {
     await navigator.clipboard.writeText(value);
     setCopiedKey(key);
     window.setTimeout(() => setCopiedKey(null), 1800);
+  }
+
+  function downloadSpec() {
+    const blob = new Blob([integrationSpec], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "integration-spec-day9.md";
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   async function handleFileUpload(event: ChangeEvent<HTMLInputElement>) {
@@ -351,27 +412,51 @@ export function Day9IntegrationWorkspace() {
   }
 
   return (
-    <section className="rounded-[1.8rem] border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[0_18px_50px_rgba(22,27,45,0.06)]">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
-            Lab Dia 9
-          </p>
-          <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
-            Integrar documento, app local e AI sem perder controlo do fluxo.
-          </h2>
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--muted-foreground)]">
-            Este workspace ajuda o estudante a desenhar uma integracao pequena, testavel e local-first:
-            receber ficheiro, correr a app, pedir explicacao ao modelo e guardar tudo com handoff claro.
-          </p>
-        </div>
+    <section className="space-y-6">
+      <div className="rounded-[1.8rem] border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[0_18px_50px_rgba(22,27,45,0.06)]">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
+              Lab Dia 9 — Integracao Completa
+            </p>
+            <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
+              Integrar documento, app local e AI sem perder controlo do fluxo.
+            </h2>
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--muted-foreground)]">
+              Define uma integracao pequena, testavel e local-first: receber ficheiro, correr a app,
+              pedir explicacao ao modelo e guardar tudo com handoff claro.
+            </p>
+          </div>
 
-        <div className="rounded-[1.2rem] border border-[var(--accent-soft)] bg-[linear-gradient(180deg,rgba(124,63,88,0.08),rgba(124,63,88,0.03))] px-4 py-3 text-sm text-[var(--foreground)]">
-          Pronto para integrar: {readiness}%
+          <div className="flex items-center gap-3">
+            <div className="rounded-xl border border-[var(--accent-soft)] bg-[linear-gradient(180deg,rgba(124,63,88,0.08),rgba(124,63,88,0.03))] px-4 py-2.5 text-sm font-semibold text-[var(--foreground)]">
+              {readiness}% pronto
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="mt-6 grid gap-4 xl:grid-cols-[0.88fr_1.12fr]">
+      <div className="rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-5">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
+          Ficheiros de apoio — descarrega antes de comecar
+        </p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {ASSETS.map((asset) => (
+            <a
+              key={asset.href}
+              href={asset.href}
+              download
+              className="flex flex-col gap-2 rounded-xl border border-[var(--border)] bg-white p-4 transition hover:border-[var(--accent-soft)] hover:shadow-sm"
+            >
+              <p className="text-sm font-semibold text-[var(--foreground)]">{asset.title}</p>
+              <p className="text-xs leading-5 text-[var(--muted-foreground)]">{asset.description}</p>
+              <span className="mt-auto text-xs font-semibold text-[var(--accent)]">Descarregar</span>
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <div className="grid gap-6 xl:grid-cols-[0.88fr_1.12fr]">
         <div className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <MetricCard label="Etapa ativa" value={currentStage.label} />
@@ -628,52 +713,53 @@ export function Day9IntegrationWorkspace() {
               className="mt-4 min-h-28 w-full rounded-[1rem] border border-[var(--border)] bg-[var(--surface-subtle)] px-3 py-3 text-sm leading-7 text-[var(--foreground)] outline-none focus:border-[var(--accent-soft)]"
             />
           </label>
+        </div>
+      </div>
 
-          <div className="rounded-[1.3rem] border border-[var(--accent-soft)] bg-[linear-gradient(180deg,rgba(124,63,88,0.06),rgba(124,63,88,0.1))] p-4">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--accent)]">
-                  Plano copiavel para a app local
-                </p>
-                <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">
-                  Copia este bloco para o teu repo, issue local ou para pedir implementacao assistida no CLI.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => copyText("plan", integrationPlan)}
-                className="rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[var(--accent-strong)]"
-              >
-                {copiedKey === "plan" ? "Plano copiado" : "Copiar plano"}
-              </button>
-            </div>
-            <pre className="mt-4 overflow-x-auto rounded-[1rem] border border-[var(--border)] bg-white p-4 text-xs leading-6 text-[var(--foreground)]">
-              {integrationPlan}
-            </pre>
+      <div className="rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface)] p-5">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
+              Artefacto final — integration-spec-day9.md
+            </p>
+            <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">
+              Descarrega a spec completa ou copia o prompt para pedir ao OpenCode para construir a app integrada.
+            </p>
           </div>
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+            <button
+              type="button"
+              onClick={() => copyText("prompt", openCodePrompt)}
+              className="rounded-full border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--foreground)] transition hover:border-[var(--accent-soft)]"
+            >
+              {copiedKey === "prompt" ? "Copiado" : "Copiar prompt"}
+            </button>
+            <button
+              type="button"
+              onClick={() => copyText("spec", integrationSpec)}
+              className="rounded-full border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--foreground)] transition hover:border-[var(--accent-soft)]"
+            >
+              {copiedKey === "spec" ? "Copiado" : "Copiar spec"}
+            </button>
+            <button
+              type="button"
+              onClick={downloadSpec}
+              className="rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[var(--accent-strong)]"
+            >
+              Descarregar spec.md
+            </button>
+          </div>
+        </div>
 
-          <div className="rounded-[1.3rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-4">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
-                  Handoff final
-                </p>
-                <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">
-                  Bloco curto para passar integracao, estado atual e limites da automacao a outra pessoa.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => copyText("handoff", handoffBlock)}
-                className="rounded-full border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--foreground)] transition hover:border-[var(--accent-soft)]"
-              >
-                {copiedKey === "handoff" ? "Handoff copiado" : "Copiar handoff"}
-              </button>
-            </div>
-            <pre className="mt-4 overflow-x-auto rounded-[1rem] border border-[var(--border)] bg-white p-4 text-xs leading-6 text-[var(--foreground)]">
-              {handoffBlock}
-            </pre>
-          </div>
+        <pre className="mt-4 max-h-80 overflow-auto whitespace-pre-wrap break-words rounded-xl border border-[var(--border)] bg-[var(--surface-subtle)] p-4 text-xs leading-6 text-[var(--foreground)]">
+          {integrationSpec}
+        </pre>
+
+        <div className="mt-4 rounded-xl border border-dashed border-[var(--border-strong)] bg-white/60 p-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
+            Prompt para OpenCode / GLM-5 — construir a app integrada
+          </p>
+          <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">{openCodePrompt}</p>
         </div>
       </div>
     </section>

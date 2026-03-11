@@ -89,6 +89,8 @@ def init_session():
         st.session_state.demo_progress = {}
     if "demo_submissions" not in st.session_state:
         st.session_state.demo_submissions = {}
+    if "demo_ai_reviews" not in st.session_state:
+        st.session_state.demo_ai_reviews = {}
     if _auth_bypass_enabled() and st.session_state.user is None:
         st.session_state.user = {
             "id": "review-demo",

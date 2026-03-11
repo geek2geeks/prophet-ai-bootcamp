@@ -8,6 +8,7 @@ import { useAuth } from "@/lib/auth-context";
 import { course, days, missionItems } from "@/lib/course";
 import { db } from "@/lib/firebase";
 import { useStudentState } from "@/lib/use-student-state";
+import { isItemDone, type ProgressMap } from "@/lib/student-state";
 import type { ReviewMap } from "@/lib/day1-review";
 
 type SubmissionEntry = {
@@ -243,8 +244,8 @@ function extractRecentSubmissions(data: unknown) {
     .slice(0, 6);
 }
 
-function getDayCompletion(dayProgressIds: string[], progress: Record<string, boolean>) {
-  const completed = dayProgressIds.filter((id) => progress[id]).length;
+function getDayCompletion(dayProgressIds: string[], progress: ProgressMap) {
+  const completed = dayProgressIds.filter((id) => isItemDone(progress, id)).length;
   const total = dayProgressIds.length;
   const percent = Math.round((completed / total) * 100) || 0;
 
@@ -326,25 +327,25 @@ export function PortfolioProgressPage() {
   }, [user]);
 
   const summary = useMemo(() => {
-    const completedItems = missionItems.filter((item) => progress[item.id]);
+    const completedItems = missionItems.filter((item) => isItemDone(progress, item.id));
     const completedPoints = completedItems.reduce((sum, item) => sum + item.points, 0);
     const completedDays = days.filter((day) => {
       const ids = [...day.exercicios.map((item) => item.id), day.desafio.id];
-      return ids.every((id) => progress[id]);
+      return ids.every((id) => isItemDone(progress, id));
     });
     const startedDays = days.filter((day) => {
       const ids = [...day.exercicios.map((item) => item.id), day.desafio.id];
-      return ids.some((id) => progress[id]);
+      return ids.some((id) => isItemDone(progress, id));
     });
     const nextDay =
       days.find((day) => {
         const ids = [...day.exercicios.map((item) => item.id), day.desafio.id];
-        return ids.some((id) => !progress[id]);
+        return ids.some((id) => !isItemDone(progress, id));
       }) ?? days.at(-1);
     const highlightedDays = days
       .filter((day) => {
         const ids = [...day.exercicios.map((item) => item.id), day.desafio.id];
-        return ids.some((id) => progress[id]) || day.slug === nextDay?.slug;
+        return ids.some((id) => isItemDone(progress, id)) || day.slug === nextDay?.slug;
       })
       .slice(0, 5)
       .map((day) => {
@@ -451,25 +452,26 @@ export function PortfolioProgressPage() {
               Portfolio do estudante
             </p>
             <span className="ink-rule mt-3" aria-hidden="true" />
-            <h1 className="mt-4 max-w-4xl font-serif text-5xl leading-[0.94] tracking-[-0.04em] text-[var(--foreground)] sm:text-6xl">
+            <h1 className="mt-4 max-w-4xl font-serif text-[2.6rem] leading-[0.96] tracking-[-0.04em] text-[var(--foreground)] sm:text-6xl">
               O teu progresso, as tuas entregas e o proximo passo num so lugar.
             </h1>
             <p className="mt-4 max-w-3xl text-base leading-8 text-[var(--muted-foreground)] sm:text-lg">
-              Esta pagina junta o que ja foi concluido, o que ainda esta em curso e os sinais de trabalho guardados pelo estudante ao longo do bootcamp.
+              Consulta o que ja fechaste, o que ainda esta em curso e as entregas recentes que ja
+              servem como prova do teu trabalho.
             </p>
 
-            <div className="mt-6 flex flex-wrap gap-3">
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               {summary.nextDay ? (
                 <AppLink
                   href={`/missions/${summary.nextDay.slug}`}
-                  className="button-primary px-5 py-3 text-sm"
+                  className="button-primary w-full px-5 py-3 text-center text-sm sm:w-auto"
                 >
                   Continuar no Dia {summary.nextDay.slug}
                 </AppLink>
               ) : null}
               <AppLink
                 href="/"
-                className="button-secondary px-5 py-3 text-sm font-semibold"
+                className="button-secondary w-full px-5 py-3 text-center text-sm font-semibold sm:w-auto"
               >
                 Voltar ao inicio
               </AppLink>
@@ -513,7 +515,7 @@ export function PortfolioProgressPage() {
           </div>
         </section>
 
-        <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
           <article className="metric-card rounded-[1.6rem] p-5">
             <p className="text-xs uppercase tracking-[0.18em] text-[var(--muted-foreground)]">Dias concluidos</p>
             <p className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
@@ -554,11 +556,12 @@ export function PortfolioProgressPage() {
                     Dias em destaque
                   </p>
                   <h2 className="mt-2 font-serif text-3xl text-[var(--foreground)] sm:text-4xl">
-                    O percurso fica visivel sem perder o contexto da aula.
+                    Dias com progresso recente.
                   </h2>
                 </div>
                 <p className="max-w-xl text-sm leading-7 text-[var(--muted-foreground)]">
-                  Os primeiros dias mostram o arranque do teu portfolio e ajudam a perceber onde vale a pena voltar agora.
+                  Revê as aulas que ja tocaste e identifica rapidamente qual merece a tua atencao a
+                  seguir.
                 </p>
               </div>
 
@@ -596,7 +599,8 @@ export function PortfolioProgressPage() {
               </div>
               ) : (
                 <div className="mt-6 rounded-[1.4rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-4 text-sm leading-7 text-[var(--muted-foreground)]">
-                  Mostra apenas quando quiseres rever dias tocados ou retomar um ramo do percurso.
+                  Abre esta secao para rever aulas iniciadas, comparar progresso e decidir onde
+                  retomar.
                 </div>
               )}
             </section>
@@ -654,7 +658,8 @@ export function PortfolioProgressPage() {
               </div>
               ) : (
                 <div className="mt-6 rounded-[1.4rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-4 text-sm leading-7 text-[var(--muted-foreground)]">
-                  Mantem esta secao fechada enquanto estas a executar tarefas; abre-a quando quiseres rever prompts, comandos ou decisoes guardadas.
+                  Abre esta secao quando quiseres rever prompts, comandos e decisoes guardadas nas
+                  tuas notas.
                 </div>
               )}
             </section>
@@ -666,11 +671,12 @@ export function PortfolioProgressPage() {
                     Reviews do tutor
                   </p>
                   <h2 className="mt-2 font-serif text-3xl text-[var(--foreground)] sm:text-4xl">
-                    Feedback AI guardado ao longo do percurso.
+                    Feedback AI sobre as tuas respostas.
                   </h2>
                 </div>
                 <p className="max-w-xl text-sm leading-7 text-[var(--muted-foreground)]">
-                  Cada review mostra evidencias, lacunas e o nivel de confianca da avaliacao. Isto torna o progresso mais auditavel e mais facil de rever.
+                  Cada review destaca pontos fortes, lacunas e o proximo passo antes de submeteres a
+                  versao final.
                 </p>
               </div>
 
@@ -739,13 +745,14 @@ export function PortfolioProgressPage() {
               </>
               ) : (
                 <div className="mt-6 rounded-[1.4rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-4 text-sm leading-7 text-[var(--muted-foreground)]">
-                  Feedback AI e util para refinar entregas, mas nao precisa de ocupar o centro do portfolio enquanto o aluno esta a navegar no trabalho do dia.
+                  Abre esta secao para rever comentarios do tutor e decidir que respostas merecem uma
+                  nova iteracao.
                 </div>
               )}
             </section>
           </div>
 
-          <aside className="space-y-6 xl:sticky xl:top-24 xl:self-start">
+          <aside className="space-y-6 xl:sticky xl:top-28 xl:self-start">
             <section className="panel shell-frame rounded-[2rem] p-6 sm:p-8">
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--muted-foreground)]">
                 Entregas recentes

@@ -1,0 +1,13 @@
+apolice_id,idade,sexo,tipo_produto,capital_segurado,premio_anual,estado,fumador
+SP001,54,M,Vida Inteira,450000,11800,Ativa,Sim
+SP002,58,F,Vida Inteira,300000,7200,Ativa,Nao
+SP003,61,M,Misto,500000,8800,Ativa,Nao
+SP004,64,F,Vida Inteira,250000,6900,Ativa,Nao
+SP005,67,M,Vida Inteira,600000,16500,Ativa,Sim
+SP006,72,F,Misto,350000,8400,Resgatada,Nao
+SP007,59,M,Vida Inteira,275000,7150,Ativa,Nao
+SP008,63,F,Vida Inteira,400000,10400,Ativa,Nao
+SP009,57,M,Misto,325000,6900,Ativa,Sim
+SP010,69,F,Vida Inteira,225000,6200,Sinistrada,Nao
+SP011,62,M,Vida Inteira,550000,14200,Ativa,Sim
+SP012,56,F,Vida Inteira,280000,7350,Ativa,Nao

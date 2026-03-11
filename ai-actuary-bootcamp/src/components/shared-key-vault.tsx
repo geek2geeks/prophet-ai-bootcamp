@@ -6,7 +6,7 @@ import { db } from "@/lib/firebase";
 import { useAuth } from "@/lib/auth-context";
 
 type SharedKeys = {
-  deepseek: string;
+  gemini: string;
   zai: string;
 };
 
@@ -71,25 +71,25 @@ export function SharedKeyVault() {
           <p>{error}</p>
           <p className="mt-3 text-xs leading-6 text-red-700">
             Para concluir o setup do Dia 0, cria o documento `config/keys` no Firestore com os
-            campos `deepseek` e `zai`.
+            campos `gemini` e `zai`.
           </p>
         </div>
       ) : (
         <div className="mt-5 space-y-4">
           <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-subtle)] p-4">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--foreground)]">DeepSeek API Key</span>
-              <button 
-                onClick={() => copyToClipboard('deepseek', keys?.deepseek || '')}
-                className="text-xs font-semibold text-[var(--accent)] hover:underline"
-              >
-                {copiedKey === 'deepseek' ? 'Copiado!' : 'Copiar'}
-              </button>
-            </div>
-            <div className="mt-2 font-mono text-sm text-[var(--muted-foreground)] break-all">
-              {keys?.deepseek ? (keys.deepseek.substring(0, 12) + "...") : "..."}
-            </div>
-          </div>
+               <span className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--foreground)]">Gemini API Key</span>
+               <button
+                onClick={() => copyToClipboard('gemini', keys?.gemini || '')}
+                 className="text-xs font-semibold text-[var(--accent)] hover:underline"
+               >
+                {copiedKey === 'gemini' ? 'Copiado!' : 'Copiar'}
+               </button>
+             </div>
+             <div className="mt-2 font-mono text-sm text-[var(--muted-foreground)] break-all">
+              {keys?.gemini ? (keys.gemini.substring(0, 12) + "...") : "..."}
+             </div>
+           </div>
 
           <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-subtle)] p-4">
             <div className="flex items-center justify-between">

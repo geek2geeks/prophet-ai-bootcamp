@@ -191,6 +191,7 @@ SYSTEM_PROMPT = f"""Es o AI Tutor do Prophet Lite Founder Bootcamp -- um bootcam
 
 PAPEL:
 - Ajudar alunos com duvidas sobre exercicios, specs, ferramentas, prompts e arquitetura do bootcamp.
+- Fazer first-pass review de respostas do Dia 1 quando o aluno pedir feedback: devolver score recomendado, pontos fortes, lacunas, evidencia usada e proximos ajustes, sem agir como examinador final.
 - Explicar os conceitos atuarialmente relevantes apenas na medida em que suportam o produto Prophet Lite.
 - Ajudar com OpenCode, APIs, Streamlit, document drop, copiloto AI, UX mobile-first, deploy e narrativa de produto.
 - Explicar o Spec-Driven Development (SDD): escrever spec, gerar codigo, auditar e iterar.
@@ -213,6 +214,126 @@ REGRAS:
 - O foco do bootcamp nao e ensinar coding manual, mas ensinar o aluno a especificar, validar, empacotar, deployar e divulgar um produto.
 - O ultimo passo do curso inclui preparar o lancamento publico no LinkedIn.
 """
+
+
+DAY1_REVIEW_SYSTEM_PROMPT = """Es o AI Tutor do bootcamp a atuar como camada de review para respostas do Dia 1.
+
+OBJETIVO:
+- Avaliar a resposta do aluno contra a rubrica do exercicio.
+- Dar feedback acionavel, especifico e curto.
+- Funcionar como coach: recomendacao, nao nota final academica.
+
+REGRAS:
+- Responde em portugues de Portugal.
+- Sê exigente com elementos em falta e com respostas vagas.
+- Valoriza clareza, especificidade, uso de evidencia e ligacao ao contexto do bootcamp.
+- Penaliza mais a falta de requisitos do que estilo ou formato cosmetico.
+- Se houver contexto factual extra, usa-o para verificar a resposta.
+- Nao inventes factos nem assumes trabalho que o aluno nao mostrou.
+- Devolve APENAS JSON valido, sem markdown, sem texto antes ou depois.
+
+JSON OBRIGATORIO:
+{
+  "score_recommended": 0,
+  "max_score": 10,
+  "pass_recommended": false,
+  "short_feedback": "2-4 frases objetivas.",
+  "strengths": ["..."],
+  "gaps": ["..."],
+  "required_fixes": ["..."],
+  "evidence_used": ["..."],
+  "confidence": "low|medium|high"
+}
+"""
+
+
+DAY1_REVIEW_SPECS = {
+    "ex1.1": {
+        "max_score": 10,
+        "deliverable": "Glossario pessoal do fundador em formato de tabela ou lista estruturada.",
+        "must_include": [
+            "Os 10 termos pedidos: SaaS, MVP, Wedge, Workflow, UX, Feature, Deploy, Incumbent, Posicionamento, Stack.",
+            "Definicao curta em palavras do aluno, nao apenas texto copiado.",
+            "Um exemplo concreto do mundo dos seguros para cada termo.",
+            "Perspetiva de produto, especialmente para Deploy e Stack.",
+        ],
+    },
+    "ex1.2": {
+        "max_score": 10,
+        "deliverable": "Comparacao curta entre vender horas e vender produto, com conclusoes pessoais.",
+        "must_include": [
+            "Comparacao em margem, escala e dependencia do tempo.",
+            "Tabela ou estrutura equivalente que contraste os dois modelos.",
+            "Tres conclusoes pessoais.",
+            "Ligacao explicita a alavanca observada no Dia 0.",
+        ],
+    },
+    "ex1.3": {
+        "max_score": 10,
+        "deliverable": "Tabela sobre o Prophet e as oportunidades para um MVP simples.",
+        "must_include": [
+            "Pelo menos 5 areas: model points, assumptions, motor de projecao, relatorios e governance.",
+            "Ponto forte do Prophet em cada area.",
+            "Oportunidade clara para uma versao simples e moderna.",
+            "Raciocinio de foco, nao tentativa de copiar tudo.",
+        ],
+    },
+    "ex1.4": {
+        "max_score": 10,
+        "deliverable": "Tres frustracoes reais e vendaveis no mercado de seguros Vida.",
+        "must_include": [
+            "Tres problemas distintos e especificos.",
+            "Quem sofre, frequencia, impacto no negocio e porque as solucoes atuais falham.",
+            "Problemas concretos, nao abstratos nem demasiado amplos.",
+            "Ligacao plausivel a dados, workflows ou experiencia profissional real.",
+        ],
+    },
+    "ex1.5": {
+        "max_score": 10,
+        "deliverable": "Memo do fundador numa pagina com foco e wedge clara.",
+        "must_include": [
+            "Cliente ideal.",
+            "Problema principal.",
+            "Ponto de entrada no mercado (wedge).",
+            "3 a 5 capacidades iniciais do produto.",
+            "Pelo menos 5 coisas que ficam de fora de proposito.",
+            "Argumento de foco explicando porque fazer menos e melhor.",
+        ],
+    },
+    "ex1.6": {
+        "max_score": 10,
+        "deliverable": "Resposta ao quiz do Dia 1 em 12 itens numerados.",
+        "must_include": [
+            "Cobertura das 12 perguntas.",
+            "Explicacoes curtas mas corretas, em linguagem propria.",
+            "Distincao clara entre prompts precisos e exploradores.",
+            "Entendimento de wedge, MVP, UX, workflow, posicionamento e incumbent.",
+        ],
+    },
+    "ex1.7": {
+        "max_score": 10,
+        "deliverable": "Analise curta da variacao trimestral com recomendacao de automacao.",
+        "must_include": [
+            "Identificacao dos segmentos com maior deterioracao do lucro.",
+            "Justificacao do principal driver da subida de reserva com numeros.",
+            "Nota curta e executiva para o CFO.",
+            "Trabalho manual repetitivo identificado com sugestao de feature AI para automatizar.",
+        ],
+    },
+    "des1": {
+        "max_score": 25,
+        "deliverable": "Tese de produto para convencer o primeiro cliente, com foco comercial e prova de conceito.",
+        "must_include": [
+            "Para quem e: tipo de equipa, empresa e estimativa de quantas existem no mercado.",
+            "Problema hoje: workflow atual, lentidao, custo ou risco.",
+            "O que o Prophet Lite faz primeiro e como.",
+            "Vantagem face ao Prophet: copiloto AI, UX moderna e document drop ligado ao calculo.",
+            "Prova de conceito com dados reais do Dia 0, incluindo numeros concretos.",
+            "Plano de 3 passos para encontrar o primeiro cliente.",
+            "Tres riscos e respostas claras.",
+        ],
+    },
+}
 
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
@@ -240,6 +361,168 @@ def get_user_context() -> str:
                     pass
             break  # use first key found
     return "\n".join(parts) if parts else ""
+
+
+def get_day1_review_spec(exercise_id: str) -> dict[str, Any]:
+    return DAY1_REVIEW_SPECS.get(exercise_id, {})
+
+
+def _extract_review_json(content: str) -> dict[str, Any]:
+    text = (content or "").strip()
+    if not text:
+        return {}
+
+    if text.startswith("```"):
+        lines = text.splitlines()
+        if len(lines) >= 3:
+            text = "\n".join(lines[1:-1]).strip()
+
+    try:
+        parsed = json.loads(text)
+        return parsed if isinstance(parsed, dict) else {}
+    except json.JSONDecodeError:
+        start = text.find("{")
+        end = text.rfind("}")
+        if start == -1 or end == -1 or end <= start:
+            return {}
+        try:
+            parsed = json.loads(text[start:end + 1])
+            return parsed if isinstance(parsed, dict) else {}
+        except json.JSONDecodeError:
+            return {}
+
+
+def _normalize_review_list(value: Any) -> list[str]:
+    if isinstance(value, list):
+        return [str(item).strip() for item in value if str(item).strip()]
+    if isinstance(value, str) and value.strip():
+        return [value.strip()]
+    return []
+
+
+def _normalize_review_payload(payload: dict[str, Any], max_score: int) -> dict[str, Any]:
+    try:
+        score = int(payload.get("score_recommended", 0))
+    except (TypeError, ValueError):
+        score = 0
+    score = max(0, min(score, max_score))
+
+    confidence = str(payload.get("confidence", "medium")).strip().lower()
+    if confidence not in {"low", "medium", "high"}:
+        confidence = "medium"
+
+    short_feedback = str(payload.get("short_feedback", "")).strip()
+    strengths = _normalize_review_list(payload.get("strengths"))
+    gaps = _normalize_review_list(payload.get("gaps"))
+    required_fixes = _normalize_review_list(payload.get("required_fixes"))
+    evidence_used = _normalize_review_list(payload.get("evidence_used"))
+
+    pass_recommended = payload.get("pass_recommended")
+    if isinstance(pass_recommended, bool):
+        pass_value = pass_recommended
+    else:
+        pass_value = score >= max(6, int(max_score * 0.7)) and not required_fixes
+
+    return {
+        "score_recommended": score,
+        "max_score": max_score,
+        "pass_recommended": pass_value,
+        "short_feedback": short_feedback,
+        "strengths": strengths,
+        "gaps": gaps,
+        "required_fixes": required_fixes,
+        "evidence_used": evidence_used,
+        "confidence": confidence,
+    }
+
+
+def review_day1_exercise_answer(
+    exercise_id: str,
+    exercise_title: str,
+    exercise_description: str,
+    student_answer: str,
+    extra_context: str = "",
+) -> dict[str, Any]:
+    spec = get_day1_review_spec(exercise_id)
+    max_score = int(spec.get("max_score", 10))
+
+    if not student_answer.strip():
+        return {
+            "error": t("day1_review_empty"),
+            "score_recommended": 0,
+            "max_score": max_score,
+            "pass_recommended": False,
+            "short_feedback": "",
+            "strengths": [],
+            "gaps": [],
+            "required_fixes": [],
+            "evidence_used": [],
+            "confidence": "low",
+        }
+
+    try:
+        api_key = st.secrets["deepseek"]["api_key"]
+    except Exception:
+        return {
+            "error": t("tutor_unavailable"),
+            "score_recommended": 0,
+            "max_score": max_score,
+            "pass_recommended": False,
+            "short_feedback": "",
+            "strengths": [],
+            "gaps": [],
+            "required_fixes": [],
+            "evidence_used": [],
+            "confidence": "low",
+        }
+
+    page_context = get_user_context()
+    review_prompt = f"""EXERCICIO: {exercise_id} -- {exercise_title}
+
+DESCRICAO OFICIAL:
+{exercise_description}
+
+RUBRICA DE REVIEW:
+{json.dumps(spec, indent=2, ensure_ascii=False)}
+
+CONTEXTO DO ALUNO:
+{page_context or 'Sem contexto adicional.'}
+
+CONTEXTO FACTUAL EXTRA:
+{extra_context or 'Sem contexto factual extra.'}
+
+RESPOSTA DO ALUNO:
+{student_answer.strip()}
+
+Avalia a resposta e devolve apenas o JSON pedido.
+"""
+
+    try:
+        from openai import OpenAI
+
+        client = OpenAI(api_key=api_key, base_url="https://api.deepseek.com")
+        response = client.chat.completions.create(
+            model="deepseek-chat",
+            messages=[
+                {"role": "system", "content": DAY1_REVIEW_SYSTEM_PROMPT},
+                {"role": "user", "content": review_prompt},
+            ],
+            max_tokens=900,
+            temperature=0.1,
+        )
+        content = response.choices[0].message.content
+        payload = _extract_review_json(content if isinstance(content, str) else "")
+        if not payload:
+            return {
+                "error": t("day1_review_parse_error"),
+                **_normalize_review_payload({}, max_score),
+            }
+        return _normalize_review_payload(payload, max_score)
+    except Exception as e:
+        return {
+            "error": t("tutor_contact_error", error=e),
+            **_normalize_review_payload({}, max_score),
+        }
 
 
 def _build_full_messages(

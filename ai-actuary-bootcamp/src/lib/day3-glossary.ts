@@ -1,0 +1,16 @@
+export const DAY3_GLOSSARY: Record<string, string> = {
+  JSON: "Formato de dados muito usado para trocar informacao entre sistemas.",
+  YAML: "Formato de configuracao mais legivel para humanos do que JSON.",
+  schema: "Regra que diz que campos existem, que tipo de valor aceitam e o que e obrigatorio.",
+  schemas: "Regras que definem estrutura, campos obrigatorios e tipos de dados.",
+  API: "Forma padronizada de um sistema pedir ou enviar informacao a outro.",
+  endpoint: "Morada exata de uma API para onde fazes um pedido.",
+  payload: "O conteudo enviado num pedido, por exemplo um JSON com dados.",
+  headers: "Metadados do pedido, como formato dos dados ou autenticacao.",
+  HTTP: "Protocolo base usado para pedidos e respostas entre apps e servicos web.",
+  request: "Pedido enviado a uma API ou servico.",
+  response: "Resposta recebida depois do pedido.",
+  "model points": "Tabela base das apolices que alimenta o motor atuarial.",
+  assumptions: "Hipoteses tecnicas do modelo, como mortalidade, lapse e desconto.",
+  contract: "Acordo explicito sobre que dados entram, saem e em que formato.",
+};

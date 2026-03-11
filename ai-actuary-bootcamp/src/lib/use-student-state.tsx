@@ -15,7 +15,9 @@ import { useAuth } from "./auth-context";
 import type { Day1AnswerMap, Day1ReviewMap } from "./day1-review";
 import { db } from "./firebase";
 import {
+  type ProgressEntry,
   type ProgressMap,
+  migrateProgress,
   readProgress,
   readStickyNotes,
   type StickyNote,
@@ -139,7 +141,7 @@ export function StudentStateProvider({ children }: { children: React.ReactNode }
 
         if (docSnap.exists()) {
           const data = docSnap.data() as StudentDocument;
-          const nextProgress = data.progress || {};
+          const nextProgress = migrateProgress(data.progress || {});
           const remoteStickyNotes = (data.stickyNotes || []) as StickyNote[];
           const nextStickyNotes = stickyDirtySinceHydration.current
             ? mergeStickyNotes(remoteStickyNotes, localStickyNotes)
@@ -276,7 +278,11 @@ export function StudentStateProvider({ children }: { children: React.ReactNode }
 
   const toggleProgress = useCallback(
     async (id: string, checked: boolean) => {
-      const next = { ...progress, [id]: checked };
+      const existing = progress[id];
+      const entry: ProgressEntry = checked
+        ? { done: true, completedAt: Date.now(), evidence: existing?.evidence ?? "done" }
+        : { done: false };
+      const next = { ...progress, [id]: entry };
       await updateProgress(next);
     },
     [progress, updateProgress],

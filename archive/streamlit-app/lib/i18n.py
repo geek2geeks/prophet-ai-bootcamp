@@ -1288,6 +1288,106 @@ TRANSLATIONS = {
         "en": "Error contacting the AI Tutor: {error}",
         "fr": "Erreur lors du contact avec l'AI Tutor : {error}",
     },
+    "day1_review_button": {
+        "pt": "Review with AI",
+        "en": "Review with AI",
+        "fr": "Review with AI",
+    },
+    "day1_review_loading": {
+        "pt": "O tutor esta a avaliar a tua resposta...",
+        "en": "The tutor is evaluating your answer...",
+        "fr": "Le tuteur evalue votre reponse...",
+    },
+    "day1_review_score": {
+        "pt": "Score recomendado",
+        "en": "Recommended score",
+        "fr": "Score recommande",
+    },
+    "day1_review_ready": {
+        "pt": "Pronto para fechar?",
+        "en": "Ready to complete?",
+        "fr": "Pret a terminer ?",
+    },
+    "day1_review_confidence": {
+        "pt": "Confianca",
+        "en": "Confidence",
+        "fr": "Confiance",
+    },
+    "day1_review_yes": {
+        "pt": "Sim",
+        "en": "Yes",
+        "fr": "Oui",
+    },
+    "day1_review_not_yet": {
+        "pt": "Ainda nao",
+        "en": "Not yet",
+        "fr": "Pas encore",
+    },
+    "day1_review_strengths": {
+        "pt": "Pontos fortes",
+        "en": "Strengths",
+        "fr": "Points forts",
+    },
+    "day1_review_gaps": {
+        "pt": "Lacunas",
+        "en": "Gaps",
+        "fr": "Lacunes",
+    },
+    "day1_review_fixes": {
+        "pt": "Ajustes obrigatorios antes de fechar",
+        "en": "Required fixes before completion",
+        "fr": "Corrections obligatoires avant validation",
+    },
+    "day1_review_evidence": {
+        "pt": "Evidencia reconhecida pelo tutor",
+        "en": "Evidence recognized by the tutor",
+        "fr": "Preuves reconnues par le tuteur",
+    },
+    "day1_review_stale": {
+        "pt": "Alteraste a resposta depois da ultima review. Corre o tutor outra vez para atualizar a avaliacao.",
+        "en": "You changed the answer after the last review. Run the tutor again to refresh the evaluation.",
+        "fr": "Vous avez modifie la reponse apres la derniere review. Relancez le tuteur pour mettre l'evaluation a jour.",
+    },
+    "day1_review_lab_hint": {
+        "pt": "No ex1.7, o tutor tambem usa as respostas do lab acima se ja preencheste os campos estruturados.",
+        "en": "For ex1.7, the tutor also uses the structured lab answers above if you already filled them in.",
+        "fr": "Pour ex1.7, le tuteur utilise aussi les reponses structurees du lab ci-dessus si vous les avez deja remplies.",
+    },
+    "day1_review_disclaimer": {
+        "pt": "A avaliacao e recomendada pelo tutor. Nao substitui revisao humana nem atribuicao final de pontos.",
+        "en": "This evaluation is a tutor recommendation. It does not replace human review or final scoring.",
+        "fr": "Cette evaluation est une recommandation du tuteur. Elle ne remplace pas une revue humaine ni la note finale.",
+    },
+    "day1_review_empty": {
+        "pt": "Resposta vazia. Escreve primeiro a tua resposta antes de pedir review.",
+        "en": "Empty answer. Write your answer before asking for review.",
+        "fr": "Reponse vide. Ecrivez votre reponse avant de demander une review.",
+    },
+    "day1_review_parse_error": {
+        "pt": "Nao foi possivel interpretar a resposta do modelo em formato estruturado.",
+        "en": "Could not interpret the model response in structured format.",
+        "fr": "Impossible d'interpreter la reponse du modele dans un format structure.",
+    },
+    "day1_review_gate_required": {
+        "pt": "Para fechar este exercicio, corre primeiro uma review com AI a uma resposta tua.",
+        "en": "Run an AI review on your answer before completing this exercise.",
+        "fr": "Lancez d'abord une review AI de votre reponse avant de valider cet exercice.",
+    },
+    "day1_review_gate_refresh": {
+        "pt": "Alteraste a resposta depois da review. Atualiza a avaliacao AI antes de fechar o exercicio.",
+        "en": "You changed the answer after the review. Refresh the AI evaluation before completing the exercise.",
+        "fr": "Vous avez modifie la reponse apres la review. Actualisez l'evaluation AI avant de valider l'exercice.",
+    },
+    "day1_review_gate_required_challenge": {
+        "pt": "Antes de submeter o desafio do Dia 1, corre uma review com AI sobre a tese de produto.",
+        "en": "Run an AI review on the product thesis before submitting the Day 1 challenge.",
+        "fr": "Lancez une review AI de la these produit avant de soumettre le challenge du Jour 1.",
+    },
+    "day1_review_gate_refresh_challenge": {
+        "pt": "Alteraste a tese depois da review. Atualiza a avaliacao AI antes de submeter o desafio.",
+        "en": "You changed the thesis after the review. Refresh the AI evaluation before submitting the challenge.",
+        "fr": "Vous avez modifie la these apres la review. Actualisez l'evaluation AI avant de soumettre le challenge.",
+    },
 
     # ── LinkedIn Launch Page ──
     "launch_title": {

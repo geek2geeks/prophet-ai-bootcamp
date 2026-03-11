@@ -40,7 +40,25 @@ type PricingWireflowStudioState = {
   hooks: CopyHook[];
 };
 
-const STORAGE_KEY = "aibootcamp-day7-pricing-wireflow-studio-v1";
+const STORAGE_KEY = "aibootcamp-day7-pricing-wireflow-studio-v2";
+
+const ASSETS = [
+  {
+    title: "pricing_framework.md",
+    description: "Estrutura para definir planos, precos e racional comercial.",
+    href: "/course-assets/day7/pricing_framework.md",
+  },
+  {
+    title: "journey_wireflow_template.md",
+    description: "Template de mapeamento de jornada e touchpoints.",
+    href: "/course-assets/day7/journey_wireflow_template.md",
+  },
+  {
+    title: "launch_copy_angles.md",
+    description: "Angulos de copy para pagina, outreach e demo curta.",
+    href: "/course-assets/day7/launch_copy_angles.md",
+  },
+];
 
 function createJourneyStage(stage: Partial<JourneyStage> = {}): JourneyStage {
   return {
@@ -233,6 +251,24 @@ export function buildDay7PricingWireflowBrief(state: PricingWireflowStudioState)
   ].join("\n");
 }
 
+function buildOpenCodePrompt(state: PricingWireflowStudioState): string {
+  return [
+    "Prompt local-first para CLI/OpenCode",
+    "",
+    `Objetivo: rever a proposta comercial e wireflow para ${state.productName}.`,
+    "",
+    "Pede ao agente para:",
+    "1. validar a coerencia entre jornada, planos e hooks de copy;",
+    "2. apontar gaps na narrativa de valor entre etapas;",
+    "3. sugerir melhorias nos CTAs e headlines para cada angulo;",
+    "4. verificar se o pricing anchor e rationale estao alinhados com o publico-alvo;",
+    "5. produzir uma versao revista do brief com todas as correcoes.",
+    "",
+    `Cliente-alvo: ${state.targetCustomer}`,
+    `Objetivo de lancamento: ${state.launchGoal}`,
+  ].join("\n");
+}
+
 export function Day7PricingWireflowStudio() {
   const [state, setState] = useState<PricingWireflowStudioState>(() => {
     if (typeof window === "undefined") {
@@ -257,6 +293,7 @@ export function Day7PricingWireflowStudio() {
   }, [state]);
 
   const brief = useMemo(() => buildDay7PricingWireflowBrief(state), [state]);
+  const openCodePrompt = useMemo(() => buildOpenCodePrompt(state), [state]);
 
   const readiness = useMemo(() => {
     const signals = [
@@ -360,32 +397,64 @@ export function Day7PricingWireflowStudio() {
   async function copyText(key: string, value: string) {
     await navigator.clipboard.writeText(value);
     setCopied(key);
-    window.setTimeout(() => setCopied(null), 1800);
+    window.setTimeout(() => setCopied(null), 1600);
+  }
+
+  function downloadBrief() {
+    const blob = new Blob([brief], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `pricing-wireflow-${state.productName.toLowerCase().replace(/\s+/g, "-")}.md`;
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   return (
-    <section className="rounded-[1.8rem] border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[0_18px_50px_rgba(22,27,45,0.06)]">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
-            Lab Dia 7
-          </p>
-          <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
-            Fechar jornada, pricing e copy antes do lancamento do MVP.
-          </h2>
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--muted-foreground)]">
-            Este studio ajuda o estudante a ligar descoberta, ativacao e expansao a uma oferta
-            vendavel. Em vez de inventar mais features, organiza o wireflow comercial, compara
-            planos e sai com um brief copiavel para ferramentas locais de planeamento.
-          </p>
-        </div>
+    <section className="space-y-6">
+      <div className="rounded-[1.8rem] border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[0_18px_50px_rgba(22,27,45,0.06)]">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
+              Lab Dia 7 — Pricing & Wireflow Studio
+            </p>
+            <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
+              Fechar jornada, pricing e copy antes do lancamento do MVP.
+            </h2>
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--muted-foreground)]">
+              Este studio ajuda o estudante a ligar descoberta, ativacao e expansao a uma oferta
+              vendavel. Em vez de inventar mais features, organiza o wireflow comercial, compara
+              planos e sai com um brief copiavel para ferramentas locais de planeamento.
+            </p>
+          </div>
 
-        <div className="rounded-[1.2rem] border border-[var(--accent-soft)] bg-[linear-gradient(180deg,rgba(124,63,88,0.08),rgba(124,63,88,0.03))] px-4 py-3 text-sm text-[var(--foreground)]">
-          Readiness do lancamento: {readiness}%
+          <div className="rounded-xl border border-[var(--accent-soft)] bg-[linear-gradient(180deg,rgba(124,63,88,0.08),rgba(124,63,88,0.03))] px-4 py-2.5 text-sm font-semibold text-[var(--foreground)]">
+            Readiness: {readiness}%
+          </div>
         </div>
       </div>
 
-      <div className="mt-6 grid gap-4 xl:grid-cols-[0.92fr_1.08fr]">
+      <div className="rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-5">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
+          Ficheiros de apoio — descarrega antes de comecar
+        </p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-3">
+          {ASSETS.map((asset) => (
+            <a
+              key={asset.href}
+              href={asset.href}
+              download
+              className="flex flex-col gap-2 rounded-xl border border-[var(--border)] bg-white p-4 transition hover:border-[var(--accent-soft)] hover:shadow-sm"
+            >
+              <p className="text-sm font-semibold text-[var(--foreground)]">{asset.title}</p>
+              <p className="text-xs leading-5 text-[var(--muted-foreground)]">{asset.description}</p>
+              <span className="mt-auto text-xs font-semibold text-[var(--accent)]">Descarregar</span>
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <div className="grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
         <div className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
             <FieldPanel
@@ -416,7 +485,7 @@ export function Day7PricingWireflowStudio() {
             onChange={(value) => updateField("offerGuardrail", value)}
           />
 
-          <div className="rounded-[1.3rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-4">
+          <div className="rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-5">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
@@ -449,7 +518,7 @@ export function Day7PricingWireflowStudio() {
             </div>
           </div>
 
-          <div className="rounded-[1.3rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-4">
+          <div className="rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-5">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
               Perguntas de pressao
             </p>
@@ -462,7 +531,7 @@ export function Day7PricingWireflowStudio() {
         </div>
 
         <div className="space-y-4">
-          <div className="rounded-[1.3rem] border border-[var(--border)] bg-white p-4">
+          <div className="rounded-[1.5rem] border border-[var(--border)] bg-white p-5">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
@@ -495,7 +564,7 @@ export function Day7PricingWireflowStudio() {
             </div>
           </div>
 
-          <div className="rounded-[1.3rem] border border-[var(--border)] bg-white p-4">
+          <div className="rounded-[1.5rem] border border-[var(--border)] bg-white p-5">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
@@ -526,30 +595,53 @@ export function Day7PricingWireflowStudio() {
               ))}
             </div>
           </div>
+        </div>
+      </div>
 
-          <div className="rounded-[1.3rem] border border-[var(--accent-soft)] bg-[linear-gradient(180deg,rgba(124,63,88,0.06),rgba(124,63,88,0.1))] p-4">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--accent)]">
-                  Brief de build copiavel
-                </p>
-                <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">
-                  Bloco pronto para OpenCode, Z.ai, GitHub Spec Kit ou outra ferramenta local.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => copyText("brief", brief)}
-                className="rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[var(--accent-strong)]"
-              >
-                {copied === "brief" ? "Brief copiado" : "Copiar brief"}
-              </button>
-            </div>
-
-            <pre className="mt-4 overflow-x-auto rounded-[1rem] border border-[var(--border)] bg-white p-4 text-xs leading-6 text-[var(--foreground)]">
-              {brief}
-            </pre>
+      <div className="rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface)] p-5">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
+              Artefacto final — pricing-wireflow.md
+            </p>
+            <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">
+              Descarrega o brief completo ou copia o prompt para o OpenCode.
+            </p>
           </div>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => copyText("prompt", openCodePrompt)}
+              className="rounded-full border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--foreground)] transition hover:border-[var(--accent-soft)]"
+            >
+              {copied === "prompt" ? "Copiado" : "Copiar prompt"}
+            </button>
+            <button
+              type="button"
+              onClick={() => copyText("brief", brief)}
+              className="rounded-full border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--foreground)] transition hover:border-[var(--accent-soft)]"
+            >
+              {copied === "brief" ? "Copiado" : "Copiar brief"}
+            </button>
+            <button
+              type="button"
+              onClick={downloadBrief}
+              className="rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[var(--accent-strong)]"
+            >
+              Descarregar brief.md
+            </button>
+          </div>
+        </div>
+
+        <pre className="mt-4 max-h-72 overflow-auto rounded-xl border border-[var(--border)] bg-[var(--surface-subtle)] p-4 text-xs leading-6 text-[var(--foreground)]">
+          {brief}
+        </pre>
+
+        <div className="mt-4 rounded-xl border border-dashed border-[var(--border-strong)] bg-white/60 p-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
+            Prompt para OpenCode / GLM-5
+          </p>
+          <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">{openCodePrompt}</p>
         </div>
       </div>
     </section>
@@ -566,14 +658,14 @@ function FieldPanel({
   onChange: (value: string) => void;
 }) {
   return (
-    <label className="rounded-[1.3rem] border border-[var(--border)] bg-white p-4">
+    <label className="rounded-xl border border-[var(--border)] bg-white p-4">
       <span className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
         {label}
       </span>
       <textarea
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="mt-3 min-h-28 w-full resize-y rounded-[1rem] border border-[var(--border)] bg-[var(--surface-subtle)] px-3 py-3 text-sm leading-7 text-[var(--foreground)] outline-none focus:border-[var(--accent-soft)]"
+        className="mt-3 min-h-28 w-full resize-y rounded-lg border border-[var(--border)] bg-[var(--surface-subtle)] px-3 py-3 text-sm leading-7 text-[var(--foreground)] outline-none focus:border-[var(--accent-soft)]"
       />
     </label>
   );
@@ -591,7 +683,7 @@ function JourneyStageCard({
   onRemove: () => void;
 }) {
   return (
-    <article className="rounded-[1.1rem] border border-[var(--border)] bg-white p-4">
+    <article className="rounded-xl border border-[var(--border)] bg-white p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <span className="rounded-full bg-[rgba(47,107,114,0.12)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--foreground)]">
           Etapa {index + 1}
@@ -656,7 +748,7 @@ function PricingPlanCard({
   onRemove: () => void;
 }) {
   return (
-    <article className="rounded-[1.1rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-4">
+    <article className="rounded-xl border border-[var(--border)] bg-[var(--surface-subtle)] p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">
           Plano {index + 1}
@@ -727,7 +819,7 @@ function HookCard({
   onRemove: () => void;
 }) {
   return (
-    <article className="rounded-[1.1rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-4">
+    <article className="rounded-xl border border-[var(--border)] bg-[var(--surface-subtle)] p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <span className="rounded-full bg-[rgba(201,125,59,0.16)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--foreground)]">
           Hook {index + 1}
@@ -794,7 +886,7 @@ function SmallField({
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
-        className="mt-2 w-full rounded-[0.9rem] border border-[var(--border)] bg-white px-3 py-2.5 text-sm text-[var(--foreground)] outline-none focus:border-[var(--accent-soft)]"
+        className="mt-2 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2.5 text-sm text-[var(--foreground)] outline-none focus:border-[var(--accent-soft)]"
       />
     </label>
   );
@@ -820,7 +912,7 @@ function LargeField({
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
-        className="mt-2 min-h-24 w-full resize-y rounded-[0.9rem] border border-[var(--border)] bg-white px-3 py-3 text-sm leading-7 text-[var(--foreground)] outline-none focus:border-[var(--accent-soft)]"
+        className="mt-2 min-h-24 w-full resize-y rounded-lg border border-[var(--border)] bg-white px-3 py-3 text-sm leading-7 text-[var(--foreground)] outline-none focus:border-[var(--accent-soft)]"
       />
     </label>
   );

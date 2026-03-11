@@ -25,7 +25,7 @@ export function MobileWorkspaceDock() {
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-                Workspace rapido
+                Acesso rapido
               </p>
               <p className="mt-1 text-sm font-semibold text-[var(--foreground)]">
                 {activePanel === "notes" ? "Notas rapidas" : "Peter · AI Tutor"}
@@ -61,7 +61,7 @@ export function MobileWorkspaceDock() {
             {activePanel === "notes" ? (
               <div className="rounded-[1.25rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-4 text-sm leading-7 text-[var(--muted-foreground)]">
                 <p className="font-semibold text-[var(--foreground)]">{stickyNotes.length} nota{stickyNotes.length !== 1 ? "s" : ""} guardada{stickyNotes.length !== 1 ? "s" : ""}</p>
-                <p className="mt-2">Para edicao livre e drag-and-drop continua a usar desktop. Em mobile, esta dock reduz ruído enquanto mantemos o acesso rapido ao workspace.</p>
+                <p className="mt-2">Usa esta area para consultar notas recentes no telemovel. Se precisares de editar com mais liberdade, continua no desktop.</p>
               </div>
             ) : (
               <div className="rounded-[1.25rem] border border-[var(--border)] bg-[var(--surface-subtle)] p-2">

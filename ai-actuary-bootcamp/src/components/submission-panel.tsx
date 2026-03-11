@@ -334,7 +334,7 @@ export function SubmissionPanel({
             Entrega de artefactos
           </p>
           <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
-            Guarda a evidencia desta missao sem sair da plataforma.
+            Guarda a evidencia desta missao.
           </h2>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--muted-foreground)]">
             Resume o que foi construido, adiciona um titulo se fizer sentido e anexa um ficheiro quando tiveres prova pronta para guardar.

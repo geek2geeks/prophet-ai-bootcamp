@@ -1,9 +1,12 @@
 import courseData from "@/data/course.json";
 
+export type CompletionType = "pratica" | "entrega";
+
 export type Exercise = {
   id: string;
   titulo: string;
   pontos: number;
+  tipo: CompletionType;
   descricao: string;
 };
 
@@ -11,6 +14,7 @@ export type Challenge = {
   id: string;
   titulo: string;
   pontos: number;
+  tipo: CompletionType;
   descricao: string;
 };
 
@@ -19,6 +23,8 @@ export type Topic = {
   conteudo: string;
   imagemUrl?: string;
   mermaid?: string;
+  spotifyEmbedUrl?: string;
+  customVisual?: "effort-axis";
 };
 
 export type ModuleContent = {
@@ -53,8 +59,15 @@ export type DayWithMeta = Day & {
 };
 
 const payload = courseData as unknown as CoursePayload;
+const computedTotalPoints = payload.days.reduce((sum, day) => {
+  const exercisePoints = day.exercicios.reduce((daySum, exercise) => daySum + exercise.pontos, 0);
+  return sum + exercisePoints + day.desafio.pontos;
+}, 0);
 
-export const course = payload;
+export const course: CoursePayload = {
+  ...payload,
+  totalPoints: computedTotalPoints,
+};
 
 export function daySlug(dayNumber: number): string {
   return dayNumber.toString().padStart(2, "0");

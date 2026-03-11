@@ -16,7 +16,7 @@ import { isAdminEmail } from "@/lib/admin";
 import { RouteGuard } from "@/components/route-guard";
 
 type Keys = {
-  deepseek: string;
+  gemini: string;
   zai: string;
 };
 
@@ -62,7 +62,7 @@ export default function AdminPage() {
   const { user } = useAuth();
   const isAdmin = isAdminEmail(user?.email);
 
-  const [keys, setKeys] = useState<Keys>({ deepseek: "", zai: "" });
+  const [keys, setKeys] = useState<Keys>({ gemini: "", zai: "" });
   const [keysLoading, setKeysLoading] = useState(true);
   const [keysSaving, setKeysSaving] = useState(false);
   const [keysSaved, setKeysSaved] = useState(false);
@@ -85,7 +85,7 @@ export default function AdminPage() {
       .then((snap) => {
         if (snap.exists()) {
           const data = snap.data() as Keys;
-          setKeys({ deepseek: data.deepseek ?? "", zai: data.zai ?? "" });
+          setKeys({ gemini: data.gemini ?? "", zai: data.zai ?? "" });
         }
       })
       .catch(() => setKeysError("Erro ao carregar chaves."))
@@ -321,20 +321,23 @@ export default function AdminPage() {
                     <div className="mt-6 space-y-4">
                       <div>
                         <label className="block text-xs font-semibold uppercase tracking-[0.16em] text-[var(--foreground)]">
-                          DeepSeek API Key
+                          Gemini API Key
                         </label>
                         <input
                           type="text"
-                          value={keys.deepseek}
+                          value={keys.gemini}
                           onChange={(e) =>
                             setKeys((k) => ({
                               ...k,
-                              deepseek: e.target.value,
+                              gemini: e.target.value,
                             }))
                           }
                           className="mt-2 w-full rounded-[1rem] border border-[var(--border)] bg-[var(--surface-subtle)] px-4 py-3 font-mono text-sm text-[var(--foreground)] outline-none focus:border-[var(--accent-soft)]"
-                          placeholder="sk-..."
+                          placeholder="AIza..."
                         />
+                        <p className="mt-2 text-xs leading-6 text-[var(--muted-foreground)]">
+                          Nota: a chave Gemini ja foi criada via CLI, mas o projeto Google continua sem billing/quota ativa para gerar respostas.
+                        </p>
                       </div>
                       <div>
                         <label className="block text-xs font-semibold uppercase tracking-[0.16em] text-[var(--foreground)]">
