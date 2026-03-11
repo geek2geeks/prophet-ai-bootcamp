@@ -22,23 +22,30 @@ from pathlib import Path
 # Force UTF-8 stdout on Windows
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 
-SUPABASE_URL = os.environ.get(
-    "SUPABASE_URL", "https://naecdtkxxlawxlkljtkt.supabase.co"
-)
-SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_KEY")
+DEFAULT_SUPABASE_URL = "https://naecdtkxxlawxlkljtkt.supabase.co"
 
 OUT_DIR = Path(__file__).parent / "data"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def get_admin_client():
-    if not SERVICE_KEY:
+def get_supabase_url() -> str:
+    return os.environ.get("SUPABASE_URL", DEFAULT_SUPABASE_URL)
+
+
+def get_service_key() -> str:
+    service_key = os.environ.get("SUPABASE_SERVICE_KEY")
+    if not service_key:
         print("ERROR: missing SUPABASE_SERVICE_KEY environment variable.")
         sys.exit(1)
+    return service_key
+
+
+def get_admin_client():
+    service_key = get_service_key()
     try:
         from supabase import create_client
 
-        return create_client(SUPABASE_URL, SERVICE_KEY)
+        return create_client(get_supabase_url(), service_key)
     except ImportError:
         print("ERROR: supabase-py not installed. Run: pip install supabase")
         sys.exit(1)
@@ -70,16 +77,18 @@ def export_auth_users(client) -> list:
     import urllib.request
     import urllib.error
 
+    supabase_url = get_supabase_url()
+    service_key = get_service_key()
     users = []
     page = 1
     per_page = 1000
     while True:
-        url = f"{SUPABASE_URL}/auth/v1/admin/users?page={page}&per_page={per_page}"
+        url = f"{supabase_url}/auth/v1/admin/users?page={page}&per_page={per_page}"
         req = urllib.request.Request(
             url,
             headers={
-                "apikey": SERVICE_KEY or "",
-                "Authorization": f"Bearer {SERVICE_KEY or ''}",
+                "apikey": service_key,
+                "Authorization": f"Bearer {service_key}",
             },
         )
         try:
