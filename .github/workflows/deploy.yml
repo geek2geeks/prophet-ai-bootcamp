@@ -1,10 +1,6 @@
 name: AI Actuary Bootcamp CI/CD
 
 on:
-  pull_request:
-    paths:
-      - "ai-actuary-bootcamp/**"
-      - ".github/workflows/deploy.yml"
   push:
     branches:
       - main
@@ -12,13 +8,22 @@ on:
       - "ai-actuary-bootcamp/**"
       - ".github/workflows/deploy.yml"
   workflow_dispatch:
+    inputs:
+      deploy:
+        description: "Deploy to Firebase production after quality checks"
+        type: boolean
+        default: false
 
 concurrency:
-  group: ai-actuary-bootcamp-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 
 permissions:
   contents: read
+
+defaults:
+  run:
+    shell: pwsh
 
 env:
   WORKDIR: ai-actuary-bootcamp
@@ -34,31 +39,36 @@ env:
 jobs:
   quality:
     name: Lint, typecheck, build and test
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
+    runs-on: [self-hosted, Windows, X64, prophet-ai-bootcamp]
+    timeout-minutes: 30
     defaults:
       run:
-        working-directory: ${{ env.WORKDIR }}
+        shell: pwsh
+        working-directory: ai-actuary-bootcamp
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
           cache-dependency-path: ai-actuary-bootcamp/package-lock.json
 
       - name: Validate lockfile exists
-        run: test -f package-lock.json
+        run: |
+          if (-not (Test-Path -LiteralPath "package-lock.json")) {
+            Write-Error "package-lock.json is missing."
+            exit 1
+          }
 
       - name: Install dependencies
         run: npm ci
 
       - name: Install Playwright browser
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install chromium
 
       - name: Run lint
         run: npm run lint
@@ -69,27 +79,43 @@ jobs:
       - name: Build static export
         run: npm run build
 
-      - name: Start local static server
+      - name: Run Playwright smoke tests against static export
         run: |
-          npx serve out -p 3000 --no-clipboard --no-port-switching > serve.log 2>&1 &
-          for i in $(seq 1 30); do
-            if curl --silent --fail http://127.0.0.1:3000/ > /dev/null; then
-              exit 0
-            fi
-            sleep 2
-          done
-          echo "Static server did not start in time."
-          cat serve.log
-          exit 1
-
-      - name: Run Playwright smoke tests
-        run: npm run test:e2e:ci
-        env:
-          PLAYWRIGHT_BASE_URL: http://127.0.0.1:3000
+          $serve = Join-Path $PWD "node_modules\.bin\serve.cmd"
+          $server = Start-Process -FilePath $serve -ArgumentList @("out", "-p", "4173", "--no-clipboard", "--no-port-switching") -RedirectStandardOutput "serve.log" -RedirectStandardError "serve.err.log" -PassThru
+          $exitCode = 1
+          try {
+            $ready = $false
+            for ($i = 0; $i -lt 30; $i++) {
+              try {
+                $response = Invoke-WebRequest -Uri "http://127.0.0.1:4173/" -UseBasicParsing -TimeoutSec 5
+                if ($response.StatusCode -eq 200) {
+                  $ready = $true
+                  break
+                }
+              } catch {
+              }
+              Start-Sleep -Seconds 2
+            }
+            if ($ready) {
+              $env:PLAYWRIGHT_BASE_URL = "http://127.0.0.1:4173"
+              npm run test:e2e:ci
+              $exitCode = $LASTEXITCODE
+            } else {
+              Write-Host "Static server did not start in time."
+              Get-Content "serve.log" -ErrorAction SilentlyContinue
+              Get-Content "serve.err.log" -ErrorAction SilentlyContinue
+            }
+          } finally {
+            if ($server -and -not $server.HasExited) {
+              taskkill /T /F /PID $server.Id 2>$null | Out-Null
+            }
+          }
+          exit $exitCode
 
       - name: Upload static export
         if: success()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ai-actuary-bootcamp-static-export
           path: ai-actuary-bootcamp/out
@@ -98,38 +124,40 @@ jobs:
 
       - name: Upload Playwright artifacts on failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ai-actuary-bootcamp-playwright-report
           path: |
             ai-actuary-bootcamp/playwright-report
             ai-actuary-bootcamp/test-results
             ai-actuary-bootcamp/serve.log
+            ai-actuary-bootcamp/serve.err.log
           if-no-files-found: ignore
           retention-days: 7
 
   deploy:
-    name: Deploy Firebase live
+    name: Deploy Firebase live (manual)
     needs: quality
-    if: |
-      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
-      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
+    if: github.event_name == 'workflow_dispatch' && inputs.deploy == true && github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, Windows, X64, prophet-ai-bootcamp]
+    timeout-minutes: 20
     environment:
       name: production
+    defaults:
+      run:
+        shell: pwsh
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Download static export
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: ai-actuary-bootcamp-static-export
           path: ai-actuary-bootcamp/out
@@ -138,17 +166,17 @@ jobs:
         env:
           FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_AI_ACTUARY_BOOTCAMP_DEV_260308 }}
         run: |
-          if [ "$NEXT_PUBLIC_FIREBASE_API_KEY" = "placeholder-api-key" ]; then
-            echo "Missing GitHub Variables for Firebase public config."
+          if ($env:NEXT_PUBLIC_FIREBASE_API_KEY -eq "placeholder-api-key") {
+            Write-Error "Missing GitHub Variables for Firebase public config."
             exit 1
-          fi
-          if [ -z "$FIREBASE_SERVICE_ACCOUNT_JSON" ]; then
-            echo "Missing FIREBASE_SERVICE_ACCOUNT_AI_ACTUARY_BOOTCAMP_DEV_260308 secret."
+          }
+          if ([string]::IsNullOrWhiteSpace($env:FIREBASE_SERVICE_ACCOUNT_JSON)) {
+            Write-Error "Missing FIREBASE_SERVICE_ACCOUNT_AI_ACTUARY_BOOTCAMP_DEV_260308 secret."
             exit 1
-          fi
+          }
 
       - name: Authenticate with Google Cloud
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@v3
         with:
           credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_AI_ACTUARY_BOOTCAMP_DEV_260308 }}
 
@@ -157,4 +185,4 @@ jobs:
 
       - name: Deploy Firebase Hosting and Firestore config
         working-directory: ai-actuary-bootcamp
-        run: firebase deploy --project "$FIREBASE_PROJECT_ID" --only hosting,firestore:rules,firestore:indexes --non-interactive
+        run: firebase deploy --project $env:FIREBASE_PROJECT_ID --only hosting,firestore:rules,firestore:indexes --non-interactive

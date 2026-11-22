@@ -64,7 +64,7 @@ export function Day3ContextSandbox() {
                     <span>System Prompt Injectado:</span>
                   </div>
                   <p className="font-mono text-xs bg-white/60 p-2 rounded border border-[var(--border)]">
-                    "És um atuário de pricing a avaliar risco de cauda longa. Regras: 1) Procura saltos anómalos de qx após os 80 anos. 2) Compara a suavidade da curva com expectativas normais."
+                    &quot;És um atuário de pricing a avaliar risco de cauda longa. Regras: 1) Procura saltos anómalos de qx após os 80 anos. 2) Compara a suavidade da curva com expectativas normais.&quot;
                   </p>
                 </div>
               )}
@@ -86,7 +86,7 @@ export function Day3ContextSandbox() {
 
             {!hasContext ? (
               <div className="space-y-3 text-gray-400">
-                <p>O ficheiro contém 120 linhas. As colunas são 'Idade' e 'qx'.</p>
+                <p>O ficheiro contém 120 linhas. As colunas são &apos;Idade&apos; e &apos;qx&apos;.</p>
                 <p>A média da coluna qx é 0.045 e o valor máximo é 1.00.</p>
                 <p>O ficheiro parece ser uma tabela de números sequenciais associados a idades. Não encontrei erros de formatação.</p>
                 <div className="mt-4 border-l-2 border-orange-500/50 pl-3 py-1 text-orange-400/80 text-xs">
