@@ -14,6 +14,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Pre-existing root-level maintenance scripts (not part of Next.js app):
     "*.js",
+    // Firebase Functions is a separate CommonJS package with its own runtime:
+    "functions/**",
     // Pre-existing file with known parse errors (Supabase migration artifact):
     "src/lib/day-experience.ts",
   ]),
